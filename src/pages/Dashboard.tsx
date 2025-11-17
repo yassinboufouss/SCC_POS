@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, DollarSign, CalendarCheck, Package } from "lucide-react";
 import RevenueChart from "@/components/RevenueChart";
 import { calculateDashboardMetrics } from "@/utils/dashboard-metrics";
+import RecentTransactions from "@/components/RecentTransactions";
 
 const Dashboard = () => {
   const metrics = calculateDashboardMetrics();
@@ -67,6 +68,9 @@ const Dashboard = () => {
       
       {/* Revenue Chart */}
       <RevenueChart />
+
+      {/* Recent Transactions */}
+      <RecentTransactions />
     </div>
   );
 };
