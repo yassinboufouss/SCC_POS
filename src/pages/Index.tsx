@@ -18,7 +18,8 @@ const Index = () => {
   return (
     <div className={cn(
       "min-h-screen flex flex-col items-center justify-center p-4",
-      "bg-gradient-to-r from-gray-100 via-blue-50 to-gray-100 dark:from-gray-900 dark:via-primary/10 dark:to-gray-900",
+      // Using a diagonal gradient (br) for a more dynamic look
+      "bg-gradient-to-br from-gray-100 via-blue-100 to-gray-100 dark:from-background dark:via-primary/10 dark:to-background",
       "bg-[length:400%_400%] animate-gradient-shift"
     )}>
       <Card className={cn(
