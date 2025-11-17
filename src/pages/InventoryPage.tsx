@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Package, AlertTriangle } from 'lucide-react';
+import { PlusCircle, Package, AlertTriangle, Pencil } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -12,10 +12,19 @@ import {
 } from "@/components/ui/table";
 import { Badge } from '@/components/ui/badge';
 import { inventoryItems, InventoryItem } from '@/data/inventory';
+import InventoryItemSheet from '@/components/InventoryItemSheet';
 
 const LOW_STOCK_THRESHOLD = 10;
 
 const InventoryPage = () => {
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
+
+  const handleEditItem = (item: InventoryItem) => {
+    setSelectedItem(item);
+    setIsSheetOpen(true);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -69,7 +78,9 @@ const InventoryPage = () => {
                     </TableCell>
                     <TableCell className="text-muted-foreground text-sm">{item.lastRestock}</TableCell>
                     <TableCell className="text-right">
-                      <Button variant="outline" size="sm">Edit</Button>
+                      <Button variant="outline" size="sm" onClick={() => handleEditItem(item)}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
                     </TableCell>
                   </TableRow>
                 );
@@ -78,6 +89,12 @@ const InventoryPage = () => {
           </Table>
         </CardContent>
       </Card>
+      
+      <InventoryItemSheet
+        open={isSheetOpen}
+        onOpenChange={setIsSheetOpen}
+        selectedItem={selectedItem}
+      />
     </div>
   );
 };
