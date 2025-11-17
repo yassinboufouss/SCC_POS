@@ -4,14 +4,17 @@ import { DollarSign, TrendingUp, Users, FileText } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import RecentTransactions from '@/components/RecentTransactions';
+import { calculateDashboardMetrics } from '@/utils/dashboard-metrics';
 
 const FinancePage = () => {
-  // Mock Financial Data
+  const metrics = calculateDashboardMetrics();
+  
+  // Mock Financial Data (using calculated revenue)
   const financialData = {
-    monthlyRevenue: 45231.89,
-    newMembers: 55,
-    outstandingInvoices: 1200.50,
-    expenseMTD: 15000.00,
+    monthlyRevenue: metrics.monthlyRevenue,
+    newMembers: metrics.activeMembers, // Reusing active members count as a proxy for new members MTD for simplicity
+    outstandingInvoices: 1200.50, // Keeping this mock as we lack invoice data
+    expenseMTD: 15000.00, // Keeping this mock
   };
 
   return (
@@ -29,7 +32,7 @@ const FinancePage = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">${financialData.monthlyRevenue.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">+18.5% vs last month</p>
+            <p className="text-xs text-muted-foreground">+18.5% vs last month (Mock)</p>
           </CardContent>
         </Card>
         
@@ -37,13 +40,13 @@ const FinancePage = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              New Members (MTD)
+              Active Members
             </CardTitle>
             <Users className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{financialData.newMembers}</div>
-            <p className="text-xs text-muted-foreground">Target: 75</p>
+            <p className="text-xs text-muted-foreground">Currently active</p>
           </CardContent>
         </Card>
         
@@ -57,7 +60,7 @@ const FinancePage = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">${financialData.outstandingInvoices.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">Awaiting payment</p>
+            <p className="text-xs text-muted-foreground">Awaiting payment (Mock)</p>
           </CardContent>
         </Card>
         
@@ -71,7 +74,7 @@ const FinancePage = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">${financialData.expenseMTD.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">Includes payroll & utilities</p>
+            <p className="text-xs text-muted-foreground">Includes payroll & utilities (Mock)</p>
           </CardContent>
         </Card>
       </div>
