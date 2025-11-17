@@ -11,6 +11,7 @@ import MembersPage from "@/pages/members/MembersPage.tsx";
 import CheckInPage from "./pages/CheckInPage";
 import ClassesPage from "./pages/ClassesPage";
 import TrainersPage from "./pages/TrainersPage";
+import InventoryPage from "./pages/InventoryPage";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/checkin" element={<CheckInPage />} />
             <Route path="/classes" element={<ClassesPage />} />
             <Route path="/trainers" element={<TrainersPage />} />
+            <Route path="/inventory" element={<InventoryPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           </Route>
 
