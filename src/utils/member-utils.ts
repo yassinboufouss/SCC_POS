@@ -46,3 +46,22 @@ export const renewMemberPlan = (memberId: string, planId: string) => {
   updateMember(updatedMember);
   return updatedMember;
 };
+
+// Utility to simulate a member check-in
+export const processCheckIn = (memberId: string) => {
+  const member = mockMembers.find(m => m.id === memberId);
+
+  if (!member || member.status !== 'Active') {
+    return null;
+  }
+  
+  const now = new Date();
+  const updatedMember: Member = {
+    ...member,
+    lastCheckIn: format(now, 'yyyy-MM-dd hh:mm a'), // Update check-in time
+    totalCheckIns: member.totalCheckIns + 1, // Increment count
+  };
+
+  updateMember(updatedMember);
+  return updatedMember;
+};

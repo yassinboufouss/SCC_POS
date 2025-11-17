@@ -6,6 +6,7 @@ import { QrCode, UserCheck, UserX, Search, RefreshCw } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 import { mockMembers, Member } from '@/data/members'; // Import centralized data
 import MembershipRenewalDialog from '@/components/MembershipRenewalDialog';
+import { processCheckIn } from '@/utils/member-utils'; // Import new utility
 
 const CheckInPage = () => {
   const [memberCode, setMemberCode] = useState('');
@@ -22,10 +23,18 @@ const CheckInPage = () => {
       const member = mockMembers.find(m => m.id === code.toUpperCase());
       
       if (member) {
-        setMemberInfo(member);
         if (member.status === 'Active') {
-          showSuccess(`${member.name} checked in successfully!`);
+          const checkedInMember = processCheckIn(member.id);
+          if (checkedInMember) {
+            setMemberInfo(checkedInMember);
+            showSuccess(`${checkedInMember.name} checked in successfully! Total check-ins: ${checkedInMember.totalCheckIns}`);
+          } else {
+            // Should not happen if status is 'Active', but for safety
+            setMemberInfo(member);
+            showError(`Check-in failed for ${member.name}.`);
+          }
         } else {
+          setMemberInfo(member);
           showError(`${member.name}: Membership is ${member.status}. Cannot check in.`);
           if (member.status === 'Expired') {
             setIsRenewalDialogOpen(true);
