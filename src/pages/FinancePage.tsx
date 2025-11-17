@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, TrendingUp, Users, FileText } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
+import RecentTransactions from '@/components/RecentTransactions';
 
 const FinancePage = () => {
   // Mock Financial Data
@@ -74,6 +75,9 @@ const FinancePage = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Recent Transactions Table */}
+      <RecentTransactions />
 
       <Card>
         <CardHeader>
