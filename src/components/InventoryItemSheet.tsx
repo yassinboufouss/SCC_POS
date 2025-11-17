@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { showSuccess, showError } from '@/utils/toast';
 import { restockInventoryItem, updateInventoryItem } from '@/utils/inventory-utils';
+import ImageUploadField from './ImageUploadField'; // Import the component
 
 interface InventoryItemSheetProps {
   open: boolean;
@@ -45,6 +46,16 @@ const InventoryItemSheet: React.FC<InventoryItemSheetProps> = ({ open, onOpenCha
       } as InventoryItem;
     });
   };
+  
+  const handleImageUrlChange = (url: string) => {
+    setFormData(prev => {
+        if (!prev) return null;
+        return {
+            ...prev,
+            imageUrl: url,
+        } as InventoryItem;
+    });
+  };
 
   const handleSave = () => {
     if (!formData) return;
@@ -54,6 +65,8 @@ const InventoryItemSheet: React.FC<InventoryItemSheetProps> = ({ open, onOpenCha
         ...formData,
         stock: Math.floor(formData.stock),
         price: parseFloat(formData.price.toFixed(2)),
+        // Ensure imageUrl is undefined if empty string
+        imageUrl: formData.imageUrl || undefined,
     };
 
     updateInventoryItem(updatedData);
@@ -161,6 +174,13 @@ const InventoryItemSheet: React.FC<InventoryItemSheetProps> = ({ open, onOpenCha
                 <Label htmlFor="category">Category</Label>
                 <Input id="category" name="category" value={formData.category} onChange={handleChange} />
               </div>
+              
+              {/* Image URL Field */}
+              <ImageUploadField 
+                label="Product Image URL"
+                value={formData.imageUrl || ''}
+                onChange={handleImageUrlChange}
+              />
             </div>
           </div>
         </ScrollArea>
