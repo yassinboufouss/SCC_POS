@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import RegistrationForm from './RegistrationForm';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Eye } from 'lucide-react';
+import { PlusCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
 import { mockMembers, Member } from '@/data/members';
 import MemberProfileSheet from '@/components/MemberProfileSheet';
+import { DataTable } from '@/components/DataTable';
+import { createMemberColumns } from './member-columns';
 
 interface MembersListProps {
   onViewMember: (member: Member) => void;
@@ -15,15 +15,8 @@ interface MembersListProps {
 
 const MembersList: React.FC<MembersListProps> = ({ onViewMember }) => {
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState('');
   
-  const allMembers = mockMembers;
-
-  const filteredMembers = allMembers.filter(member => 
-    member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    member.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    member.id.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const columns = createMemberColumns(onViewMember);
 
   return (
     <div className="space-y-6">
@@ -36,43 +29,15 @@ const MembersList: React.FC<MembersListProps> = ({ onViewMember }) => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Active Members ({filteredMembers.filter(m => m.status === 'Active').length})</CardTitle>
+          <CardTitle>Member Directory ({mockMembers.length})</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="mb-4">
-            <Input 
-              placeholder="Search members by name, email, or ID..." 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          <Separator className="mb-4" />
-          
-          <div className="space-y-3">
-            {filteredMembers.length > 0 ? (
-              filteredMembers.map((member) => (
-                <div key={member.id} className="flex justify-between items-center p-3 border rounded-md hover:bg-muted/50 transition-colors">
-                  <div>
-                    <p className="font-medium">{member.name}</p>
-                    <p className="text-sm text-muted-foreground">{member.plan} Plan (ID: {member.id})</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="text-right">
-                      <span className={`text-sm font-semibold ${member.status === 'Active' ? 'text-green-600' : 'text-red-600'}`}>
-                        {member.status}
-                      </span>
-                      <p className="text-xs text-muted-foreground">Expires: {member.expirationDate}</p>
-                    </div>
-                    <Button variant="outline" size="sm" onClick={() => onViewMember(member)}>
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-center text-muted-foreground py-8">No members found matching your search criteria.</p>
-            )}
-          </div>
+          <DataTable 
+            columns={columns} 
+            data={mockMembers} 
+            filterColumnId="name"
+            filterPlaceholder="Search members by name..."
+          />
         </CardContent>
       </Card>
     </div>
