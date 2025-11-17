@@ -3,95 +3,160 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { ShoppingCart, X, Trash2, Plus, Minus, UserX } from 'lucide-react';
+import { ShoppingCart, X, Trash2, Plus, Minus, UserX, Ticket } from 'lucide-react';
 import { inventoryItems, InventoryItem } from '@/data/inventory';
+import { membershipPlans, MembershipPlan } from '@/data/membership-plans';
 import { showSuccess } from '@/utils/toast';
 import MemberSelectDialog from '@/components/MemberSelectDialog';
 import { Member } from '@/data/members';
+import { updateInventoryItem } from '@/utils/inventory-utils';
 
-interface CartItem extends InventoryItem {
+// Define a unified CartItem type
+interface CartItem {
+  sourceId: string; // ID of the source item/plan
+  name: string;
+  price: number;
   quantity: number;
+  type: 'inventory' | 'membership';
+  // Only relevant for inventory items (for stock validation)
+  stock?: number; 
 }
 
 const POSPage = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [inventorySearchTerm, setInventorySearchTerm] = useState('');
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
 
-  const filteredItems = useMemo(() => {
+  const filteredInventoryItems = useMemo(() => {
     return inventoryItems.filter(item =>
-      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.category.toLowerCase().includes(searchTerm.toLowerCase())
+      item.name.toLowerCase().includes(inventorySearchTerm.toLowerCase()) ||
+      item.category.toLowerCase().includes(inventorySearchTerm.toLowerCase())
     );
-  }, [searchTerm]);
+  }, [inventorySearchTerm]);
 
-  const addToCart = (item: InventoryItem) => {
+  // --- Cart Manipulation Functions ---
+
+  const addInventoryToCart = (item: InventoryItem) => {
     setCart(prevCart => {
-      const existingItem = prevCart.find(i => i.id === item.id);
+      const existingItem = prevCart.find(i => i.sourceId === item.id && i.type === 'inventory');
+      
       if (existingItem) {
-        // Check stock limit
         if (existingItem.quantity + 1 > item.stock) {
-            // In a real app, we'd show an error toast here.
+            showSuccess(`Cannot add more ${item.name}. Stock limit reached.`);
             return prevCart;
         }
         return prevCart.map(i =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+          i.sourceId === item.id && i.type === 'inventory' ? { ...i, quantity: i.quantity + 1 } : i
         );
       }
-      return [...prevCart, { ...item, quantity: 1 }];
+      
+      return [...prevCart, { 
+          sourceId: item.id, 
+          name: item.name, 
+          price: item.price, 
+          quantity: 1, 
+          type: 'inventory', 
+          stock: item.stock 
+      }];
+    });
+  };
+  
+  const addMembershipToCart = (plan: MembershipPlan) => {
+    setCart(prevCart => {
+        const existingItem = prevCart.find(i => i.sourceId === plan.id && i.type === 'membership');
+
+        if (existingItem) {
+            return prevCart.map(i =>
+                i.sourceId === plan.id && i.type === 'membership' ? { ...i, quantity: i.quantity + 1 } : i
+            );
+        }
+
+        return [...prevCart, { 
+            sourceId: plan.id, 
+            name: `${plan.name} (${plan.durationDays} days)`, 
+            price: plan.price, 
+            quantity: 1, 
+            type: 'membership' 
+        }];
     });
   };
 
-  const updateQuantity = (itemId: string, delta: number) => {
+  const updateQuantity = (sourceId: string, type: 'inventory' | 'membership', delta: number) => {
     setCart(prevCart => {
-      const item = prevCart.find(i => i.id === itemId);
+      const item = prevCart.find(i => i.sourceId === sourceId && i.type === type);
       if (!item) return prevCart;
 
       const newQuantity = item.quantity + delta;
-      const inventoryStock = inventoryItems.find(i => i.id === itemId)?.stock || 0;
-
+      
       if (newQuantity <= 0) {
-        return prevCart.filter(i => i.id !== itemId);
+        return prevCart.filter(i => !(i.sourceId === sourceId && i.type === type));
       }
       
-      if (newQuantity > inventoryStock) {
-        // Stock limit reached
-        return prevCart;
+      if (item.type === 'inventory') {
+        const inventoryStock = inventoryItems.find(i => i.id === sourceId)?.stock || 0;
+        if (newQuantity > inventoryStock) {
+          showSuccess(`Cannot add more ${item.name}. Stock limit reached.`);
+          return prevCart;
+        }
       }
 
       return prevCart.map(i =>
-        i.id === itemId ? { ...i, quantity: newQuantity } : i
+        i.sourceId === sourceId && i.type === type ? { ...i, quantity: newQuantity } : i
       );
     });
   };
 
-  const removeItem = (itemId: string) => {
-    setCart(prevCart => prevCart.filter(i => i.id !== itemId));
+  const removeItem = (sourceId: string, type: 'inventory' | 'membership') => {
+    setCart(prevCart => prevCart.filter(i => !(i.sourceId === sourceId && i.type === type)));
   };
+
+  // --- Calculations ---
 
   const { subtotal, tax, total } = useMemo(() => {
     const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const TAX_RATE = 0.08; // 8% sales tax
-    const tax = subtotal * TAX_RATE;
+    
+    // Apply tax only to inventory items 
+    const taxableSubtotal = cart
+        .filter(item => item.type === 'inventory')
+        .reduce((sum, item) => sum + item.price * item.quantity, 0);
+        
+    const tax = taxableSubtotal * TAX_RATE;
     const total = subtotal + tax;
     return { subtotal, tax, total };
   }, [cart]);
 
+  // --- Checkout ---
+
   const handleCheckout = () => {
     if (cart.length === 0) return;
 
+    // 1. Process inventory stock reduction (mock)
+    cart.filter(item => item.type === 'inventory').forEach(item => {
+        const inventoryItem = inventoryItems.find(i => i.id === item.sourceId);
+        if (inventoryItem) {
+            inventoryItem.stock -= item.quantity;
+            updateInventoryItem(inventoryItem); 
+        }
+    });
+    
+    const transactionType = cart.some(item => item.type === 'membership') ? 'Mixed Sale' : 'POS Sale';
+    
     const transactionDetails = {
         memberId: selectedMember?.id || 'GUEST',
         memberName: selectedMember?.name || 'Guest Customer',
-        items: cart.map(item => ({ name: item.name, quantity: item.quantity, price: item.price })),
+        items: cart.map(item => ({ name: item.name, quantity: item.quantity, price: item.price, type: item.type })),
         total: total.toFixed(2),
+        type: transactionType
     };
 
     console.log("Processing sale:", transactionDetails);
-    showSuccess(`Sale processed successfully! Total: $${total.toFixed(2)}`);
+    showSuccess(`${transactionType} processed successfully! Total: $${total.toFixed(2)}`);
+    
+    // Reset state
     setCart([]);
-    setSearchTerm('');
-    setSelectedMember(null); // Clear member after checkout
+    setInventorySearchTerm('');
+    setSelectedMember(null);
   };
 
   return (
@@ -102,24 +167,54 @@ const POSPage = () => {
         
         {/* Product Selection (2/3 width) */}
         <div className="lg:col-span-2 space-y-4">
+          
+          {/* Membership Plans Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Ticket className="h-5 w-5" /> Membership Plans
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {membershipPlans.map((plan) => (
+                  <div 
+                    key={plan.id} 
+                    className="border rounded-lg p-3 cursor-pointer bg-blue-50 dark:bg-blue-950 hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors flex flex-col justify-between"
+                    onClick={() => addMembershipToCart(plan)}
+                  >
+                    <div>
+                      <p className="font-medium truncate">{plan.name}</p>
+                      <p className="text-xs text-muted-foreground">{plan.durationDays} days</p>
+                    </div>
+                    <div className="mt-2">
+                      <span className="text-lg font-bold text-blue-600 dark:text-blue-400">${plan.price.toFixed(2)}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* Inventory Products Section */}
           <Card>
             <CardHeader>
               <CardTitle>Available Products</CardTitle>
             </CardHeader>
             <CardContent>
               <Input
-                placeholder="Search products..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search inventory products..."
+                value={inventorySearchTerm}
+                onChange={(e) => setInventorySearchTerm(e.target.value)}
                 className="mb-4"
               />
               
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-[60vh] overflow-y-auto pr-2">
-                {filteredItems.map((item) => (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-[40vh] overflow-y-auto pr-2">
+                {filteredInventoryItems.map((item) => (
                   <div 
                     key={item.id} 
                     className="border rounded-lg p-3 cursor-pointer hover:bg-primary/10 transition-colors flex flex-col justify-between"
-                    onClick={() => addToCart(item)}
+                    onClick={() => addInventoryToCart(item)}
                   >
                     <div>
                       <p className="font-medium truncate">{item.name}</p>
@@ -133,8 +228,8 @@ const POSPage = () => {
                     </div>
                   </div>
                 ))}
-                {filteredItems.length === 0 && (
-                    <p className="text-muted-foreground col-span-full text-center py-8">No products found matching "{searchTerm}"</p>
+                {filteredInventoryItems.length === 0 && (
+                    <p className="text-muted-foreground col-span-full text-center py-8">No products found matching "{inventorySearchTerm}"</p>
                 )}
               </div>
             </CardContent>
@@ -176,21 +271,24 @@ const POSPage = () => {
                     Cart is empty. Add items to start a sale.
                   </div>
                 ) : (
-                  cart.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between border-b pb-2 last:border-b-0">
+                  cart.map((item, index) => (
+                    <div key={`${item.sourceId}-${index}`} className="flex items-center justify-between border-b pb-2 last:border-b-0">
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium truncate">{item.name}</p>
+                        <p className="font-medium truncate flex items-center gap-1">
+                            {item.type === 'membership' && <Ticket className="h-3 w-3 text-blue-500" />}
+                            {item.name}
+                        </p>
                         <p className="text-sm text-muted-foreground">${item.price.toFixed(2)} x {item.quantity}</p>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => updateQuantity(item.id, -1)}>
+                        <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => updateQuantity(item.sourceId, item.type, -1)}>
                           <Minus className="h-3 w-3" />
                         </Button>
                         <span className="w-6 text-center text-sm font-semibold">{item.quantity}</span>
-                        <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => updateQuantity(item.id, 1)}>
+                        <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => updateQuantity(item.sourceId, item.type, 1)}>
                           <Plus className="h-3 w-3" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-6 w-6 text-red-500 hover:bg-red-100" onClick={() => removeItem(item.id)}>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 text-red-500 hover:bg-red-100" onClick={() => removeItem(item.sourceId, item.type)}>
                           <X className="h-4 w-4" />
                         </Button>
                       </div>
@@ -207,7 +305,7 @@ const POSPage = () => {
                     <span className="font-medium">${subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Tax (8%):</span>
+                    <span>Tax (8% on inventory):</span>
                     <span className="font-medium">${tax.toFixed(2)}</span>
                   </div>
                   <Separator className="my-2" />
