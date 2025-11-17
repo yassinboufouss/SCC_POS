@@ -3,14 +3,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { ShoppingCart, X, Trash2, Plus, Minus, UserX, Ticket, Image } from 'lucide-react';
+import { ShoppingCart, X, Trash2, Plus, Minus, UserX, Ticket, Image, DollarSign, CreditCard, Receipt } from 'lucide-react';
 import { inventoryItems, InventoryItem } from '@/data/inventory';
 import { membershipPlans, MembershipPlan } from '@/data/membership-plans';
-import { showSuccess } from '@/utils/toast';
+import { showSuccess, showError } from '@/utils/toast';
 import MemberSelectDialog from '@/components/MemberSelectDialog';
 import { Member } from '@/data/members';
 import { updateInventoryItem } from '@/utils/inventory-utils';
 import { cn } from '@/lib/utils';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { format } from 'date-fns';
+import { addTransaction } from '@/utils/transaction-utils';
 
 // Define a unified CartItem type
 interface CartItem {
@@ -27,6 +31,7 @@ const POSPage = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [inventorySearchTerm, setInventorySearchTerm] = useState('');
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<'Card' | 'Cash' | 'Transfer'>('Card');
 
   const filteredInventoryItems = useMemo(() => {
     return inventoryItems.filter(item =>
@@ -131,9 +136,14 @@ const POSPage = () => {
 
   const handleCheckout = () => {
     if (cart.length === 0) return;
+    if (!paymentMethod) {
+        showError("Please select a payment method.");
+        return;
+    }
 
     // 1. Process inventory stock reduction (mock)
-    cart.filter(item => item.type === 'inventory').forEach(item => {
+    const inventoryItemsSold = cart.filter(item => item.type === 'inventory');
+    inventoryItemsSold.forEach(item => {
         const inventoryItem = inventoryItems.find(i => i.id === item.sourceId);
         if (inventoryItem) {
             const updatedItem = {
@@ -144,23 +154,40 @@ const POSPage = () => {
         }
     });
     
-    const transactionType = cart.some(item => item.type === 'membership') ? 'Mixed Sale' : 'POS Sale';
+    const hasMembership = cart.some(item => item.type === 'membership');
+    const hasInventory = inventoryItemsSold.length > 0;
     
-    const transactionDetails = {
+    let transactionType: 'Membership' | 'POS Sale' | 'Mixed Sale';
+    if (hasMembership && hasInventory) {
+        transactionType = 'Mixed Sale';
+    } else if (hasMembership) {
+        transactionType = 'Membership';
+    } else {
+        transactionType = 'POS Sale';
+    }
+    
+    const itemDescription = cart.map(item => `${item.name} x${item.quantity}`).join(', ');
+    
+    const newTransaction = {
         memberId: selectedMember?.id || 'GUEST',
         memberName: selectedMember?.name || 'Guest Customer',
-        items: cart.map(item => ({ name: item.name, quantity: item.quantity, price: item.price, type: item.type })),
-        total: total.toFixed(2),
-        type: transactionType
+        type: transactionType,
+        item: itemDescription,
+        amount: total,
+        date: format(new Date(), 'yyyy-MM-dd'),
+        paymentMethod: paymentMethod,
     };
 
-    console.log("Processing sale:", transactionDetails);
-    showSuccess(`${transactionType} processed successfully! Total: $${total.toFixed(2)}`);
+    addTransaction(newTransaction);
+
+    console.log("Processing sale:", newTransaction);
+    showSuccess(`${transactionType} processed successfully via ${paymentMethod}! Total: $${total.toFixed(2)}`);
     
     // Reset state
     setCart([]);
     setInventorySearchTerm('');
     setSelectedMember(null);
+    setPaymentMethod('Card');
   };
 
   return (
@@ -333,6 +360,53 @@ const POSPage = () => {
                     <span>Total:</span>
                     <span>${total.toFixed(2)}</span>
                   </div>
+                </div>
+                
+                <Separator className="my-4" />
+            
+                {/* Payment Method Selection */}
+                <div className="space-y-2">
+                    <h4 className="font-semibold text-sm mb-2">Select Payment Method</h4>
+                    <RadioGroup 
+                        defaultValue="Card" 
+                        value={paymentMethod} 
+                        onValueChange={(value: 'Card' | 'Cash' | 'Transfer') => setPaymentMethod(value)}
+                        className="grid grid-cols-3 gap-2"
+                    >
+                        <Label
+                            htmlFor="payment-card"
+                            className={cn(
+                                "flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-3 text-sm hover:bg-accent hover:text-accent-foreground cursor-pointer",
+                                paymentMethod === 'Card' && "border-primary"
+                            )}
+                        >
+                            <CreditCard className="mb-1 h-5 w-5" />
+                            Card
+                            <RadioGroupItem value="Card" id="payment-card" className="sr-only" />
+                        </Label>
+                        <Label
+                            htmlFor="payment-cash"
+                            className={cn(
+                                "flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-3 text-sm hover:bg-accent hover:text-accent-foreground cursor-pointer",
+                                paymentMethod === 'Cash' && "border-primary"
+                            )}
+                        >
+                            <DollarSign className="mb-1 h-5 w-5" />
+                            Cash
+                            <RadioGroupItem value="Cash" id="payment-cash" className="sr-only" />
+                        </Label>
+                        <Label
+                            htmlFor="payment-transfer"
+                            className={cn(
+                                "flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-3 text-sm hover:bg-accent hover:text-accent-foreground cursor-pointer",
+                                paymentMethod === 'Transfer' && "border-primary"
+                            )}
+                        >
+                            <Receipt className="mb-1 h-5 w-5" />
+                            Transfer
+                            <RadioGroupItem value="Transfer" id="payment-transfer" className="sr-only" />
+                        </Label>
+                    </RadioGroup>
                 </div>
                 
                 <Button 

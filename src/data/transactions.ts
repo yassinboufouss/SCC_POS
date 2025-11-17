@@ -2,7 +2,7 @@ export type Transaction = {
   id: string;
   memberId: string;
   memberName: string;
-  type: 'Membership' | 'POS Sale';
+  type: 'Membership' | 'POS Sale' | 'Mixed Sale';
   item: string;
   amount: number;
   date: string; // YYYY-MM-DD
