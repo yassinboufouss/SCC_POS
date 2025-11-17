@@ -1,14 +1,14 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, DollarSign, CalendarCheck } from "lucide-react";
+import { Users, DollarSign, CalendarCheck, Package } from "lucide-react";
 import RevenueChart from "@/components/RevenueChart";
+import { calculateDashboardMetrics } from "@/utils/dashboard-metrics";
 
 const Dashboard = () => {
-  // Using mock data consistent with FinancePage
-  const activeMembers = 1250;
-  const monthlyRevenue = 45231.89;
-  const dailyCheckins = 345;
-  const expiredMemberships = 12;
+  const metrics = calculateDashboardMetrics();
+  
+  // Daily check-ins remains a simple mock value for now
+  const dailyCheckins = 345; 
 
   return (
     <div className="space-y-6">
@@ -23,8 +23,8 @@ const Dashboard = () => {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{activeMembers.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">+20.1% from last month</p>
+            <div className="text-2xl font-bold">{metrics.activeMembers.toLocaleString()}</div>
+            <p className="text-xs text-muted-foreground">Total active memberships</p>
           </CardContent>
         </Card>
         <Card>
@@ -35,8 +35,8 @@ const Dashboard = () => {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${monthlyRevenue.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">+18.5% from last month</p>
+            <div className="text-2xl font-bold">${metrics.monthlyRevenue.toFixed(2)}</div>
+            <p className="text-xs text-muted-foreground">This month's sales</p>
           </CardContent>
         </Card>
         <Card>
@@ -54,13 +54,13 @@ const Dashboard = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Expired Memberships
+              Low Stock Items
             </CardTitle>
-            <Users className="h-4 w-4 text-red-500" />
+            <Package className="h-4 w-4 text-orange-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{expiredMemberships}</div>
-            <p className="text-xs text-muted-foreground">Pending renewal</p>
+            <div className="text-2xl font-bold">{metrics.lowStockItems}</div>
+            <p className="text-xs text-muted-foreground">Needs reordering</p>
           </CardContent>
         </Card>
       </div>
