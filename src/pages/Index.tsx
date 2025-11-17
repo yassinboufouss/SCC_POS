@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import { Dumbbell } from "lucide-react";
+import { cn } from "@/lib/utils"; // Import cn utility
 
 const Index = () => {
   const navigate = useNavigate();
@@ -16,7 +17,10 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
-      <Card className="w-full max-w-sm shadow-2xl">
+      <Card className={cn(
+        "w-full max-w-sm shadow-2xl opacity-0", // Start invisible
+        "animate-fade-in-up" // Apply animation
+      )}>
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-2">
             <Dumbbell className="h-10 w-10 text-primary" />
