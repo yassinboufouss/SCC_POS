@@ -12,6 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from '@/components/ui/badge';
+import NewMembershipPlanDialog from '@/components/NewMembershipPlanDialog';
 
 const MembershipPlansPage = () => {
   // In a real app, we would have state management for adding/editing plans.
@@ -20,9 +21,7 @@ const MembershipPlansPage = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Membership Plans Management</h1>
-        <Button>
-          <PlusCircle className="mr-2 h-4 w-4" /> Create New Plan
-        </Button>
+        <NewMembershipPlanDialog />
       </div>
 
       <Card>
