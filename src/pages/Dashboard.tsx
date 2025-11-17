@@ -5,6 +5,7 @@ import RevenueChart from "@/components/RevenueChart";
 import { calculateDashboardMetrics } from "@/utils/dashboard-metrics";
 import RecentTransactions from "@/components/RecentTransactions";
 import ExpiringMembersList from "@/components/ExpiringMembersList";
+import LowStockAlerts from "@/components/LowStockAlerts";
 
 const Dashboard = () => {
   const metrics = calculateDashboardMetrics();
@@ -77,8 +78,15 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Recent Transactions */}
-      <RecentTransactions />
+      {/* Alerts and Transactions Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+            <RecentTransactions />
+        </div>
+        <div className="lg:col-span-1">
+            <LowStockAlerts />
+        </div>
+      </div>
     </div>
   );
 };
