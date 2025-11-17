@@ -5,10 +5,11 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Button } from "@/components/ui/button";
 import { Separator } from '@/components/ui/separator';
-import { Package, DollarSign, AlertTriangle, Calendar } from 'lucide-react';
+import { Package, AlertTriangle, Calendar, Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { showSuccess } from '@/utils/toast';
+import { showSuccess, showError } from '@/utils/toast';
+import { restockInventoryItem, updateInventoryItem } from '@/utils/inventory-utils';
 
 interface InventoryItemSheetProps {
   open: boolean;
@@ -18,10 +19,12 @@ interface InventoryItemSheetProps {
 
 const InventoryItemSheet: React.FC<InventoryItemSheetProps> = ({ open, onOpenChange, selectedItem }) => {
   const [formData, setFormData] = useState<InventoryItem | null>(null);
+  const [restockQuantity, setRestockQuantity] = useState(0);
 
   useEffect(() => {
     if (selectedItem) {
       setFormData(selectedItem);
+      setRestockQuantity(0); // Reset restock input when item changes
     }
   }, [selectedItem]);
 
@@ -34,19 +37,47 @@ const InventoryItemSheet: React.FC<InventoryItemSheetProps> = ({ open, onOpenCha
     const { name, value } = e.target;
     setFormData(prev => {
       if (!prev) return null;
+      // Handle numeric inputs
+      const newValue = name === 'stock' || name === 'price' ? parseFloat(value) || 0 : value;
       return {
         ...prev,
-        [name]: name === 'stock' || name === 'price' ? parseFloat(value) || 0 : value,
-      };
+        [name]: newValue,
+      } as InventoryItem;
     });
   };
 
   const handleSave = () => {
-    console.log("Saving inventory item:", formData);
-    showSuccess(`Inventory item ${formData.name} updated successfully!`);
+    if (!formData) return;
+    
+    // Ensure stock is integer and price is fixed to 2 decimal places before saving
+    const updatedData: InventoryItem = {
+        ...formData,
+        stock: Math.floor(formData.stock),
+        price: parseFloat(formData.price.toFixed(2)),
+    };
+
+    updateInventoryItem(updatedData);
+    showSuccess(`Inventory item ${updatedData.name} details updated.`);
     onOpenChange(false);
-    // In a real app, this would update the global inventory state/API
   };
+  
+  const handleRestock = () => {
+    if (!formData || restockQuantity <= 0) {
+        showError("Please enter a valid quantity to restock.");
+        return;
+    }
+    
+    const updatedItem = restockInventoryItem(formData.id, restockQuantity);
+    
+    if (updatedItem) {
+        setFormData(updatedItem); // Update local state with new stock/date
+        showSuccess(`Restocked ${restockQuantity} units of ${updatedItem.name}. New stock: ${updatedItem.stock}`);
+        setRestockQuantity(0);
+    } else {
+        showError("Failed to restock item.");
+    }
+  };
+
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -80,10 +111,35 @@ const InventoryItemSheet: React.FC<InventoryItemSheetProps> = ({ open, onOpenCha
                 </div>
               </div>
             </div>
+            
+            {/* Restock Action */}
+            <div className="space-y-4 p-4 border rounded-lg bg-card shadow-sm">
+                <h3 className="text-lg font-semibold">Restock Inventory</h3>
+                <div className="flex gap-2">
+                    <div className="space-y-2 flex-1">
+                        <Label htmlFor="restock-qty">Quantity to Add</Label>
+                        <Input 
+                            id="restock-qty" 
+                            type="number" 
+                            value={restockQuantity === 0 ? '' : restockQuantity} 
+                            onChange={(e) => setRestockQuantity(parseInt(e.target.value) || 0)} 
+                            min="1"
+                        />
+                    </div>
+                    <Button 
+                        onClick={handleRestock} 
+                        disabled={restockQuantity <= 0}
+                        className="self-end h-10"
+                    >
+                        <Plus className="h-4 w-4 mr-2" /> Restock
+                    </Button>
+                </div>
+            </div>
+
 
             {/* Editable Fields */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Edit Details</h3>
+              <h3 className="text-lg font-semibold">Edit Item Details</h3>
               
               <div className="space-y-2">
                 <Label htmlFor="name">Item Name</Label>
@@ -96,7 +152,7 @@ const InventoryItemSheet: React.FC<InventoryItemSheetProps> = ({ open, onOpenCha
                   <Input id="price" name="price" type="number" step="0.01" value={formData.price} onChange={handleChange} />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="stock">Stock Quantity</Label>
+                  <Label htmlFor="stock">Current Stock (Manual Override)</Label>
                   <Input id="stock" name="stock" type="number" value={formData.stock} onChange={handleChange} />
                 </div>
               </div>
@@ -111,7 +167,7 @@ const InventoryItemSheet: React.FC<InventoryItemSheetProps> = ({ open, onOpenCha
         
         <div className="mt-auto pt-4 border-t">
             <Button className="w-full" onClick={handleSave}>
-                Save Changes
+                Save Item Details
             </Button>
         </div>
       </SheetContent>
