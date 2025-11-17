@@ -8,6 +8,7 @@ import {
   Package,
   Settings,
   LogIn,
+  ShoppingCart,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,12 @@ const navItems = [
     icon: LogIn,
     path: "/checkin",
     roles: ["Admin", "Receptionist"],
+  },
+  {
+    name: "POS", // New Item
+    icon: ShoppingCart,
+    path: "/pos",
+    roles: ["Admin", "Manager", "Receptionist"],
   },
   {
     name: "Classes",

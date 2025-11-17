@@ -14,6 +14,7 @@ import TrainersPage from "./pages/TrainersPage";
 import InventoryPage from "./pages/InventoryPage";
 import FinancePage from "./pages/FinancePage";
 import SettingsPage from "./pages/SettingsPage";
+import POSPage from "./pages/POSPage";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/members/*" element={<MembersPage />} />
             <Route path="/checkin" element={<CheckInPage />} />
+            <Route path="/pos" element={<POSPage />} />
             <Route path="/classes" element={<ClassesPage />} />
             <Route path="/trainers" element={<TrainersPage />} />
             <Route path="/inventory" element={<InventoryPage />} />
