@@ -43,5 +43,6 @@ export const inventoryItems: InventoryItem[] = [
     stock: 5, // Low stock
     price: 29.99,
     lastRestock: "2024-10-20",
+    imageUrl: "https://images.unsplash.com/photo-1579751626657-72bc17010498?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", // Reusing a supplement image
   },
 ];
