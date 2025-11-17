@@ -15,8 +15,15 @@ interface MembersListProps {
 
 const MembersList: React.FC<MembersListProps> = ({ onViewMember }) => {
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState('');
   
-  const members = mockMembers;
+  const allMembers = mockMembers;
+
+  const filteredMembers = allMembers.filter(member => 
+    member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    member.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    member.id.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="space-y-6">
@@ -29,34 +36,42 @@ const MembersList: React.FC<MembersListProps> = ({ onViewMember }) => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Active Members ({members.filter(m => m.status === 'Active').length})</CardTitle>
+          <CardTitle>Active Members ({filteredMembers.filter(m => m.status === 'Active').length})</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="mb-4">
-            <Input placeholder="Search members by name or email..." />
+            <Input 
+              placeholder="Search members by name, email, or ID..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
           <Separator className="mb-4" />
           
           <div className="space-y-3">
-            {members.map((member) => (
-              <div key={member.id} className="flex justify-between items-center p-3 border rounded-md hover:bg-muted/50 transition-colors">
-                <div>
-                  <p className="font-medium">{member.name}</p>
-                  <p className="text-sm text-muted-foreground">{member.plan} Plan (ID: {member.id})</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="text-right">
-                    <span className={`text-sm font-semibold ${member.status === 'Active' ? 'text-green-600' : 'text-red-600'}`}>
-                      {member.status}
-                    </span>
-                    <p className="text-xs text-muted-foreground">Expires: {member.expirationDate}</p>
+            {filteredMembers.length > 0 ? (
+              filteredMembers.map((member) => (
+                <div key={member.id} className="flex justify-between items-center p-3 border rounded-md hover:bg-muted/50 transition-colors">
+                  <div>
+                    <p className="font-medium">{member.name}</p>
+                    <p className="text-sm text-muted-foreground">{member.plan} Plan (ID: {member.id})</p>
                   </div>
-                  <Button variant="outline" size="sm" onClick={() => onViewMember(member)}>
-                    <Eye className="h-4 w-4" />
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <div className="text-right">
+                      <span className={`text-sm font-semibold ${member.status === 'Active' ? 'text-green-600' : 'text-red-600'}`}>
+                        {member.status}
+                      </span>
+                      <p className="text-xs text-muted-foreground">Expires: {member.expirationDate}</p>
+                    </div>
+                    <Button variant="outline" size="sm" onClick={() => onViewMember(member)}>
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-center text-muted-foreground py-8">No members found matching your search criteria.</p>
+            )}
           </div>
         </CardContent>
       </Card>
