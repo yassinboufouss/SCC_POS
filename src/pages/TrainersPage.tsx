@@ -13,6 +13,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { trainers, Trainer } from '@/data/trainers';
 import TrainerProfileSheet from '@/components/TrainerProfileSheet';
+import NewTrainerDialog from '@/components/NewTrainerDialog';
 
 const TrainersPage = () => {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -27,9 +28,7 @@ const TrainersPage = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Trainer Management</h1>
-        <Button>
-          <PlusCircle className="mr-2 h-4 w-4" /> Add New Trainer
-        </Button>
+        <NewTrainerDialog />
       </div>
 
       <Card>
