@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Member } from '@/data/members';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -16,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { membershipPlans } from '@/data/membership-plans';
 import { showSuccess } from '@/utils/toast';
 import { updateMember } from '@/utils/member-utils';
+import MembershipRenewalDialog from './MembershipRenewalDialog';
 
 interface MemberProfileSheetProps {
   open: boolean;
@@ -36,12 +37,16 @@ const memberSchema = z.object({
 type MemberFormValues = z.infer<typeof memberSchema>;
 
 const MemberProfileSheet: React.FC<MemberProfileSheetProps> = ({ open, onOpenChange, selectedMember }) => {
+  const [localMember, setLocalMember] = useState<Member | null>(selectedMember);
+  const [isRenewalDialogOpen, setIsRenewalDialogOpen] = useState(false);
+    
   const form = useForm<MemberFormValues>({
     resolver: zodResolver(memberSchema),
   });
 
   useEffect(() => {
     if (selectedMember) {
+      setLocalMember(selectedMember);
       form.reset({
         email: selectedMember.email,
         phone: selectedMember.phone,
@@ -52,17 +57,17 @@ const MemberProfileSheet: React.FC<MemberProfileSheetProps> = ({ open, onOpenCha
     }
   }, [selectedMember, form]);
 
-  if (!selectedMember) return null;
+  if (!localMember) return null;
 
-  const statusVariant = selectedMember.status === 'Active' ? 'default' : 'destructive';
-  const expirationDate = new Date(selectedMember.expirationDate);
-  const isExpired = selectedMember.status === 'Expired';
+  const statusVariant = localMember.status === 'Active' ? 'default' : 'destructive';
+  const expirationDate = new Date(localMember.expirationDate);
+  const isExpired = localMember.status === 'Expired';
 
   const onSubmit = (values: MemberFormValues) => {
     // Note: We are not recalculating expirationDate here for simplicity, 
     // but in a real app, changing the plan would require recalculation.
     const updatedMember: Member = {
-      ...selectedMember,
+      ...localMember,
       email: values.email,
       phone: values.phone,
       dob: values.dob,
@@ -71,19 +76,32 @@ const MemberProfileSheet: React.FC<MemberProfileSheetProps> = ({ open, onOpenCha
     };
 
     updateMember(updatedMember);
+    setLocalMember(updatedMember); // Update local state immediately
     showSuccess(`Member ${updatedMember.name} profile updated.`);
     onOpenChange(false);
   };
+  
+  const handleRenewalSuccess = (renewedMember: Member) => {
+      setLocalMember(renewedMember); // Update local state after renewal
+      setIsRenewalDialogOpen(false);
+      // Also update the form state to reflect the new plan/status
+      form.reset({
+        ...form.getValues(),
+        plan: renewedMember.plan,
+        status: renewedMember.status as MemberFormValues['status'],
+      });
+  };
+
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="sm:max-w-lg flex flex-col">
         <SheetHeader>
           <SheetTitle className="text-2xl flex items-center gap-2">
-            <User className="h-6 w-6" /> {selectedMember.name}
+            <User className="h-6 w-6" /> {localMember.name}
           </SheetTitle>
           <SheetDescription>
-            Member ID: {selectedMember.id}
+            Member ID: {localMember.id}
           </SheetDescription>
         </SheetHeader>
 
@@ -96,12 +114,12 @@ const MemberProfileSheet: React.FC<MemberProfileSheetProps> = ({ open, onOpenCha
                 <div className="flex justify-between items-center">
                   <p className="text-sm font-medium text-muted-foreground">Current Status</p>
                   <Badge variant={statusVariant} className="text-base py-1">
-                    {selectedMember.status}
+                    {localMember.status}
                   </Badge>
                 </div>
                 <Separator />
                 <div className="text-sm">
-                  <p>Start Date: {format(new Date(selectedMember.startDate), 'MMM dd, yyyy')}</p>
+                  <p>Start Date: {format(new Date(localMember.startDate), 'MMM dd, yyyy')}</p>
                   <p className={isExpired ? 'text-red-500 font-semibold' : 'text-green-600 font-semibold'}>
                     Expiration: {format(expirationDate, 'MMM dd, yyyy')}
                   </p>
@@ -218,13 +236,13 @@ const MemberProfileSheet: React.FC<MemberProfileSheetProps> = ({ open, onOpenCha
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-3 border rounded-md bg-background">
                     <p className="text-sm font-medium text-muted-foreground">Total Check-ins</p>
-                    <span className="text-xl font-bold">{selectedMember.totalCheckIns}</span>
+                    <span className="text-xl font-bold">{localMember.totalCheckIns}</span>
                   </div>
                   <div className="p-3 border rounded-md bg-background">
                     <p className="text-sm font-medium text-muted-foreground">Last Check-in</p>
                     <div className="flex items-center gap-1 mt-1">
                       <Clock className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm font-semibold">{selectedMember.lastCheckIn || 'N/A'}</span>
+                      <span className="text-sm font-semibold">{localMember.lastCheckIn || 'N/A'}</span>
                     </div>
                   </div>
                 </div>
@@ -248,10 +266,25 @@ const MemberProfileSheet: React.FC<MemberProfileSheetProps> = ({ open, onOpenCha
         </ScrollArea>
         
         <div className="mt-auto pt-4 border-t space-y-2">
+            {isExpired && (
+                <Button variant="default" className="w-full" onClick={() => setIsRenewalDialogOpen(true)}>
+                    Renew Membership
+                </Button>
+            )}
             <Button variant="outline" className="w-full text-red-500">
                 Freeze/Cancel Membership
             </Button>
         </div>
+        
+        {/* Renewal Dialog */}
+        {localMember && isRenewalDialogOpen && (
+            <MembershipRenewalDialog
+                open={isRenewalDialogOpen}
+                onOpenChange={setIsRenewalDialogOpen}
+                member={localMember}
+                onRenewalSuccess={handleRenewalSuccess}
+            />
+        )}
       </SheetContent>
     </Sheet>
   );
