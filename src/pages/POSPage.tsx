@@ -25,6 +25,7 @@ interface CartItem {
   type: 'inventory' | 'membership';
   // Only relevant for inventory items (for stock validation)
   stock?: number; 
+  imageUrl?: string; // Added imageUrl for display in cart
 }
 
 const POSPage = () => {
@@ -62,7 +63,8 @@ const POSPage = () => {
           price: item.price, 
           quantity: 1, 
           type: 'inventory', 
-          stock: item.stock 
+          stock: item.stock,
+          imageUrl: item.imageUrl // Store image URL
       }];
     });
   };
@@ -320,14 +322,31 @@ const POSPage = () => {
                 ) : (
                   cart.map((item, index) => (
                     <div key={`${item.sourceId}-${index}`} className="flex items-center justify-between border-b pb-2 last:border-b-0">
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium truncate flex items-center gap-1">
-                            {item.type === 'membership' && <Ticket className="h-3 w-3 text-blue-500" />}
-                            {item.name}
-                        </p>
-                        <p className="text-sm text-muted-foreground">${item.price.toFixed(2)} x {item.quantity}</p>
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        {/* Image Thumbnail for Inventory Items */}
+                        {item.type === 'inventory' && (
+                            <div className="w-8 h-8 rounded-sm overflow-hidden bg-muted flex items-center justify-center shrink-0">
+                                {item.imageUrl ? (
+                                    <img 
+                                        src={item.imageUrl} 
+                                        alt={item.name} 
+                                        className="w-full h-full object-cover" 
+                                    />
+                                ) : (
+                                    <Image className="h-4 w-4 text-muted-foreground" />
+                                )}
+                            </div>
+                        )}
+                        
+                        <div className="min-w-0">
+                            <p className="font-medium truncate flex items-center gap-1">
+                                {item.type === 'membership' && <Ticket className="h-3 w-3 text-blue-500" />}
+                                {item.name}
+                            </p>
+                            <p className="text-sm text-muted-foreground">${item.price.toFixed(2)} x {item.quantity}</p>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 shrink-0">
                         <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => updateQuantity(item.sourceId, item.type, -1)}>
                           <Minus className="h-3 w-3" />
                         </Button>
