@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from '@/components/ui/badge';
 import ClassEnrollmentSheet from '@/components/ClassEnrollmentSheet';
+import NewClassDialog from '@/components/NewClassDialog';
 
 const ClassesPage = () => {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -27,9 +28,7 @@ const ClassesPage = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Class Schedule Management</h1>
-        <Button>
-          <PlusCircle className="mr-2 h-4 w-4" /> Add New Class
-        </Button>
+        <NewClassDialog />
       </div>
 
       <Card>
