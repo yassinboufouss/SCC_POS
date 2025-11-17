@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Dumbbell, Star } from 'lucide-react';
@@ -12,8 +12,17 @@ import {
 } from "@/components/ui/table";
 import { Badge } from '@/components/ui/badge';
 import { trainers, Trainer } from '@/data/trainers';
+import TrainerProfileSheet from '@/components/TrainerProfileSheet';
 
 const TrainersPage = () => {
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [selectedTrainer, setSelectedTrainer] = useState<Trainer | null>(null);
+
+  const handleViewProfile = (trainer: Trainer) => {
+    setSelectedTrainer(trainer);
+    setIsSheetOpen(true);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -61,7 +70,7 @@ const TrainersPage = () => {
                       {trainer.memberRating.toFixed(1)}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="outline" size="sm">View Profile</Button>
+                      <Button variant="outline" size="sm" onClick={() => handleViewProfile(trainer)}>View Profile</Button>
                     </TableCell>
                   </TableRow>
                 );
@@ -70,6 +79,12 @@ const TrainersPage = () => {
           </Table>
         </CardContent>
       </Card>
+      
+      <TrainerProfileSheet
+        open={isSheetOpen}
+        onOpenChange={setIsSheetOpen}
+        selectedTrainer={selectedTrainer}
+      />
     </div>
   );
 };
