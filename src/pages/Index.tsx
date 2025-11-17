@@ -1,6 +1,10 @@
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
+import { Dumbbell } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -12,32 +16,42 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
-      <div className="w-full max-w-md bg-white dark:bg-gray-800 shadow-xl rounded-lg p-8 space-y-6">
-        <h1 className="text-4xl font-extrabold text-center text-primary">
-          Gym POS System
-        </h1>
-        <p className="text-center text-lg text-muted-foreground">
-          Secure Login
-        </p>
-        
-        {/* Placeholder Login Form */}
-        <div className="space-y-4">
-          <input 
-            type="email" 
-            placeholder="Username" 
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-          />
-          <input 
-            type="password" 
-            placeholder="Password" 
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-          />
-          <Button onClick={handleLogin} className="w-full">
-            Log In (Admin Access)
-          </Button>
-        </div>
-        
-      </div>
+      <Card className="w-full max-w-sm shadow-2xl">
+        <CardHeader className="space-y-1 text-center">
+          <div className="flex justify-center mb-2">
+            <Dumbbell className="h-10 w-10 text-primary" />
+          </div>
+          <CardTitle className="text-3xl font-bold">
+            Gym POS System
+          </CardTitle>
+          <CardDescription>
+            Enter your credentials to access the management dashboard.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="username">Username</Label>
+              <Input 
+                id="username" 
+                type="email" 
+                placeholder="admin@gym.com" 
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="password">Password</Label>
+              <Input 
+                id="password" 
+                type="password" 
+                placeholder="••••••••" 
+              />
+            </div>
+            <Button onClick={handleLogin} className="w-full mt-2">
+              Log In
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
       <div className="mt-8">
         <MadeWithDyad />
       </div>
