@@ -7,7 +7,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import MainLayout from "@/layouts/MainLayout.tsx";
 import Dashboard from "./pages/Dashboard";
-import MemberRegistration from "@/pages/members/MemberRegistration.tsx";
+import MembersPage from "@/pages/members/MembersPage.tsx";
 
 const queryClient = new QueryClient();
 
@@ -23,7 +23,7 @@ const App = () => (
           {/* Protected Routes using MainLayout */}
           <Route element={<MainLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/members" element={<MemberRegistration />} />
+            <Route path="/members/*" element={<MembersPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           </Route>
 
