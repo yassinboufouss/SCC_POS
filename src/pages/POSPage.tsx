@@ -135,8 +135,11 @@ const POSPage = () => {
     cart.filter(item => item.type === 'inventory').forEach(item => {
         const inventoryItem = inventoryItems.find(i => i.id === item.sourceId);
         if (inventoryItem) {
-            inventoryItem.stock -= item.quantity;
-            updateInventoryItem(inventoryItem); 
+            const updatedItem = {
+                ...inventoryItem,
+                stock: inventoryItem.stock - item.quantity,
+            };
+            updateInventoryItem(updatedItem); 
         }
     });
     
