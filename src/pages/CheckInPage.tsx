@@ -4,22 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { QrCode, UserCheck, UserX, Search } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
-
-// Placeholder for member data structure
-interface Member {
-  id: string;
-  name: string;
-  status: 'Active' | 'Expired' | 'Pending';
-  plan: string;
-  lastCheckIn: string | null;
-}
-
-// Simulated database lookup
-const mockMembers: Member[] = [
-  { id: 'M001', name: 'Alice Johnson', status: 'Active', plan: 'Monthly', lastCheckIn: null },
-  { id: 'M002', name: 'Bob Smith', status: 'Expired', plan: 'Yearly', lastCheckIn: '2024-10-20 08:30 AM' },
-  { id: 'M003', name: 'Charlie Brown', status: 'Active', plan: 'Weekly', lastCheckIn: '2024-10-21 07:00 AM' },
-];
+import { mockMembers, Member } from '@/data/members'; // Import centralized data
 
 const CheckInPage = () => {
   const [memberCode, setMemberCode] = useState('');

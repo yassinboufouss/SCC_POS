@@ -1,22 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import RegistrationForm from './RegistrationForm';
 import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, Eye } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import { mockMembers, Member } from '@/data/members';
+import MemberProfileSheet from '@/components/MemberProfileSheet';
 
-// Placeholder component for the list of members
-const MembersList = () => {
+interface MembersListProps {
+  onViewMember: (member: Member) => void;
+}
+
+const MembersList: React.FC<MembersListProps> = ({ onViewMember }) => {
   const navigate = useNavigate();
   
-  // Placeholder data
-  const members = [
-    { id: 1, name: "Alice Johnson", plan: "Monthly", status: "Active", expiration: "2024-11-15" },
-    { id: 2, name: "Bob Smith", plan: "Yearly", status: "Active", expiration: "2025-08-01" },
-    { id: 3, name: "Charlie Brown", plan: "Daily", status: "Expired", expiration: "2024-09-20" },
-  ];
+  const members = mockMembers;
 
   return (
     <div className="space-y-6">
@@ -29,7 +29,7 @@ const MembersList = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Active Members ({members.length})</CardTitle>
+          <CardTitle>Active Members ({members.filter(m => m.status === 'Active').length})</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="mb-4">
@@ -42,13 +42,18 @@ const MembersList = () => {
               <div key={member.id} className="flex justify-between items-center p-3 border rounded-md hover:bg-muted/50 transition-colors">
                 <div>
                   <p className="font-medium">{member.name}</p>
-                  <p className="text-sm text-muted-foreground">{member.plan} Plan</p>
+                  <p className="text-sm text-muted-foreground">{member.plan} Plan (ID: {member.id})</p>
                 </div>
-                <div className="text-right">
-                  <span className={`text-sm font-semibold ${member.status === 'Active' ? 'text-green-600' : 'text-red-600'}`}>
-                    {member.status}
-                  </span>
-                  <p className="text-xs text-muted-foreground">Expires: {member.expiration}</p>
+                <div className="flex items-center gap-2">
+                  <div className="text-right">
+                    <span className={`text-sm font-semibold ${member.status === 'Active' ? 'text-green-600' : 'text-red-600'}`}>
+                      {member.status}
+                    </span>
+                    <p className="text-xs text-muted-foreground">Expires: {member.expirationDate}</p>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={() => onViewMember(member)}>
+                    <Eye className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             ))}
@@ -61,12 +66,26 @@ const MembersList = () => {
 
 
 const MembersPage = () => {
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+
+  const handleViewMember = (member: Member) => {
+    setSelectedMember(member);
+    setIsSheetOpen(true);
+  };
+
   return (
     <div className="flex flex-col flex-1">
       <Routes>
-        <Route index element={<MembersList />} />
+        <Route index element={<MembersList onViewMember={handleViewMember} />} />
         <Route path="register" element={<RegistrationForm />} />
       </Routes>
+      
+      <MemberProfileSheet
+        open={isSheetOpen}
+        onOpenChange={setIsSheetOpen}
+        selectedMember={selectedMember}
+      />
     </div>
   );
 };
