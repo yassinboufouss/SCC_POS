@@ -4,6 +4,7 @@ import { Users, DollarSign, CalendarCheck, Package } from "lucide-react";
 import RevenueChart from "@/components/RevenueChart";
 import { calculateDashboardMetrics } from "@/utils/dashboard-metrics";
 import RecentTransactions from "@/components/RecentTransactions";
+import ExpiringMembersList from "@/components/ExpiringMembersList";
 
 const Dashboard = () => {
   const metrics = calculateDashboardMetrics();
@@ -66,8 +67,15 @@ const Dashboard = () => {
         </Card>
       </div>
       
-      {/* Revenue Chart */}
-      <RevenueChart />
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+            <RevenueChart />
+        </div>
+        <div className="lg:col-span-1">
+            <ExpiringMembersList />
+        </div>
+      </div>
 
       {/* Recent Transactions */}
       <RecentTransactions />

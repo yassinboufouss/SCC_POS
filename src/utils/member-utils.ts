@@ -1,6 +1,6 @@
 import { Member, mockMembers } from "@/data/members";
 import { membershipPlans } from "@/data/membership-plans";
-import { addDays, format } from "date-fns";
+import { addDays, format, isBefore, parseISO } from "date-fns";
 
 // Utility to simulate updating member data
 export const updateMember = (updatedMember: Member) => {
@@ -64,4 +64,19 @@ export const processCheckIn = (memberId: string) => {
 
   updateMember(updatedMember);
   return updatedMember;
+};
+
+// Utility to get members whose plans expire soon (e.g., within the next 30 days)
+export const getExpiringMembers = (daysThreshold: number = 30): Member[] => {
+    const today = new Date();
+    const thresholdDate = addDays(today, daysThreshold);
+    
+    return mockMembers
+        .filter(member => member.status === 'Active')
+        .filter(member => {
+            const expiration = parseISO(member.expirationDate);
+            // Check if expiration is in the future AND before the threshold date
+            return isBefore(expiration, thresholdDate) && isBefore(today, expiration);
+        })
+        .sort((a, b) => parseISO(a.expirationDate).getTime() - parseISO(b.expirationDate).getTime());
 };
