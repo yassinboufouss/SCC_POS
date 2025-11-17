@@ -1,21 +1,12 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Package, AlertTriangle, Pencil } from 'lucide-react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from '@/components/ui/badge';
-import { inventoryItems, InventoryItem } from '@/data/inventory';
+import { Package, Pencil } from 'lucide-react';
+import { InventoryItem, inventoryItems } from '@/data/inventory';
 import InventoryItemSheet from '@/components/InventoryItemSheet';
 import NewInventoryItemDialog from '@/components/NewInventoryItemDialog';
-
-const LOW_STOCK_THRESHOLD = 10;
+import { DataTable } from '@/components/DataTable';
+import { createInventoryColumns } from './inventory/inventory-columns';
 
 const InventoryPage = () => {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -25,6 +16,8 @@ const InventoryPage = () => {
     setSelectedItem(item);
     setIsSheetOpen(true);
   };
+  
+  const columns = createInventoryColumns(handleEditItem);
 
   return (
     <div className="space-y-6">
@@ -40,52 +33,12 @@ const InventoryPage = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Item Name</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead className="text-right">Price</TableHead>
-                <TableHead className="text-center">Stock Level</TableHead>
-                <TableHead>Last Restock</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {inventoryItems.map((item: InventoryItem) => {
-                const isLowStock = item.stock <= LOW_STOCK_THRESHOLD;
-                
-                let stockBadgeVariant: 'default' | 'secondary' | 'destructive' = 'secondary';
-                if (item.stock === 0) {
-                    stockBadgeVariant = 'destructive';
-                } else if (isLowStock) {
-                    stockBadgeVariant = 'destructive';
-                } else {
-                    stockBadgeVariant = 'default';
-                }
-
-                return (
-                  <TableRow key={item.id}>
-                    <TableCell className="font-medium">{item.name}</TableCell>
-                    <TableCell>{item.category}</TableCell>
-                    <TableCell className="text-right">${item.price.toFixed(2)}</TableCell>
-                    <TableCell className="text-center">
-                      <Badge variant={stockBadgeVariant} className="flex items-center justify-center mx-auto w-28">
-                        {isLowStock && item.stock > 0 && <AlertTriangle className="h-3 w-3 mr-1" />}
-                        {item.stock} {item.stock === 0 ? 'Out of Stock' : 'in Stock'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground text-sm">{item.lastRestock}</TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="outline" size="sm" onClick={() => handleEditItem(item)}>
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+          <DataTable
+            columns={columns}
+            data={inventoryItems}
+            filterColumnId="name"
+            filterPlaceholder="Search items by name..."
+          />
         </CardContent>
       </Card>
       
