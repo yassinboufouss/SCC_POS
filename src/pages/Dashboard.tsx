@@ -1,8 +1,15 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, DollarSign, CalendarCheck } from "lucide-react";
+import RevenueChart from "@/components/RevenueChart";
 
 const Dashboard = () => {
+  // Using mock data consistent with FinancePage
+  const activeMembers = 1250;
+  const monthlyRevenue = 45231.89;
+  const dailyCheckins = 345;
+  const expiredMemberships = 12;
+
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">Dashboard Overview</h1>
@@ -16,7 +23,7 @@ const Dashboard = () => {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">1,250</div>
+            <div className="text-2xl font-bold">{activeMembers.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">+20.1% from last month</p>
           </CardContent>
         </Card>
@@ -28,7 +35,7 @@ const Dashboard = () => {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$45,231.89</div>
+            <div className="text-2xl font-bold">${monthlyRevenue.toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">+18.5% from last month</p>
           </CardContent>
         </Card>
@@ -40,7 +47,7 @@ const Dashboard = () => {
             <CalendarCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">345</div>
+            <div className="text-2xl font-bold">{dailyCheckins}</div>
             <p className="text-xs text-muted-foreground">Today so far</p>
           </CardContent>
         </Card>
@@ -52,23 +59,14 @@ const Dashboard = () => {
             <Users className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12</div>
+            <div className="text-2xl font-bold">{expiredMemberships}</div>
             <p className="text-xs text-muted-foreground">Pending renewal</p>
           </CardContent>
         </Card>
       </div>
       
-      {/* Placeholder for charts/analytics */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Revenue Trend</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-64 flex items-center justify-center text-muted-foreground">
-            [Chart Placeholder]
-          </div>
-        </CardContent>
-      </Card>
+      {/* Revenue Chart */}
+      <RevenueChart />
     </div>
   );
 };
