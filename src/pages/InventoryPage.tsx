@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Package, AlertTriangle, Pencil } from 'lucide-react';
+import { Package, AlertTriangle, Pencil } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -13,6 +13,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { inventoryItems, InventoryItem } from '@/data/inventory';
 import InventoryItemSheet from '@/components/InventoryItemSheet';
+import NewInventoryItemDialog from '@/components/NewInventoryItemDialog';
 
 const LOW_STOCK_THRESHOLD = 10;
 
@@ -29,9 +30,7 @@ const InventoryPage = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Inventory Management</h1>
-        <Button>
-          <PlusCircle className="mr-2 h-4 w-4" /> Add New Item
-        </Button>
+        <NewInventoryItemDialog />
       </div>
 
       <Card>
