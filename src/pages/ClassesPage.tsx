@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Clock, Users, Calendar } from 'lucide-react';
@@ -12,8 +12,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from '@/components/ui/badge';
+import ClassEnrollmentSheet from '@/components/ClassEnrollmentSheet';
 
 const ClassesPage = () => {
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [selectedClass, setSelectedClass] = useState<GymClass | null>(null);
+
+  const handleViewDetails = (cls: GymClass) => {
+    setSelectedClass(cls);
+    setIsSheetOpen(true);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -59,7 +68,7 @@ const ClassesPage = () => {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="outline" size="sm">View Details</Button>
+                      <Button variant="outline" size="sm" onClick={() => handleViewDetails(cls)}>View Details</Button>
                     </TableCell>
                   </TableRow>
                 );
@@ -68,6 +77,13 @@ const ClassesPage = () => {
           </Table>
         </CardContent>
       </Card>
+      
+      {/* Enrollment Sheet */}
+      <ClassEnrollmentSheet 
+        open={isSheetOpen} 
+        onOpenChange={setIsSheetOpen} 
+        selectedClass={selectedClass} 
+      />
     </div>
   );
 };
