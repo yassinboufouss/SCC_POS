@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { ShoppingCart, X, Trash2, Plus, Minus, UserX, Ticket, Image, DollarSign, CreditCard, Receipt } from 'lucide-react';
+import { ShoppingCart, X, Trash2, Plus, Minus, UserX, Ticket, Image, DollarSign, CreditCard, Receipt, Percent } from 'lucide-react';
 import { inventoryItems, InventoryItem } from '@/data/inventory';
 import { membershipPlans, MembershipPlan } from '@/data/membership-plans';
 import { showSuccess, showError } from '@/utils/toast';
@@ -33,6 +33,7 @@ const POSPage = () => {
   const [inventorySearchTerm, setInventorySearchTerm] = useState('');
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'Card' | 'Cash' | 'Transfer'>('Card');
+  const [discountPercent, setDiscountPercent] = useState(0); // New state for discount
 
   const filteredInventoryItems = useMemo(() => {
     return inventoryItems.filter(item =>
@@ -103,7 +104,7 @@ const POSPage = () => {
       if (item.type === 'inventory') {
         const inventoryStock = inventoryItems.find(i => i.id === sourceId)?.stock || 0;
         if (newQuantity > inventoryStock) {
-          showSuccess(`Cannot add more ${item.name}. Stock limit reached.`);
+          showError(`Cannot add more ${item.name}. Stock limit reached.`);
           return prevCart;
         }
       }
@@ -117,22 +118,49 @@ const POSPage = () => {
   const removeItem = (sourceId: string, type: 'inventory' | 'membership') => {
     setCart(prevCart => prevCart.filter(i => !(i.sourceId === sourceId && i.type === type)));
   };
+  
+  const handleDiscountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value);
+    if (isNaN(value) || value < 0) {
+        setDiscountPercent(0);
+    } else if (value > 100) {
+        setDiscountPercent(100);
+    } else {
+        setDiscountPercent(value);
+    }
+  };
 
   // --- Calculations ---
 
-  const { subtotal, tax, total } = useMemo(() => {
-    const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const { subtotal, discountAmount, taxableSubtotal, tax, total } = useMemo(() => {
+    const rawSubtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    
+    // 1. Apply Discount to Subtotal
+    const discountFactor = discountPercent / 100;
+    const discountAmount = rawSubtotal * discountFactor;
+    const discountedSubtotal = rawSubtotal - discountAmount;
+    
     const TAX_RATE = 0.08; // 8% sales tax
     
-    // Apply tax only to inventory items 
-    const taxableSubtotal = cart
+    // 2. Calculate Taxable Base (only inventory items, after discount)
+    const rawTaxableSubtotal = cart
         .filter(item => item.type === 'inventory')
         .reduce((sum, item) => sum + item.price * item.quantity, 0);
         
-    const tax = taxableSubtotal * TAX_RATE;
-    const total = subtotal + tax;
-    return { subtotal, tax, total };
-  }, [cart]);
+    // Apply the same percentage discount to the taxable base
+    const discountedTaxableSubtotal = rawTaxableSubtotal * (1 - discountFactor);
+        
+    const calculatedTax = discountedTaxableSubtotal * TAX_RATE;
+    const finalTotal = discountedSubtotal + calculatedTax;
+    
+    return { 
+        subtotal: rawSubtotal, 
+        discountAmount, 
+        taxableSubtotal: discountedTaxableSubtotal, 
+        tax: calculatedTax, 
+        total: finalTotal 
+    };
+  }, [cart, discountPercent]);
 
   // --- Checkout ---
 
@@ -190,6 +218,7 @@ const POSPage = () => {
     setInventorySearchTerm('');
     setSelectedMember(null);
     setPaymentMethod('Card');
+    setDiscountPercent(0); // Reset discount
   };
 
   return (
@@ -370,10 +399,36 @@ const POSPage = () => {
                     <span>Subtotal:</span>
                     <span className="font-medium">${subtotal.toFixed(2)}</span>
                   </div>
+                  
+                  {/* Discount Input */}
+                  <div className="flex items-center justify-between gap-2">
+                    <Label htmlFor="discount-input" className="flex items-center gap-1 text-muted-foreground">
+                        <Percent className="h-3 w-3" /> Discount (%)
+                    </Label>
+                    <Input
+                        id="discount-input"
+                        type="number"
+                        placeholder="0"
+                        value={discountPercent === 0 ? '' : discountPercent}
+                        onChange={handleDiscountChange}
+                        className="w-20 h-8 text-right"
+                        min={0}
+                        max={100}
+                    />
+                  </div>
+                  
+                  {discountAmount > 0 && (
+                    <div className="flex justify-between text-red-500">
+                        <span>Discount Applied:</span>
+                        <span className="font-medium">-${discountAmount.toFixed(2)}</span>
+                    </div>
+                  )}
+                  
                   <div className="flex justify-between">
                     <span>Tax (8% on inventory):</span>
                     <span className="font-medium">${tax.toFixed(2)}</span>
                   </div>
+                  
                   <Separator className="my-2" />
                   <div className="flex justify-between text-lg font-bold">
                     <span>Total:</span>
