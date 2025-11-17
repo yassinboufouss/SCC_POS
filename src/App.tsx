@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import MembersPage from "@/pages/members/MembersPage.tsx";
 import CheckInPage from "./pages/CheckInPage";
 import ClassesPage from "./pages/ClassesPage";
+import TrainersPage from "./pages/TrainersPage";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
             <Route path="/members/*" element={<MembersPage />} />
             <Route path="/checkin" element={<CheckInPage />} />
             <Route path="/classes" element={<ClassesPage />} />
+            <Route path="/trainers" element={<TrainersPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           </Route>
 
