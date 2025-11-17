@@ -10,6 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { showSuccess } from '@/utils/toast';
 import { format } from 'date-fns';
+import ImageUploadField from './ImageUploadField';
 
 const InventoryCategories = ['Apparel', 'Supplements', 'Equipment'] as const;
 
@@ -18,6 +19,7 @@ const newItemSchema = z.object({
   category: z.enum(InventoryCategories, { required_error: "Category is required." }),
   price: z.coerce.number().min(0.01, { message: "Price must be greater than zero." }),
   stock: z.coerce.number().int().min(0, { message: "Stock must be a non-negative integer." }),
+  imageUrl: z.string().url({ message: "Must be a valid URL." }).optional().or(z.literal('')),
 });
 
 type NewItemFormValues = z.infer<typeof newItemSchema>;
@@ -32,6 +34,7 @@ const NewInventoryItemDialog = () => {
       category: undefined,
       price: 0.00,
       stock: 0,
+      imageUrl: "",
     },
   });
 
@@ -40,6 +43,7 @@ const NewInventoryItemDialog = () => {
       ...values,
       id: `INV${Math.floor(Math.random() * 10000)}`, // Mock ID generation
       lastRestock: format(new Date(), 'yyyy-MM-dd'),
+      imageUrl: values.imageUrl || undefined,
     };
     
     console.log("Adding new inventory item:", newItem);
@@ -141,6 +145,23 @@ const NewInventoryItemDialog = () => {
                 )}
               />
             </div>
+            
+            <FormField
+              control={form.control}
+              name="imageUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <ImageUploadField 
+                      label="Product Image URL (Optional)"
+                      value={field.value || ''}
+                      onChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <Button type="submit" className="w-full mt-6" disabled={!form.formState.isValid}>
               Save Item

@@ -3,13 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { ShoppingCart, X, Trash2, Plus, Minus, UserX, Ticket } from 'lucide-react';
+import { ShoppingCart, X, Trash2, Plus, Minus, UserX, Ticket, Image } from 'lucide-react';
 import { inventoryItems, InventoryItem } from '@/data/inventory';
 import { membershipPlans, MembershipPlan } from '@/data/membership-plans';
 import { showSuccess } from '@/utils/toast';
 import MemberSelectDialog from '@/components/MemberSelectDialog';
 import { Member } from '@/data/members';
 import { updateInventoryItem } from '@/utils/inventory-utils';
+import { cn } from '@/lib/utils';
 
 // Define a unified CartItem type
 interface CartItem {
@@ -216,9 +217,25 @@ const POSPage = () => {
                 {filteredInventoryItems.map((item) => (
                   <div 
                     key={item.id} 
-                    className="border rounded-lg p-3 cursor-pointer hover:bg-primary/10 transition-colors flex flex-col justify-between"
-                    onClick={() => addInventoryToCart(item)}
+                    className={cn(
+                        "border rounded-lg p-3 cursor-pointer hover:bg-primary/10 transition-colors flex flex-col justify-between",
+                        item.stock === 0 && "opacity-50 cursor-not-allowed"
+                    )}
+                    onClick={() => item.stock > 0 && addInventoryToCart(item)}
                   >
+                    {/* Product Image */}
+                    <div className="h-24 w-full mb-2 rounded-md overflow-hidden bg-muted flex items-center justify-center">
+                        {item.imageUrl ? (
+                            <img 
+                                src={item.imageUrl} 
+                                alt={item.name} 
+                                className="w-full h-full object-cover" 
+                            />
+                        ) : (
+                            <Image className="h-6 w-6 text-muted-foreground" />
+                        )}
+                    </div>
+                    
                     <div>
                       <p className="font-medium truncate">{item.name}</p>
                       <p className="text-xs text-muted-foreground">{item.category}</p>
