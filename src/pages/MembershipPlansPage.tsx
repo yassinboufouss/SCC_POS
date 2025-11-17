@@ -1,17 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Ticket } from 'lucide-react';
 import { membershipPlans, MembershipPlan } from '@/data/membership-plans';
 import NewMembershipPlanDialog from '@/components/NewMembershipPlanDialog';
 import { DataTable } from '@/components/DataTable';
 import { createPlanColumns } from './plans/plan-columns';
-import { Button } from '@/components/ui/button'; // Ensure Button is imported if used in actions
+import MembershipPlanSheet from '@/components/MembershipPlanSheet';
 
 const MembershipPlansPage = () => {
-  // Placeholder for edit functionality
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<MembershipPlan | null>(null);
+
   const handleEditPlan = (plan: MembershipPlan) => {
-    console.log("Editing plan:", plan.name);
-    // In a real app, this would open an edit dialog/sheet
+    setSelectedPlan(plan);
+    setIsSheetOpen(true);
   };
   
   const columns = createPlanColumns(handleEditPlan);
@@ -49,6 +51,13 @@ const MembershipPlansPage = () => {
           </p>
         </CardContent>
       </Card>
+      
+      {/* Membership Plan Edit Sheet */}
+      <MembershipPlanSheet
+        open={isSheetOpen}
+        onOpenChange={setIsSheetOpen}
+        selectedPlan={selectedPlan}
+      />
     </div>
   );
 };
