@@ -17,13 +17,15 @@ const Index = () => {
 
   return (
     <div className={cn(
-      "min-h-screen flex flex-col items-center justify-center p-4",
-      // Using a diagonal gradient (br) for a more dynamic look
-      "bg-gradient-to-br from-gray-100 via-blue-100 to-gray-100 dark:from-background dark:via-primary/10 dark:to-background",
-      "bg-[length:400%_400%] animate-gradient-shift"
-    )}>
+      "min-h-screen flex flex-col items-center justify-center p-4 relative",
+      "bg-cover bg-center"
+    )} style={{ backgroundImage: `url('/gym-background.jpg')` }}>
+      
+      {/* Overlay to ensure readability of the card */}
+      <div className="absolute inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-sm"></div>
+
       <Card className={cn(
-        "w-full max-w-sm shadow-2xl opacity-0",
+        "w-full max-w-sm shadow-2xl opacity-0 relative z-10",
         "animate-fade-in-up"
       )}>
         <CardHeader className="space-y-1 text-center">
@@ -61,7 +63,7 @@ const Index = () => {
           </div>
         </CardContent>
       </Card>
-      <div className="mt-8">
+      <div className="mt-8 relative z-10">
         <MadeWithDyad />
       </div>
     </div>
