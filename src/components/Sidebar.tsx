@@ -9,6 +9,7 @@ import {
   Settings,
   LogIn,
   ShoppingCart,
+  Ticket,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -54,6 +55,12 @@ const navItems = [
     name: "Inventory",
     icon: Package,
     path: "/inventory",
+    roles: ["Admin", "Manager"],
+  },
+  {
+    name: "Membership Plans",
+    icon: Ticket,
+    path: "/plans",
     roles: ["Admin", "Manager"],
   },
   {
