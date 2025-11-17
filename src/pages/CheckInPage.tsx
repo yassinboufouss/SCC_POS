@@ -2,14 +2,16 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { QrCode, UserCheck, UserX, Search } from 'lucide-react';
+import { QrCode, UserCheck, UserX, Search, RefreshCw } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 import { mockMembers, Member } from '@/data/members'; // Import centralized data
+import MembershipRenewalDialog from '@/components/MembershipRenewalDialog';
 
 const CheckInPage = () => {
   const [memberCode, setMemberCode] = useState('');
   const [memberInfo, setMemberInfo] = useState<Member | null>(null);
   const [isCheckingIn, setIsCheckingIn] = useState(false);
+  const [isRenewalDialogOpen, setIsRenewalDialogOpen] = useState(false);
 
   const handleCheckIn = (code: string) => {
     setIsCheckingIn(true);
@@ -25,6 +27,9 @@ const CheckInPage = () => {
           showSuccess(`${member.name} checked in successfully!`);
         } else {
           showError(`${member.name}: Membership is ${member.status}. Cannot check in.`);
+          if (member.status === 'Expired') {
+            setIsRenewalDialogOpen(true);
+          }
         }
       } else {
         showError(`Member code ${code} not found.`);
@@ -39,6 +44,11 @@ const CheckInPage = () => {
     if (memberCode.trim()) {
       handleCheckIn(memberCode.trim());
     }
+  };
+  
+  const handleRenewalSuccess = (renewedMember: Member) => {
+      // Update the displayed member info and show success status
+      setMemberInfo(renewedMember);
   };
 
   const renderMemberStatus = () => {
@@ -56,10 +66,20 @@ const CheckInPage = () => {
             <p className="text-muted-foreground">{memberInfo.plan} Plan</p>
           </div>
         </div>
-        <div className="mt-4 pt-4 border-t">
+        <div className="mt-4 pt-4 border-t space-y-2">
           <p className="text-lg">Status: <span className={`font-bold ${statusClass}`}>{memberInfo.status}</span></p>
           {memberInfo.lastCheckIn && (
             <p className="text-sm text-muted-foreground">Last Check-in: {memberInfo.lastCheckIn}</p>
+          )}
+          
+          {memberInfo.status === 'Expired' && (
+            <Button 
+              variant="destructive" 
+              className="w-full mt-4"
+              onClick={() => setIsRenewalDialogOpen(true)}
+            >
+              <RefreshCw className="h-4 w-4 mr-2" /> Renew Membership Now
+            </Button>
           )}
         </div>
       </div>
@@ -98,6 +118,15 @@ const CheckInPage = () => {
           
         </CardContent>
       </Card>
+      
+      {memberInfo && (
+        <MembershipRenewalDialog
+          open={isRenewalDialogOpen}
+          onOpenChange={setIsRenewalDialogOpen}
+          member={memberInfo}
+          onRenewalSuccess={handleRenewalSuccess}
+        />
+      )}
     </div>
   );
 };
