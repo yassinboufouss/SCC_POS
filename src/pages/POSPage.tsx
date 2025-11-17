@@ -3,9 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { ShoppingCart, X, Trash2, Plus, Minus } from 'lucide-react';
+import { ShoppingCart, X, Trash2, Plus, Minus, UserX } from 'lucide-react';
 import { inventoryItems, InventoryItem } from '@/data/inventory';
 import { showSuccess } from '@/utils/toast';
+import MemberSelectDialog from '@/components/MemberSelectDialog';
+import { Member } from '@/data/members';
 
 interface CartItem extends InventoryItem {
   quantity: number;
@@ -14,6 +16,7 @@ interface CartItem extends InventoryItem {
 const POSPage = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
 
   const filteredItems = useMemo(() => {
     return inventoryItems.filter(item =>
@@ -77,10 +80,18 @@ const POSPage = () => {
   const handleCheckout = () => {
     if (cart.length === 0) return;
 
-    console.log("Processing sale:", cart);
+    const transactionDetails = {
+        memberId: selectedMember?.id || 'GUEST',
+        memberName: selectedMember?.name || 'Guest Customer',
+        items: cart.map(item => ({ name: item.name, quantity: item.quantity, price: item.price })),
+        total: total.toFixed(2),
+    };
+
+    console.log("Processing sale:", transactionDetails);
     showSuccess(`Sale processed successfully! Total: $${total.toFixed(2)}`);
     setCart([]);
     setSearchTerm('');
+    setSelectedMember(null); // Clear member after checkout
   };
 
   return (
@@ -140,6 +151,24 @@ const POSPage = () => {
             </CardHeader>
             <CardContent className="flex flex-col flex-1">
               
+              {/* Member Selection */}
+              <div className="mb-4">
+                <MemberSelectDialog 
+                    onSelectMember={setSelectedMember} 
+                    selectedMember={selectedMember} 
+                />
+                {selectedMember && (
+                    <div className="flex items-center justify-between text-sm mt-2 p-2 bg-accent rounded-md">
+                        <p className="font-medium">
+                            {selectedMember.name}
+                        </p>
+                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setSelectedMember(null)}>
+                            <UserX className="h-4 w-4 text-red-500" />
+                        </Button>
+                    </div>
+                )}
+              </div>
+
               {/* Cart Items List */}
               <div className="flex-1 overflow-y-auto space-y-3 pr-2 mb-4">
                 {cart.length === 0 ? (
