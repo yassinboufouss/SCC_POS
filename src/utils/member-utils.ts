@@ -3,7 +3,7 @@ import { membershipPlans } from "@/data/membership-plans";
 import { addDays, format, isBefore, parseISO } from "date-fns";
 
 // Define the expected input structure from the registration form
-type NewMemberInput = {
+export type NewMemberInput = {
   fullName: string;
   email: string;
   phone: string;

@@ -13,7 +13,7 @@ import { addDays, format } from "date-fns";
 import { showSuccess, showError } from "@/utils/toast";
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { addMember } from '@/utils/member-utils'; // Import new utility
+import { addMember, NewMemberInput } from '@/utils/member-utils'; // Import utility and type
 
 const memberRegistrationSchema = z.object({
   fullName: z.string().min(2, { message: "Full name is required." }),
@@ -47,7 +47,8 @@ const RegistrationForm = () => {
         return;
     }
 
-    const newMember = addMember(values);
+    // Type assertion is used here because we know the Zod resolver guarantees all fields are present
+    const newMember = addMember(values as NewMemberInput);
 
     if (newMember) {
         showSuccess(`Member ${newMember.name} registered successfully! Expires: ${format(new Date(newMember.expirationDate), 'MMM dd, yyyy')}`);
