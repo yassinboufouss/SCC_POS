@@ -8,12 +8,18 @@ export interface DashboardMetrics {
   monthlyRevenue: number;
   lowStockItems: number;
   expiredMemberships: number;
+  monthlyExpenses: number; // New metric
+  monthlyProfit: number; // New metric
+  profitMargin: number; // New metric
 }
 
 export interface RevenueBreakdown {
   type: 'Membership' | 'POS Sale' | 'Mixed Sale';
   amount: number;
 }
+
+// Mock fixed expenses for MTD calculation
+const MOCK_MONTHLY_EXPENSES = 15000.00;
 
 export const calculateDashboardMetrics = (): DashboardMetrics => {
   const today = new Date();
@@ -26,19 +32,24 @@ export const calculateDashboardMetrics = (): DashboardMetrics => {
   const monthlyRevenue = mockTransactions
     .filter(tx => isSameMonth(parseISO(tx.date), today))
     .reduce((sum, tx) => sum + tx.amount, 0);
+    
+  // 3. Financial Calculations
+  const monthlyExpenses = MOCK_MONTHLY_EXPENSES;
+  const monthlyProfit = monthlyRevenue - monthlyExpenses;
+  const profitMargin = monthlyRevenue > 0 ? (monthlyProfit / monthlyRevenue) * 100 : 0;
 
-  // 3. Low Stock Items
+  // 4. Low Stock Items
   const LOW_STOCK_THRESHOLD = 10;
   const lowStockItems = inventoryItems.filter(item => item.stock <= LOW_STOCK_THRESHOLD).length;
-
-  // 4. Daily Check-ins (This metric is usually real-time, but we'll mock a simple count for now)
-  // Since we don't have a dedicated check-in log, we'll use a fixed mock value for the dashboard component itself.
 
   return {
     activeMembers,
     monthlyRevenue,
     lowStockItems,
     expiredMemberships,
+    monthlyExpenses,
+    monthlyProfit,
+    profitMargin,
   };
 };
 

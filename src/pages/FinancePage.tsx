@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, TrendingUp, Users, FileText, ArrowRight } from 'lucide-react';
+import { DollarSign, TrendingUp, Users, FileText, ArrowRight, Percent } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import RecentTransactions from '@/components/RecentTransactions';
@@ -13,20 +13,23 @@ const FinancePage = () => {
   const { t } = useTranslation();
   const metrics = calculateDashboardMetrics();
   
-  // Mock Financial Data (using calculated revenue)
+  // Use calculated financial data
   const financialData = {
     monthlyRevenue: metrics.monthlyRevenue,
-    newMembers: metrics.activeMembers, // Reusing active members count as a proxy for new members MTD for simplicity
-    outstandingInvoices: 1200.50, // Keeping this mock as we lack invoice data
-    expenseMTD: 15000.00, // Keeping this mock
+    monthlyExpenses: metrics.monthlyExpenses,
+    monthlyProfit: metrics.monthlyProfit,
+    profitMargin: metrics.profitMargin,
+    outstandingInvoices: 1200.50, // Keeping this mock
   };
 
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">{t("finance_reports_title")}</h1>
       
+      {/* Monthly Financial Summary Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {/* Monthly Revenue */}
+        
+        {/* Total Revenue */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
@@ -36,20 +39,65 @@ const FinancePage = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">${financialData.monthlyRevenue.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">+18.5% vs last month (Mock)</p>
+            <p className="text-xs text-muted-foreground">{t("this_months_sales")}</p>
           </CardContent>
         </Card>
         
+        {/* Total Expenses */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              {t("expenses_mtd")}
+            </CardTitle>
+            <TrendingUp className="h-4 w-4 text-orange-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">${financialData.monthlyExpenses.toFixed(2)}</div>
+            <p className="text-xs text-muted-foreground">{t("includes_payroll_mock")}</p>
+          </CardContent>
+        </Card>
+        
+        {/* Net Profit */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              {t("total_profit_mtd")}
+            </CardTitle>
+            <DollarSign className="h-4 w-4 text-blue-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">${financialData.monthlyProfit.toFixed(2)}</div>
+            <p className="text-xs text-muted-foreground">{t("net_profit_after_expenses")}</p>
+          </CardContent>
+        </Card>
+        
+        {/* Profit Margin */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              {t("profit_margin")}
+            </CardTitle>
+            <Percent className="h-4 w-4 text-purple-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{financialData.profitMargin.toFixed(1)}%</div>
+            <p className="text-xs text-muted-foreground">{t("revenue_minus_expenses")}</p>
+          </CardContent>
+        </Card>
+      </div>
+      
+      {/* Secondary Metrics (Active Members, Outstanding Invoices) */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {/* Active Members */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("active_members")}
             </CardTitle>
-            <Users className="h-4 w-4 text-blue-500" />
+            <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{financialData.newMembers}</div>
+            <div className="text-2xl font-bold">{metrics.activeMembers}</div>
             <p className="text-xs text-muted-foreground">{t("total_active_memberships")}</p>
           </CardContent>
         </Card>
@@ -65,20 +113,6 @@ const FinancePage = () => {
           <CardContent>
             <div className="text-2xl font-bold">${financialData.outstandingInvoices.toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">{t("awaiting_payment_mock")}</p>
-          </CardContent>
-        </Card>
-        
-        {/* Expenses MTD */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              {t("expenses_mtd")}
-            </CardTitle>
-            <TrendingUp className="h-4 w-4 text-orange-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">${financialData.expenseMTD.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">{t("includes_payroll_mock")}</p>
           </CardContent>
         </Card>
       </div>
