@@ -24,7 +24,7 @@ export const restockInventoryItem = (itemId: string, quantity: number) => {
 };
 
 // Utility to simulate adding a new inventory item
-export const addInventoryItem = (newItemData: Omit<InventoryItem, 'id' | 'lastRestock'> & { initialStock: number }): InventoryItem => {
+export const addInventoryItem = (newItemData: Omit<InventoryItem, 'id' | 'lastRestock' | 'stock'> & { initialStock: number }): InventoryItem => {
   const id = `INV${(inventoryItems.length + 1).toString().padStart(3, '0')}`; // Mock ID generation
   const now = format(new Date(), 'yyyy-MM-dd');
 
