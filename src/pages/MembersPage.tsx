@@ -10,31 +10,43 @@ import Layout from '@/components/Layout';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import MemberRegistrationForm from '@/components/members/MemberRegistrationForm';
+import MemberProfileDialog from '@/components/members/MemberProfileDialog';
 
 const MembersPage: React.FC = () => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
+  // State to force re-render of the member list when a member is updated
+  const [memberUpdateKey, setMemberUpdateKey] = useState(0); 
+
+  const membersList = useMemo(() => {
+    // We use a key to force re-evaluation of mockMembers when an update occurs
+    // In a real app, this would be handled by a state management library or query invalidation.
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const _key = memberUpdateKey; 
+    return mockMembers;
+  }, [memberUpdateKey]);
 
   const filteredMembers = useMemo(() => {
     if (!searchTerm) {
-      return mockMembers;
+      return membersList;
     }
     const lowerCaseSearch = searchTerm.toLowerCase();
-    return mockMembers.filter(member =>
+    return membersList.filter(member =>
       member.name.toLowerCase().includes(lowerCaseSearch) ||
       member.id.toLowerCase().includes(lowerCaseSearch) ||
       member.email.toLowerCase().includes(lowerCaseSearch)
     );
-  }, [searchTerm]);
+  }, [searchTerm, membersList]);
 
   const getStatusVariant = (status: Member['status']) => {
     switch (status) {
       case 'Active':
         return 'default';
       case 'Expired':
+        return 'destructive';
       case 'Pending':
-        return 'outline';
+        return 'secondary';
       default:
         return 'secondary';
     }
@@ -42,7 +54,11 @@ const MembersPage: React.FC = () => {
 
   const handleRegistrationSuccess = () => {
     setIsRegistrationOpen(false);
-    // In a real app, we might refresh data here, but mockMembers is mutable.
+    setMemberUpdateKey(prev => prev + 1);
+  };
+  
+  const handleMemberUpdate = () => {
+    setMemberUpdateKey(prev => prev + 1);
   };
 
   return (
@@ -108,9 +124,7 @@ const MembersPage: React.FC = () => {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button variant="outline" size="sm">
-                            <Edit className="h-4 w-4" />
-                          </Button>
+                          <MemberProfileDialog member={member} onUpdate={handleMemberUpdate} />
                         </TableCell>
                       </TableRow>
                     ))

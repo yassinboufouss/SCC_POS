@@ -21,6 +21,23 @@ export const updateMember = (updatedMember: Member) => {
   }
 };
 
+// Utility to simulate updating member status
+export const updateMemberStatus = (memberId: string, newStatus: Member['status']) => {
+  const member = mockMembers.find(m => m.id === memberId);
+  if (!member) {
+    console.error("Member not found for status update.");
+    return null;
+  }
+  
+  const updatedMember: Member = {
+    ...member,
+    status: newStatus,
+  };
+
+  updateMember(updatedMember);
+  return updatedMember;
+};
+
 // Utility to simulate adding a new member (kept for POS/Check-in future expansion, though currently unused)
 export const addMember = (newMemberData: NewMemberInput): Member | null => {
   const plan = membershipPlans.find(p => p.id === newMemberData.planId);
