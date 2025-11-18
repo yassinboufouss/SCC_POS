@@ -110,7 +110,13 @@ const PlanActions: React.FC<PlanActionsProps> = ({ plan }) => {
                   <FormItem>
                     <FormLabel>{t("duration_days_label")}</FormLabel>
                     <FormControl>
-                      <Input type="number" min="1" {...field} onChange={e => field.onChange(parseInt(e.target.value))} />
+                      <Input 
+                        type="number" 
+                        min="1" 
+                        {...field} 
+                        onChange={e => field.onChange(e.target.value)} // Let zod coerce
+                        value={field.value === 0 ? '' : field.value} // Handle 0 for empty input display
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -125,7 +131,14 @@ const PlanActions: React.FC<PlanActionsProps> = ({ plan }) => {
                   <FormItem>
                     <FormLabel>{t("price")} ({t("currency_symbol")})</FormLabel>
                     <FormControl>
-                      <Input type="number" step="0.01" min="0.01" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                      <Input 
+                        type="number" 
+                        step="0.01" 
+                        min="0.01" 
+                        {...field} 
+                        onChange={e => field.onChange(e.target.value)} // Let zod coerce
+                        value={field.value === 0 ? '' : field.value} // Handle 0 for empty input display
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

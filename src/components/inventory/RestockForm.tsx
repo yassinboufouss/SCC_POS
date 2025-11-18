@@ -63,7 +63,14 @@ const RestockForm: React.FC<RestockFormProps> = ({ item, onSuccess }) => {
                 <FormItem className="flex-1">
                     <FormLabel>{t("quantity_to_add")}</FormLabel>
                     <FormControl>
-                    <Input type="number" min="1" placeholder="10" {...field} onChange={e => field.onChange(parseInt(e.target.value))} />
+                    <Input 
+                        type="number" 
+                        min="1" 
+                        placeholder="10" 
+                        {...field} 
+                        onChange={e => field.onChange(e.target.value)} // Let zod coerce
+                        value={field.value === 0 ? '' : field.value} // Handle 0 for empty input display
+                    />
                     </FormControl>
                     <FormMessage />
                 </FormItem>

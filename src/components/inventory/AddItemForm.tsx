@@ -121,7 +121,15 @@ const AddItemForm: React.FC<AddItemFormProps> = ({ onSuccess }) => {
               <FormItem>
                 <FormLabel>{t("price")}</FormLabel>
                 <FormControl>
-                  <Input type="number" step="0.01" min="0.01" placeholder="19.99" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                  <Input 
+                    type="number" 
+                    step="0.01" 
+                    min="0.01" 
+                    placeholder="19.99" 
+                    {...field} 
+                    onChange={e => field.onChange(e.target.value)} // Let zod coerce
+                    value={field.value === 0 ? '' : field.value} // Handle 0 for empty input display
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -136,7 +144,14 @@ const AddItemForm: React.FC<AddItemFormProps> = ({ onSuccess }) => {
               <FormItem>
                 <FormLabel>{t("initial_stock")}</FormLabel>
                 <FormControl>
-                  <Input type="number" min="0" placeholder="10" {...field} onChange={e => field.onChange(parseInt(e.target.value))} />
+                  <Input 
+                    type="number" 
+                    min="0" 
+                    placeholder="10" 
+                    {...field} 
+                    onChange={e => field.onChange(e.target.value)} // Let zod coerce
+                    value={field.value === 0 ? '' : field.value} // Handle 0 for empty input display
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

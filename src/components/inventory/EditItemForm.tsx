@@ -118,7 +118,14 @@ const EditItemForm: React.FC<EditItemFormProps> = ({ item, onSuccess }) => {
               <FormItem>
                 <FormLabel>{t("price")} ({t("currency_symbol")})</FormLabel>
                 <FormControl>
-                  <Input type="number" step="0.01" min="0.01" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                  <Input 
+                    type="number" 
+                    step="0.01" 
+                    min="0.01" 
+                    {...field} 
+                    onChange={e => field.onChange(e.target.value)} // Let zod coerce
+                    value={field.value === 0 ? '' : field.value} // Handle 0 for empty input display
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -133,7 +140,13 @@ const EditItemForm: React.FC<EditItemFormProps> = ({ item, onSuccess }) => {
               <FormItem>
                 <FormLabel>{t("current_stock_manual")}</FormLabel>
                 <FormControl>
-                  <Input type="number" min="0" {...field} onChange={e => field.onChange(parseInt(e.target.value))} />
+                  <Input 
+                    type="number" 
+                    min="0" 
+                    {...field} 
+                    onChange={e => field.onChange(e.target.value)} // Let zod coerce
+                    value={field.value === 0 ? '' : field.value} // Handle 0 for empty input display
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

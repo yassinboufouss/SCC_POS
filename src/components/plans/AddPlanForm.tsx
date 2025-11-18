@@ -95,7 +95,14 @@ const AddPlanForm: React.FC<AddPlanFormProps> = ({ onSuccess }) => {
               <FormItem>
                 <FormLabel>{t("duration_days_label")}</FormLabel>
                 <FormControl>
-                  <Input type="number" min="1" placeholder="30" {...field} onChange={e => field.onChange(parseInt(e.target.value))} />
+                  <Input 
+                    type="number" 
+                    min="1" 
+                    placeholder="30" 
+                    {...field} 
+                    onChange={e => field.onChange(e.target.value)} // Let zod coerce
+                    value={field.value === 0 ? '' : field.value} // Handle 0 for empty input display
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -110,7 +117,15 @@ const AddPlanForm: React.FC<AddPlanFormProps> = ({ onSuccess }) => {
               <FormItem>
                 <FormLabel>{t("price")}</FormLabel>
                 <FormControl>
-                  <Input type="number" step="0.01" min="0.01" placeholder="99.99" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                  <Input 
+                    type="number" 
+                    step="0.01" 
+                    min="0.01" 
+                    placeholder="99.99" 
+                    {...field} 
+                    onChange={e => field.onChange(e.target.value)} // Let zod coerce
+                    value={field.value === 0 ? '' : field.value} // Handle 0 for empty input display
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
