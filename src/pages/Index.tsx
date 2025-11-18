@@ -23,7 +23,7 @@ const Index = () => {
     setTimeout(() => {
       if (username === 'admin' && password === 'admin') {
         showSuccess("Login successful!");
-        navigate('/pos');
+        navigate('/dashboard'); // Redirect to Dashboard
       } else {
         showError("Invalid credentials. Try 'admin'/'admin'.");
       }

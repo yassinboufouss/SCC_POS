@@ -1,11 +1,12 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Users, ShoppingCart, LogOut, Package, Ticket, QrCode } from 'lucide-react';
+import { Users, ShoppingCart, LogOut, Package, Ticket, QrCode, LayoutDashboard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
 
 const navItems = [
+  { nameKey: 'dashboard', href: '/dashboard', icon: LayoutDashboard }, // Added Dashboard
   { nameKey: 'pos', href: '/pos', icon: ShoppingCart },
   { nameKey: 'check_in', href: '/check-in', icon: QrCode },
   { nameKey: 'members', href: '/members', icon: Users },
@@ -26,7 +27,8 @@ const Sidebar: React.FC = () => {
       <nav className="flex-1 space-y-2">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = location.pathname.startsWith(item.href);
+          // Check if the current path starts with the item's href, handling '/' for dashboard
+          const isActive = location.pathname === item.href || (item.href !== '/dashboard' && location.pathname.startsWith(item.href));
           
           return (
             <Link

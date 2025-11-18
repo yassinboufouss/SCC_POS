@@ -9,6 +9,7 @@ import MembersPage from "./pages/MembersPage";
 import InventoryPage from "./pages/InventoryPage";
 import PlansPage from "./pages/PlansPage";
 import CheckInPage from "./pages/CheckInPage";
+import DashboardPage from "./pages/DashboardPage"; // Import DashboardPage
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           
           {/* Protected Routes (Wrapped in Layout in their respective files) */}
+          <Route path="/dashboard" element={<DashboardPage />} /> {/* New Dashboard Route */}
           <Route path="/pos" element={<POSPage />} />
           <Route path="/check-in" element={<CheckInPage />} />
           <Route path="/members" element={<MembersPage />} />
