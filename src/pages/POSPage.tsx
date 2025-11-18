@@ -116,6 +116,10 @@ const POSPage = () => {
     setCart(prevCart => prevCart.filter(i => !(i.sourceId === sourceId && i.type === type)));
   };
   
+  const handleClearMember = () => {
+    setSelectedMember(null);
+  };
+  
   const handleClearCart = () => {
     setCart([]);
     setDiscountPercent(0);
@@ -272,7 +276,7 @@ const POSPage = () => {
               <POSMemberSelector 
                 selectedMember={selectedMember}
                 onSelectMember={setSelectedMember}
-                onClearMember={() => setSelectedMember(null)}
+                onClearMember={handleClearMember}
               />
               
               <POSCartAndCheckout
@@ -291,6 +295,7 @@ const POSPage = () => {
                   tax={tax}
                   total={total}
                   isProcessingSale={isProcessingSale}
+                  onClearMember={handleClearMember} // Passed the clear function here
               />
           </div>
         </div>

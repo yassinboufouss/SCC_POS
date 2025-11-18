@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { ShoppingCart, Trash2, DollarSign, Percent, CreditCard } from 'lucide-react';
+import { ShoppingCart, Trash2, DollarSign, Percent, CreditCard, X } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import POSCartItem from './POSCartItem.tsx';
@@ -28,6 +28,7 @@ interface POSCartAndCheckoutProps {
   tax: number;
   total: number;
   isProcessingSale: boolean;
+  onClearMember: () => void; // Added
 }
 
 const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
@@ -46,6 +47,7 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
   tax,
   total,
   isProcessingSale,
+  onClearMember, // Destructured new prop
 }) => {
   const { t } = useTranslation();
   
@@ -70,11 +72,18 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
       <CardContent className="flex flex-col flex-1">
         
         {/* Member Selection Display */}
-        <div className="mb-4 text-sm text-muted-foreground p-2 border rounded-md">
-            {t("member_customer")}: 
-            <span className="font-medium text-foreground ml-1">
-                {selectedMember ? `${selectedMember.first_name} ${selectedMember.last_name} (${selectedMember.member_code})` : t("guest_customer")}
-            </span>
+        <div className="mb-4 text-sm text-muted-foreground p-2 border rounded-md flex items-center justify-between">
+            <div className="flex items-center">
+                {t("member_customer")}: 
+                <span className="font-medium text-foreground ml-1">
+                    {selectedMember ? `${selectedMember.first_name} ${selectedMember.last_name} (${selectedMember.member_code})` : t("guest_customer")}
+                </span>
+            </div>
+            {selectedMember && (
+                <Button variant="ghost" size="icon" className="h-6 w-6 text-red-500" onClick={onClearMember} disabled={isProcessingSale}>
+                    <X className="h-4 w-4" />
+                </Button>
+            )}
         </div>
 
         {/* Cart Items List */}
