@@ -86,7 +86,7 @@ export const registerNewUserAndProfile = async (newMemberData: Omit<NewMemberInp
     start_date: format(startDate, 'yyyy-MM-dd'),
     expiration_date: format(expirationDate, 'yyyy-MM-dd'),
     updated_at: new Date().toISOString(),
-    email: memberDetails.email,
+    // Removed email from update payload to avoid potential RLS/constraint issues related to auth.users linkage.
   };
 
   const { data: profile, error: profileError } = await supabase
@@ -98,10 +98,11 @@ export const registerNewUserAndProfile = async (newMemberData: Omit<NewMemberInp
 
   if (profileError || !profile) {
     console.error("Supabase Profile Update Error:", profileError);
-    throw new Error("Failed to finalize member registration: Profile update failed.");
+    throw new Error(profileError?.message || "Failed to finalize member registration: Profile update failed.");
   }
   
-  return { profile, plan: planData };
+  // Merge email back into the profile object for client-side consistency
+  return { profile: { ...profile, email: memberDetails.email } as Profile, plan: planData };
 };
 
 
