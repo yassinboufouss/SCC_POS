@@ -12,6 +12,7 @@ import MemberRenewalForm from './MemberRenewalForm';
 import MemberStatusActions from './MemberStatusActions';
 import MemberDetailsCard from './MemberDetailsCard';
 import MemberBasicInfoForm from './MemberBasicInfoForm'; // New import
+import MemberTransactionHistory from './MemberTransactionHistory'; // New import
 import { useMember } from '@/integrations/supabase/data/use-members.ts';
 import { useMemberTransactions } from '@/integrations/supabase/data/use-transactions.ts';
 import { showSuccess, showError } from '@/utils/toast';
@@ -147,11 +148,12 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member }) => 
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
-                    <History className="h-5 w-5" /> {t("recent_transactions_title", { count: transactions?.length || 0 })}
+                    <History className="h-5 w-5" /> {t("activity_history")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
+                    {/* Check-in Metrics */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <Card className="p-3 text-center">
                             <p className="text-xs text-muted-foreground">{t("total_check_ins")}</p>
@@ -167,30 +169,14 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member }) => 
                     
                     <Separator className="my-2" />
                     
-                    {isLoadingTransactions ? (
-                        <div className="space-y-3">
-                            {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}
-                        </div>
-                    ) : transactions && transactions.length > 0 ? (
-                        <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
-                            {transactions.map(tx => (
-                                <div key={tx.id} className="flex justify-between items-center border-b pb-2 last:border-b-0">
-                                    <div className="text-sm min-w-0 flex-1">
-                                        <p className="font-medium truncate">{tx.item_description}</p>
-                                        <p className="text-xs text-muted-foreground">
-                                            {tx.transaction_date} | {t(tx.payment_method.toLowerCase())}
-                                        </p>
-                                    </div>
-                                    <div className="text-right shrink-0">
-                                        <p className="font-bold text-base text-green-600">{formatCurrency(tx.amount)}</p>
-                                        <Badge variant="secondary" className="text-xs">{t(tx.type.replace(/\s/g, '_').toLowerCase())}</Badge>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <p className="text-center text-muted-foreground py-4">{t("no_recent_transactions")}</p>
-                    )}
+                    {/* Transaction History Table */}
+                    <h4 className="font-semibold text-lg flex items-center gap-2">
+                        <DollarSign className="h-4 w-4" /> {t("transaction_history", { count: transactions?.length || 0 })}
+                    </h4>
+                    <MemberTransactionHistory 
+                        transactions={transactions || []} 
+                        isLoading={isLoadingTransactions} 
+                    />
                 </div>
               </CardContent>
             </Card>
