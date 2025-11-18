@@ -55,6 +55,7 @@ export const ar = {
     "plan": "الخطة",
     "expires": "ينتهي",
     "status": "الحالة",
+    "All": "جميع الحالات",
     "Active": "نشط",
     "Expired": "منتهي الصلاحية",
     "Pending": "معلق",

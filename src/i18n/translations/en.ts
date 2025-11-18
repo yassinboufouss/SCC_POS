@@ -55,6 +55,7 @@ export const en = {
     "plan": "Plan",
     "expires": "Expires",
     "status": "Status",
+    "All": "All Statuses",
     "Active": "Active",
     "Expired": "Expired",
     "Pending": "Pending",

@@ -3,17 +3,18 @@ import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '@/types/supabase';
 import { queryKeys } from './query-keys.ts';
 import { addMember, updateProfile, updateMemberStatus, renewMemberPlan, NewMemberInput, processCheckIn } from '@/utils/member-utils';
+import { isFuture } from 'date-fns';
 
 // Re-export NewMemberInput to allow components to import it
 export type { NewMemberInput };
 
 // --- Fetch Hooks ---
 
-export const useMembers = (searchTerm: string = '') => {
+export const useMembers = (searchTerm: string = '', statusFilter: Profile['status'] | 'All' = 'All') => {
   const search = searchTerm.toLowerCase();
   
   return useQuery({
-    queryKey: queryKeys.profiles.list(search),
+    queryKey: queryKeys.profiles.list(search, statusFilter),
     queryFn: async () => {
       let query = supabase
         .from('profiles')
@@ -25,6 +26,14 @@ export const useMembers = (searchTerm: string = '') => {
         // so we filter by name/code/email using ILIKE (case-insensitive)
         query = query.or(`first_name.ilike.%${search}%,last_name.ilike.%${search}%,member_code.ilike.%${search}%`);
       }
+      
+      // Apply status filter (Supabase side)
+      // We fetch all data first, then apply client-side filtering based on the calculated status below,
+      // but we still apply the filter here if possible to reduce payload size.
+      // Since we need to calculate 'Expired' status client-side, we only apply the filter if it's not 'All' and not 'Expired'.
+      if (statusFilter && statusFilter !== 'All' && statusFilter !== 'Expired') {
+          query = query.eq('status', statusFilter);
+      }
 
       const { data, error } = await query;
 
@@ -32,7 +41,31 @@ export const useMembers = (searchTerm: string = '') => {
         console.error("Supabase fetch members error:", error);
         throw new Error("Failed to fetch members.");
       }
-      return data as Profile[];
+      
+      const profiles = data as Profile[];
+      
+      // Client-side logic to ensure 'Expired' status is correctly applied if expiration date passed
+      const now = new Date();
+      
+      const processedProfiles = profiles.map(profile => {
+          let currentStatus = profile.status;
+          
+          if (currentStatus === 'Active' && profile.expiration_date) {
+              const expirationDate = new Date(profile.expiration_date);
+              if (!isFuture(expirationDate)) {
+                  // Temporarily mark as Expired for UI display
+                  currentStatus = 'Expired' as const;
+              }
+          }
+          return { ...profile, status: currentStatus };
+      });
+      
+      // Apply client-side filtering for 'Expired' or 'All' if the initial query didn't filter it
+      if (statusFilter === 'Expired') {
+          return processedProfiles.filter(p => p.status === 'Expired');
+      }
+      
+      return processedProfiles;
     },
   });
 };
@@ -51,7 +84,18 @@ export const useMember = (id: string) => {
         console.error("Supabase fetch member error:", error);
         throw new Error("Failed to fetch member details.");
       }
-      return data as Profile;
+      
+      const profile = data as Profile;
+      
+      // Client-side check for expiration status
+      if (profile.status === 'Active' && profile.expiration_date) {
+          const expirationDate = new Date(profile.expiration_date);
+          if (!isFuture(expirationDate)) {
+              return { ...profile, status: 'Expired' as const };
+          }
+      }
+      
+      return profile;
     },
     enabled: !!id,
   });

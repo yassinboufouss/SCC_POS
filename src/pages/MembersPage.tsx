@@ -13,13 +13,17 @@ import { useMembers } from '@/integrations/supabase/data/use-members.ts';
 import { Profile } from '@/types/supabase';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+const statusOptions: (Profile['status'] | 'All')[] = ['All', 'Active', 'Pending', 'Expired'];
 
 const MembersPage: React.FC = () => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<Profile['status'] | 'All'>('All');
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
   
-  const { data: members, isLoading } = useMembers(searchTerm);
+  const { data: members, isLoading } = useMembers(searchTerm, statusFilter);
 
   const getStatusVariant = (status: Profile['status']) => {
     switch (status) {
@@ -38,8 +42,6 @@ const MembersPage: React.FC = () => {
     setIsRegistrationOpen(false);
   };
   
-  // No need for handleMemberUpdate or memberUpdateKey as React Query handles invalidation
-
   return (
     <Layout>
       <div className="p-4 lg:p-6 space-y-6">
@@ -67,14 +69,27 @@ const MembersPage: React.FC = () => {
             <CardTitle>{t("member_directory", { count: members?.length || 0 })}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="mb-4 flex items-center gap-2">
-                <Search className="h-4 w-4 text-muted-foreground" />
+            <div className="mb-4 flex items-center gap-4">
+                <Search className="h-4 w-4 text-muted-foreground shrink-0" />
                 <Input
                     placeholder={t("search_members_by_name")}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="max-w-sm"
+                    className="max-w-sm flex-1"
                 />
+                
+                <Select value={statusFilter} onValueChange={(value: Profile['status'] | 'All') => setStatusFilter(value)}>
+                    <SelectTrigger className="w-[180px] shrink-0">
+                        <SelectValue placeholder={t("select_status")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {statusOptions.map(status => (
+                            <SelectItem key={status} value={status}>
+                                {t(status)}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
             </div>
             
             <div className="overflow-x-auto">
