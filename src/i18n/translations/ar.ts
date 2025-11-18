@@ -125,6 +125,11 @@ export const ar = {
     "lookup": "بحث",
     "checkin_note": "استخدم معرف العضو أو امسح بطاقته/رمز QR.",
     "checked_in_successfully": "تم تسجيل دخوله بنجاح!",
+    "checked_in_successfully_profile": "تم تسجيل دخول {{name}} بنجاح!",
+    "already_checked_in": "تم تسجيل الدخول اليوم بالفعل",
+    "cannot_check_in_inactive": "لا يمكن تسجيل الدخول (غير نشط/معلق)",
+    "checking_in": "جاري تسجيل الدخول...",
+    "manual_check_in": "تسجيل الدخول اليدوي",
     "membership_is": "العضوية هي {{status}}.",
     "cannot_check_in": "لا يمكن تسجيل الدخول.",
     "member_code_not_found": "لم يتم العثور على رمز العضو '{{code}}'.",
@@ -151,7 +156,7 @@ export const ar = {
     "clear_cart": "مسح العربة",
     "select_payment_method_error": "الرجاء تحديد طريقة دفع.",
     "sale_processed_success": "تمت معالجة {{type}} بنجاح عبر {{method}}! الإجمالي: {{total}}",
-    "checkout_failed": "فشلت عملية الدفع. الرجاء التحقق من المخزون والمحاولة مرة أخرى.",
+    "checkout_failed": "فشل الدفع. الرجاء التحقق من المخزون والمحاولة مرة أخرى.",
     "membership_renewal_pos_success": "تم تجديد العضوية لـ {{name}} كجزء من عملية البيع.",
     "search_select_member": "البحث واختيار العضو",
     "search_by_name_or_id": "البحث بالاسم أو المعرف...",
@@ -226,8 +231,6 @@ export const ar = {
     "pos_register_tab": "تسجيل عضو جديد",
     "registration_and_cart_success": "اكتمل التسجيل. تم اختيار {{name}} وإضافة الخطة إلى العربة.",
     "plan_not_found_after_registration": "لم يتم العثور على تفاصيل الخطة بعد التسجيل، يرجى التحقق من العربة يدويًا.",
-    
-    // New Transaction Details Keys
     "view_details": "عرض التفاصيل",
     "transaction_details": "تفاصيل المعاملة",
     "transaction_id": "معرف المعاملة",
@@ -236,8 +239,6 @@ export const ar = {
     "transaction_date_time": "التاريخ والوقت",
     "total_amount": "المبلغ الإجمالي",
     "lookup_failed": "فشل البحث عن العضو. الرجاء المحاولة مرة أخرى.",
-    
-    // Giveaway Keys
     "free_giveaway_item": "عنصر هدية مجاني",
     "select_optional_item": "اختر عنصرًا اختياريًا",
     "no_giveaway": "لا توجد هدية",
@@ -246,5 +247,6 @@ export const ar = {
     "cannot_remove_giveaway": "لا يمكن إزالة عنصر الهدية. قم بإزالة الخطة المرتبطة بدلاً من ذلك.",
     "giveaway_item_not_found": "لم يتم العثور على عنصر الهدية في المخزون.",
     "checkout_failed_stock_issue": "فشل الدفع: مخزون غير كافٍ لـ {{name}}.",
+    "plan_creation_failed": "فشل إنشاء خطة العضوية.",
   }
 };

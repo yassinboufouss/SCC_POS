@@ -125,6 +125,11 @@ export const en = {
     "lookup": "Lookup",
     "checkin_note": "Use the member's ID or scan their card/QR code.",
     "checked_in_successfully": "checked in successfully!",
+    "checked_in_successfully_profile": "{{name}} checked in successfully!",
+    "already_checked_in": "Already checked in today",
+    "cannot_check_in_inactive": "Cannot check in (Inactive/Pending)",
+    "checking_in": "Checking In...",
+    "manual_check_in": "Manual Check-In",
     "membership_is": "Membership is {{status}}.",
     "cannot_check_in": "Cannot check in.",
     "member_code_not_found": "Member code '{{code}}' not found.",
@@ -226,8 +231,6 @@ export const en = {
     "pos_register_tab": "New Member Registration",
     "registration_and_cart_success": "Registration complete. {{name}} selected and plan added to cart.",
     "plan_not_found_after_registration": "Plan details not found after registration, please check cart manually.",
-    
-    // New Transaction Details Keys
     "view_details": "View Details",
     "transaction_details": "Transaction Details",
     "transaction_id": "Transaction ID",
@@ -236,8 +239,6 @@ export const en = {
     "transaction_date_time": "Date & Time",
     "total_amount": "Total Amount",
     "lookup_failed": "Member lookup failed. Please try again.",
-    
-    // Giveaway Keys
     "free_giveaway_item": "Free Giveaway Item",
     "select_optional_item": "Select optional item",
     "no_giveaway": "No Giveaway",
@@ -246,5 +247,6 @@ export const en = {
     "cannot_remove_giveaway": "Cannot remove giveaway item. Remove the associated plan instead.",
     "giveaway_item_not_found": "Giveaway item not found in inventory.",
     "checkout_failed_stock_issue": "Checkout failed: Insufficient stock for {{name}}.",
+    "plan_creation_failed": "Failed to create membership plan.",
   }
 };

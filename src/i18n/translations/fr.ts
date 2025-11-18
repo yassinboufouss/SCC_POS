@@ -125,6 +125,11 @@ export const fr = {
     "lookup": "Rechercher",
     "checkin_note": "Utilisez l'ID du membre ou scannez sa carte/QR code.",
     "checked_in_successfully": "enregistré avec succès !",
+    "checked_in_successfully_profile": "{{name}} enregistré avec succès !",
+    "already_checked_in": "Déjà enregistré aujourd'hui",
+    "cannot_check_in_inactive": "Impossible de s'enregistrer (Inactif/En Attente)",
+    "checking_in": "Enregistrement en cours...",
+    "manual_check_in": "Enregistrement Manuel",
     "membership_is": "L'adhésion est {{status}}.",
     "cannot_check_in": "Impossible de s'enregistrer.",
     "member_code_not_found": "Code membre '{{code}}' introuvable.",
@@ -226,8 +231,6 @@ export const fr = {
     "pos_register_tab": "Inscription Nouveau Membre",
     "registration_and_cart_success": "Inscription terminée. {{name}} sélectionné et plan ajouté à la caisse.",
     "plan_not_found_after_registration": "Détails du plan introuvables après l'inscription, veuillez vérifier le panier manuellement.",
-    
-    // New Transaction Details Keys
     "view_details": "Voir les Détails",
     "transaction_details": "Détails de la Transaction",
     "transaction_id": "ID de la Transaction",
@@ -236,8 +239,6 @@ export const fr = {
     "transaction_date_time": "Date et Heure",
     "total_amount": "Montant Total",
     "lookup_failed": "Échec de la recherche de membre. Veuillez réessayer.",
-    
-    // Giveaway Keys
     "free_giveaway_item": "Article Cadeau Gratuit",
     "select_optional_item": "Sélectionner un article optionnel",
     "no_giveaway": "Pas de Cadeau",
@@ -246,5 +247,6 @@ export const fr = {
     "cannot_remove_giveaway": "Impossible de supprimer l'article cadeau. Supprimez plutôt le plan associé.",
     "giveaway_item_not_found": "Article cadeau introuvable dans l'inventaire.",
     "checkout_failed_stock_issue": "Échec du paiement : Stock insuffisant pour {{name}}.",
+    "plan_creation_failed": "Échec de la création du plan d'adhésion.",
   }
 };

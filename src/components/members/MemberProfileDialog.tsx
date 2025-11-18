@@ -11,8 +11,9 @@ import { useTranslation } from 'react-i18next';
 import MemberRenewalForm from './MemberRenewalForm';
 import MemberStatusActions from './MemberStatusActions';
 import MemberDetailsCard from './MemberDetailsCard';
-import MemberBasicInfoForm from './MemberBasicInfoForm'; // New import
-import MemberTransactionHistory from './MemberTransactionHistory'; // New import
+import MemberBasicInfoForm from './MemberBasicInfoForm';
+import MemberTransactionHistory from './MemberTransactionHistory';
+import MemberCheckInButton from './MemberCheckInButton';
 import { useMember } from '@/integrations/supabase/data/use-members.ts';
 import { useMemberTransactions } from '@/integrations/supabase/data/use-transactions.ts';
 import { showSuccess, showError } from '@/utils/toast';
@@ -127,6 +128,8 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member }) => 
                 member={displayMember} 
                 onRenewClick={() => setActiveTab('renewal')} 
             />
+            
+            <MemberCheckInButton member={displayMember} />
             
             <MemberStatusActions member={displayMember} />
           </TabsContent>
