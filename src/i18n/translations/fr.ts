@@ -252,5 +252,20 @@ export const fr = {
     "welcome_member": "Bienvenue, {{name}}",
     "check_in_status": "Statut d'Enregistrement",
     "never_checked_in": "Jamais enregistré",
+    
+    // New Role Management Translations
+    "role_management": "Gestion des Rôles",
+    "user_roles_directory": "Annuaire des Rôles Utilisateur ({{count}})",
+    "search_users_by_name_email": "Rechercher des utilisateurs par nom ou e-mail...",
+    "current_role": "Rôle Actuel",
+    "assign_new_role": "Attribuer un Nouveau Rôle",
+    "select_role": "Sélectionner un Rôle",
+    "role_update_success": "Rôle de {{name}} mis à jour avec succès à {{role}}.",
+    "role_update_failed": "Échec de la mise à jour du rôle utilisateur.",
+    "no_users_found": "Aucun utilisateur trouvé.",
+    "access_denied": "Accès Refusé. Seul le Propriétaire peut voir cette page.",
+    "owner": "Propriétaire",
+    "manager": "Manager",
+    "cashier": "Caissier",
   }
 };

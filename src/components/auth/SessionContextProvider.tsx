@@ -49,7 +49,7 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
               const minimalProfile = {
                   id: currentUser.id,
                   email: currentUser.email || null,
-                  role: 'staff', // Default role if profile fetch fails (shouldn't happen if trigger works)
+                  role: 'member', // Default role if profile fetch fails, forcing explicit assignment for staff/owner
                   first_name: null,
                   last_name: null,
                   avatar_url: null,

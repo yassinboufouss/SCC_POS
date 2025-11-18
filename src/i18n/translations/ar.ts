@@ -252,5 +252,20 @@ export const ar = {
     "welcome_member": "مرحبًا بك، {{name}}",
     "check_in_status": "حالة تسجيل الدخول",
     "never_checked_in": "لم يسجل الدخول مطلقًا",
+    
+    // New Role Management Translations
+    "role_management": "إدارة الأدوار",
+    "user_roles_directory": "دليل أدوار المستخدم ({{count}})",
+    "search_users_by_name_email": "البحث عن المستخدمين بالاسم أو البريد الإلكتروني...",
+    "current_role": "الدور الحالي",
+    "assign_new_role": "تعيين دور جديد",
+    "select_role": "اختر الدور",
+    "role_update_success": "تم تحديث دور {{name}} بنجاح إلى {{role}}.",
+    "role_update_failed": "فشل تحديث دور المستخدم.",
+    "no_users_found": "لم يتم العثور على مستخدمين.",
+    "access_denied": "تم رفض الوصول. يمكن للمالك فقط عرض هذه الصفحة.",
+    "owner": "المالك",
+    "manager": "المدير",
+    "cashier": "أمين الصندوق",
   }
 };

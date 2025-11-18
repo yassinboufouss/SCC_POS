@@ -1,26 +1,29 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Users, ShoppingCart, LogOut, Package, Ticket, QrCode, LayoutDashboard, History } from 'lucide-react';
+import { Users, ShoppingCart, LogOut, Package, Ticket, QrCode, LayoutDashboard, History, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
 import { supabase } from '@/integrations/supabase/client';
 import { showError } from '@/utils/toast';
+import { useUserRole } from '@/hooks/use-user-role'; // Import role hook
 
 const navItems = [
-  { nameKey: 'dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { nameKey: 'pos', href: '/pos', icon: ShoppingCart },
-  { nameKey: 'check_in', href: '/check-in', icon: QrCode },
-  { nameKey: 'members', href: '/members', icon: Users },
-  { nameKey: 'inventory', href: '/inventory', icon: Package },
-  { nameKey: 'membership_plans', href: '/plans', icon: Ticket },
-  { nameKey: 'transactions', href: '/transactions', icon: History },
+  { nameKey: 'dashboard', href: '/dashboard', icon: LayoutDashboard, roles: ['owner', 'manager', 'cashier'] },
+  { nameKey: 'pos', href: '/pos', icon: ShoppingCart, roles: ['owner', 'cashier'] },
+  { nameKey: 'check_in', href: '/check-in', icon: QrCode, roles: ['owner', 'manager', 'cashier'] },
+  { nameKey: 'members', href: '/members', icon: Users, roles: ['owner', 'manager'] },
+  { nameKey: 'inventory', href: '/inventory', icon: Package, roles: ['owner', 'manager'] },
+  { nameKey: 'membership_plans', href: '/plans', icon: Ticket, roles: ['owner', 'manager'] },
+  { nameKey: 'transactions', href: '/transactions', icon: History, roles: ['owner', 'manager', 'cashier'] },
+  { nameKey: 'role_management', href: '/roles', icon: Shield, roles: ['owner'] }, // New role management link
 ];
 
 const Sidebar: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
+  const { role, isOwner } = useUserRole(); // Use role hook
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -32,6 +35,8 @@ const Sidebar: React.FC = () => {
       navigate('/');
     }
   };
+  
+  const userRole = role || 'member';
 
   return (
     <div className="flex flex-col h-screen border-r bg-sidebar text-sidebar-foreground p-4 w-64 sticky top-0">
@@ -41,6 +46,11 @@ const Sidebar: React.FC = () => {
       
       <nav className="flex-1 space-y-2">
         {navItems.map((item) => {
+          // Check if the current user role is allowed to see this item
+          if (!item.roles.includes(userRole)) {
+              return null;
+          }
+          
           const Icon = item.icon;
           // Check if the current path starts with the item's href, handling '/' for dashboard
           const isActive = location.pathname === item.href || (item.href !== '/dashboard' && location.pathname.startsWith(item.href));

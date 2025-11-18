@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '@/types/supabase';
 import { queryKeys } from './query-keys.ts';
-import { registerNewUserAndProfile, updateProfile, updateMemberStatus, renewMemberPlan, NewMemberInput, processCheckIn, getProfileByMemberCode } from '@/utils/member-utils';
+import { registerNewUserAndProfile, updateProfile, updateMemberStatus, renewMemberPlan, NewMemberInput, processCheckIn, getProfileByMemberCode, updateMemberRole } from '@/utils/member-utils';
 import { isFuture } from 'date-fns';
 
 // Re-export NewMemberInput to allow components to import it
@@ -151,6 +151,21 @@ export const useUpdateMemberStatus = () => {
       }
     },
   });
+};
+
+export const useUpdateMemberRole = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ profileId, newRole }: { profileId: string, newRole: Profile['role'] }) => updateMemberRole(profileId, newRole),
+        onSuccess: (data) => {
+            if (data) {
+                queryClient.invalidateQueries({ queryKey: queryKeys.profiles.detail(data.id) });
+                queryClient.invalidateQueries({ queryKey: queryKeys.profiles.all });
+                // Note: Role change might affect dashboard metrics if roles determine access/visibility, 
+                // but for now, we only invalidate profiles.
+            }
+        },
+    });
 };
 
 export const useRenewMemberPlan = () => {

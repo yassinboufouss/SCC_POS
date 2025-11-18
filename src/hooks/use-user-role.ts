@@ -9,15 +9,22 @@ export const useUserRole = () => {
   const role: UserRole = profile?.role || null;
 
   const isOwner = role === 'owner';
-  const isStaff = role === 'staff';
-  const isMember = role === 'member'; // NEW
+  const isManager = role === 'manager';
+  const isCashier = role === 'cashier';
+  
+  // Staff includes managers and cashiers
+  const isStaff = isManager || isCashier; 
+  
+  const isMember = role === 'member';
   const isAuthenticated = !!profile;
 
   return {
     role,
     isOwner,
-    isStaff,
-    isMember, // Export new role check
+    isManager,
+    isCashier,
+    isStaff, // Keep isStaff for general checks
+    isMember,
     isAuthenticated,
     isLoading,
   };

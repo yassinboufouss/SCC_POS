@@ -252,5 +252,20 @@ export const en = {
     "welcome_member": "Welcome, {{name}}",
     "check_in_status": "Check-In Status",
     "never_checked_in": "Never checked in",
+    
+    // New Role Management Translations
+    "role_management": "Role Management",
+    "user_roles_directory": "User Roles Directory ({{count}})",
+    "search_users_by_name_email": "Search users by name or email...",
+    "current_role": "Current Role",
+    "assign_new_role": "Assign New Role",
+    "select_role": "Select Role",
+    "role_update_success": "Successfully updated {{name}}'s role to {{role}}.",
+    "role_update_failed": "Failed to update user role.",
+    "no_users_found": "No users found.",
+    "access_denied": "Access Denied. Only the Owner can view this page.",
+    "owner": "Owner",
+    "manager": "Manager",
+    "cashier": "Cashier",
   }
 };

@@ -30,9 +30,17 @@ export const updateProfile = async (updatedProfile: Partial<Profile> & { id: str
   return data;
 };
 
-// Utility to simulate updating member status
+// Utility to update member status
 export const updateMemberStatus = async (profileId: string, newStatus: Profile['status']): Promise<Profile | null> => {
   return updateProfile({ id: profileId, status: newStatus, updated_at: new Date().toISOString() });
+};
+
+// Utility to update member role
+export const updateMemberRole = async (profileId: string, newRole: Profile['role']): Promise<Profile | null> => {
+    if (!newRole || newRole === 'owner') {
+        throw new Error("Invalid role assignment attempt.");
+    }
+    return updateProfile({ id: profileId, role: newRole, updated_at: new Date().toISOString() });
 };
 
 // Utility to simulate adding a new member (Auth + Profile creation/activation)
@@ -86,7 +94,7 @@ export const registerNewUserAndProfile = async (newMemberData: Omit<NewMemberInp
     start_date: format(startDate, 'yyyy-MM-dd'),
     expiration_date: format(expirationDate, 'yyyy-MM-dd'),
     updated_at: new Date().toISOString(),
-    // Removed email from update payload to avoid potential RLS/constraint issues related to auth.users linkage.
+    // Role is defaulted to 'member' by the database trigger/schema default.
   };
 
   const { data: profile, error: profileError } = await supabase
