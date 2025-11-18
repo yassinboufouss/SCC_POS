@@ -1,11 +1,12 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Users, ShoppingCart, LogOut, Package, Ticket } from 'lucide-react';
+import { Users, ShoppingCart, LogOut, Package, Ticket, QrCode } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 
 const navItems = [
   { nameKey: 'pos', href: '/pos', icon: ShoppingCart },
+  { nameKey: 'check_in', href: '/check-in', icon: QrCode },
   { nameKey: 'members', href: '/members', icon: Users },
   { nameKey: 'inventory', href: '/inventory', icon: Package },
   { nameKey: 'membership_plans', href: '/plans', icon: Ticket },
