@@ -20,6 +20,7 @@ import { PaymentMethod } from '@/types/pos';
 
 interface MemberRenewalFormProps {
   member: Profile;
+  canRenew: boolean; // New prop
 }
 
 const formSchema = z.object({
@@ -29,7 +30,7 @@ const formSchema = z.object({
 
 type RenewalFormValues = z.infer<typeof formSchema>;
 
-const MemberRenewalForm: React.FC<MemberRenewalFormProps> = ({ member }) => {
+const MemberRenewalForm: React.FC<MemberRenewalFormProps> = ({ member, canRenew }) => {
   const { t } = useTranslation();
   const { data: membershipPlans, isLoading: isLoadingPlans } = usePlans();
   const { mutateAsync: renewPlan, isPending: isRenewing } = useRenewMemberPlan();
@@ -122,7 +123,7 @@ const MemberRenewalForm: React.FC<MemberRenewalFormProps> = ({ member }) => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="flex items-center gap-1"><Ticket className="h-4 w-4" /> {t("select_new_plan")}</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!canRenew}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder={t("choose_a_membership_plan")} />
@@ -170,7 +171,7 @@ const MemberRenewalForm: React.FC<MemberRenewalFormProps> = ({ member }) => {
           render={({ field }) => (
             <FormItem>
               <FormLabel className="flex items-center gap-1"><CreditCard className="h-4 w-4" /> {t("select_payment_method")}</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!canRenew}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder={t("select_payment_method")} />
@@ -187,7 +188,7 @@ const MemberRenewalForm: React.FC<MemberRenewalFormProps> = ({ member }) => {
           )}
         />
 
-        <Button type="submit" className="w-full" disabled={!selectedPlan || isPending}>
+        <Button type="submit" className="w-full" disabled={!selectedPlan || isPending || !canRenew}>
           {t("process_renewal_payment")}
         </Button>
       </form>

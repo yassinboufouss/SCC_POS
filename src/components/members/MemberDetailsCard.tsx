@@ -10,9 +10,10 @@ import { Button } from '@/components/ui/button';
 interface MemberDetailsCardProps {
   member: Profile;
   onRenewClick: () => void;
+  canRenew: boolean; // New prop
 }
 
-const MemberDetailsCard: React.FC<MemberDetailsCardProps> = ({ member, onRenewClick }) => {
+const MemberDetailsCard: React.FC<MemberDetailsCardProps> = ({ member, onRenewClick, canRenew }) => {
   const { t } = useTranslation();
 
   const getStatusVariant = (status: Profile['status']) => {
@@ -20,13 +21,15 @@ const MemberDetailsCard: React.FC<MemberDetailsCardProps> = ({ member, onRenewCl
       case 'Active':
         return 'default';
       case 'Expired':
-        return 'destructive';
-      case 'Pending':
+      case 'Pending': // Treat pending as secondary/warning
         return 'secondary';
       default:
         return 'secondary';
     }
   };
+  
+  // Check if the membership is actually expired or pending
+  const needsRenewal = member.status !== 'Active';
 
   return (
     <Card>
@@ -61,11 +64,12 @@ const MemberDetailsCard: React.FC<MemberDetailsCardProps> = ({ member, onRenewCl
             </div>
         </div>
         
-        {member.status !== 'Active' && (
+        {needsRenewal && (
             <Button 
                 variant="outline" 
                 className="w-full mt-4 text-green-600 border-green-200 hover:bg-green-50"
                 onClick={onRenewClick}
+                disabled={!canRenew}
             >
                 <RefreshCw className="h-4 w-4 mr-2" /> {t("renew_membership_now")}
             </Button>

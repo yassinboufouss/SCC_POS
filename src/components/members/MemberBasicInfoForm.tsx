@@ -14,6 +14,7 @@ import { showSuccess, showError } from '@/utils/toast';
 interface MemberBasicInfoFormProps {
   member: Profile;
   onSuccess: () => void;
+  canEdit: boolean; // New prop
 }
 
 const formSchema = z.object({
@@ -25,7 +26,7 @@ const formSchema = z.object({
 
 type BasicInfoFormValues = z.infer<typeof formSchema>;
 
-const MemberBasicInfoForm: React.FC<MemberBasicInfoFormProps> = ({ member, onSuccess }) => {
+const MemberBasicInfoForm: React.FC<MemberBasicInfoFormProps> = ({ member, onSuccess, canEdit }) => {
   const { t } = useTranslation();
   const { mutateAsync: updateProfile, isPending: isSaving } = useUpdateProfile();
 
@@ -80,7 +81,7 @@ const MemberBasicInfoForm: React.FC<MemberBasicInfoFormProps> = ({ member, onSuc
               <FormItem>
                 <FormLabel>{t("first_name")}</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input {...field} disabled={!canEdit} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -95,7 +96,7 @@ const MemberBasicInfoForm: React.FC<MemberBasicInfoFormProps> = ({ member, onSuc
               <FormItem>
                 <FormLabel>{t("last_name")}</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input {...field} disabled={!canEdit} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -110,7 +111,7 @@ const MemberBasicInfoForm: React.FC<MemberBasicInfoFormProps> = ({ member, onSuc
               <FormItem>
                 <FormLabel>{t("phone_number")}</FormLabel>
                 <FormControl>
-                  <Input placeholder="555-123-4567" {...field} />
+                  <Input placeholder="555-123-4567" {...field} disabled={!canEdit} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -126,7 +127,7 @@ const MemberBasicInfoForm: React.FC<MemberBasicInfoFormProps> = ({ member, onSuc
                 <FormLabel>{t("date_of_birth")}</FormLabel>
                 <FormControl>
                   <div className="relative">
-                    <Input type="date" {...field} className="pr-8" />
+                    <Input type="date" {...field} className="pr-8" disabled={!canEdit} />
                     <CalendarIcon className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                   </div>
                 </FormControl>
@@ -136,7 +137,7 @@ const MemberBasicInfoForm: React.FC<MemberBasicInfoFormProps> = ({ member, onSuc
           />
         </div>
 
-        <Button type="submit" className="w-full mt-4" disabled={isSaving}>
+        <Button type="submit" className="w-full mt-4" disabled={isSaving || !canEdit}>
           <Save className="h-4 w-4 mr-2" />
           {t("save_member_changes")}
         </Button>

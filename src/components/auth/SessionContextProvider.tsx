@@ -44,7 +44,6 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
           if (userProfile) {
               const completeProfile = { ...userProfile, email: currentUser.email || null };
               setProfile(completeProfile);
-              console.log("Profile fetched successfully:", completeProfile.role);
           } else {
               // If profile doesn't exist yet, create a minimal profile object with email
               const minimalProfile = {
@@ -66,7 +65,6 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
                   total_check_ins: 0,
               } as Profile;
               setProfile(minimalProfile);
-              console.log("Minimal profile created:", minimalProfile.role);
           }
       } catch (e) {
           console.error("Failed to fetch profile after sign in:", e);

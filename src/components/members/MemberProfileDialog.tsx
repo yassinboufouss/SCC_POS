@@ -22,16 +22,19 @@ import { Label } from '@/components/ui/label';
 import { formatCurrency } from '@/utils/currency-utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
+import { useUserRole } from '@/hooks/use-user-role'; // Import useUserRole
 
 interface MemberProfileDialogProps {
   member: Profile; // Initial member data from the list
+  canEdit: boolean; // New prop to control editing access
 }
 
-const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member }) => {
+const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member, canEdit }) => {
   const { t } = useTranslation();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('profile'); 
   const [isEditing, setIsEditing] = useState(false);
+  const { isOwner, isStaff } = useUserRole(); // Use role hook to determine renewal/check-in access
   
   // Fetch the freshest member data when the dialog is open
   const { data: currentMember, isLoading: isLoadingMember } = useMember(member.id);
@@ -60,6 +63,13 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member }) => 
   const handleSaveBasicDetailsSuccess = () => {
       setIsEditing(false);
   };
+  
+  // Staff (and Owner) should be able to renew members
+  const canRenew = isOwner || isStaff; 
+  // Staff (and Owner) should be able to check members in
+  const canCheckIn = isOwner || isStaff; 
+  // Only Owner can perform status actions (Freeze/Cancel)
+  const canChangeStatus = isOwner; 
   
   if (isLoadingMember && isDialogOpen) {
       return (
@@ -97,7 +107,7 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member }) => 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="profile">{t("member_details")}</TabsTrigger>
-            <TabsTrigger value="renewal">{t("renew_membership")}</TabsTrigger>
+            <TabsTrigger value="renewal" disabled={!canRenew}>{t("renew_membership")}</TabsTrigger>
             <TabsTrigger value="history">{t("activity_history")}</TabsTrigger>
           </TabsList>
           
@@ -106,13 +116,13 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member }) => 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-lg">{t("contact_information")}</CardTitle>
-                <Button variant="ghost" size="sm" onClick={() => setIsEditing(!isEditing)}>
+                <Button variant="ghost" size="sm" onClick={() => setIsEditing(!isEditing)} disabled={!canEdit}>
                     <Edit className="h-4 w-4 mr-2" /> {isEditing ? t("close") : t("edit_item_details")}
                 </Button>
               </CardHeader>
               <CardContent className="space-y-2">
                 {isEditing ? (
-                    <MemberBasicInfoForm member={displayMember} onSuccess={handleSaveBasicDetailsSuccess} />
+                    <MemberBasicInfoForm member={displayMember} onSuccess={handleSaveBasicDetailsSuccess} canEdit={canEdit} />
                 ) : (
                     <div className="grid grid-cols-2 gap-4 text-sm">
                         <p className="flex items-center gap-2"><User className="h-4 w-4 text-muted-foreground" /> {displayMember.first_name} {displayMember.last_name}</p>
@@ -127,11 +137,12 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member }) => 
             <MemberDetailsCard 
                 member={displayMember} 
                 onRenewClick={() => setActiveTab('renewal')} 
+                canRenew={canRenew} // Pass canRenew to disable the button inside
             />
             
-            <MemberCheckInButton member={displayMember} />
+            {canCheckIn && <MemberCheckInButton member={displayMember} />}
             
-            <MemberStatusActions member={displayMember} />
+            {canChangeStatus && <MemberStatusActions member={displayMember} />}
           </TabsContent>
           
           {/* Renewal Tab */}
@@ -141,7 +152,7 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member }) => 
                 <CardTitle className="text-lg">{t("renew_membership_for", { name: `${displayMember.first_name} ${displayMember.last_name}` })}</CardTitle>
               </CardHeader>
               <CardContent>
-                <MemberRenewalForm member={displayMember} />
+                <MemberRenewalForm member={displayMember} canRenew={canRenew} />
               </CardContent>
             </Card>
           </TabsContent>

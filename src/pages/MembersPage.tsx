@@ -17,6 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useAddTransaction } from '@/integrations/supabase/data/use-transactions.ts';
 import { PaymentMethod } from '@/types/pos';
 import { showError } from '@/utils/toast'; // <-- Added missing import
+import { useUserRole } from '@/hooks/use-user-role'; // Import useUserRole
 
 const statusOptions: (Profile['status'] | 'All')[] = ['All', 'Active', 'Pending', 'Expired'];
 
@@ -28,6 +29,7 @@ const MembersPage: React.FC = () => {
   
   const { data: members, isLoading } = useMembers(searchTerm, statusFilter);
   const { mutateAsync: recordTransaction } = useAddTransaction();
+  const { isOwner, isStaff } = useUserRole(); // Use role hook
 
   const getStatusVariant = (status: Profile['status']) => {
     switch (status) {
@@ -60,6 +62,11 @@ const MembersPage: React.FC = () => {
     }
   };
   
+  // Staff (and Owner) should be able to register members
+  const canRegister = isOwner || isStaff; 
+  // Only Owner can edit core profile details (as requested by user)
+  const canEdit = isOwner; 
+  
   return (
     <Layout>
       <div className="p-4 lg:p-6 space-y-6">
@@ -68,7 +75,7 @@ const MembersPage: React.FC = () => {
           
           <Dialog open={isRegistrationOpen} onOpenChange={setIsRegistrationOpen}>
             <DialogTrigger asChild>
-              <Button>
+              <Button disabled={!canRegister}>
                 <UserPlus className="h-4 w-4 mr-2" />
                 {t("register_new_member")}
               </Button>
@@ -147,7 +154,7 @@ const MembersPage: React.FC = () => {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
-                          <MemberProfileDialog member={member} />
+                          <MemberProfileDialog member={member} canEdit={canEdit} />
                         </TableCell>
                       </TableRow>
                     ))
