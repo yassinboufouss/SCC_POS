@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { QrCode, UserCheck, UserX, Search, RefreshCw } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
-import { useProcessCheckIn, useMembers } from '@/integrations/supabase/data/use-members.ts';
+import { useProcessCheckIn } from '@/integrations/supabase/data/use-members.ts';
+import { getProfileByMemberCode } from '@/utils/member-utils'; // Import the new utility
 import { useTranslation } from 'react-i18next';
 import { Profile } from '@/types/supabase';
 import { format } from 'date-fns';
@@ -18,51 +19,53 @@ const MemberCheckInScanner: React.FC<MemberCheckInScannerProps> = ({ onMemberFou
   const { t } = useTranslation();
   const [memberCode, setMemberCode] = useState('');
   const [memberInfo, setMemberInfo] = useState<Profile | null>(null);
+  const [isLookingUp, setIsLookingUp] = useState(false);
   
-  // Fetch all members to look up by member_code
-  const { data: members, isLoading: isLoadingMembers } = useMembers();
   const { mutateAsync: processCheckIn, isPending: isCheckingIn } = useProcessCheckIn();
 
   const handleCheckIn = async (code: string) => {
     setMemberInfo(null);
+    setIsLookingUp(true);
     
-    const member = members?.find(m => m.member_code?.toUpperCase() === code.toUpperCase());
-    
-    if (isLoadingMembers) {
-        showError(t("loading_members_data"));
-        return;
-    }
-
-    if (member) {
-      // Notify parent component immediately
-      onMemberFound?.(member);
-      
-      if (member.status === 'Active' && member.id) {
-        try {
-            const checkedInMember = await processCheckIn({ 
-                profileId: member.id, 
-                currentCheckIns: member.total_check_ins || 0 
-            });
-            
-            if (checkedInMember) {
-              setMemberInfo(checkedInMember);
-              showSuccess(`${checkedInMember.first_name} ${checkedInMember.last_name} ${t("checked_in_successfully")} ${t("total_check_ins")}: ${checkedInMember.total_check_ins}`);
-            } else {
-              setMemberInfo(member);
-              showError(t("checkin_failed", { name: `${member.first_name} ${member.last_name}` }));
+    try {
+        const member = await getProfileByMemberCode(code);
+        
+        if (member) {
+          // Notify parent component immediately
+          onMemberFound?.(member);
+          
+          if (member.status === 'Active' && member.id) {
+            try {
+                const checkedInMember = await processCheckIn({ 
+                    profileId: member.id, 
+                    currentCheckIns: member.total_check_ins || 0 
+                });
+                
+                if (checkedInMember) {
+                  setMemberInfo(checkedInMember);
+                  showSuccess(`${checkedInMember.first_name} ${checkedInMember.last_name} ${t("checked_in_successfully")} ${t("total_check_ins")}: ${checkedInMember.total_check_ins}`);
+                } else {
+                  // If check-in failed (e.g., status changed mid-process), show current info
+                  setMemberInfo(member);
+                  showError(t("checkin_failed", { name: `${member.first_name} ${member.last_name}` }));
+                }
+            } catch (error) {
+                setMemberInfo(member);
+                showError(t("checkin_failed", { name: `${member.first_name} ${member.last_name}` }));
             }
-        } catch (error) {
+          } else {
             setMemberInfo(member);
-            showError(t("checkin_failed", { name: `${member.first_name} ${member.last_name}` }));
+            showError(`${member.first_name} ${member.last_name}: ${t("membership_is", { status: t(member.status || 'Pending') })} ${t("cannot_check_in")}`);
+          }
+        } else {
+          showError(t("member_code_not_found", { code }));
         }
-      } else {
-        setMemberInfo(member);
-        showError(`${member.first_name} ${member.last_name}: ${t("membership_is", { status: t(member.status || 'Pending') })} ${t("cannot_check_in")}`);
-      }
-    } else {
-      showError(t("member_code_not_found", { code }));
+    } catch (error) {
+        showError(t("lookup_failed")); // Add a generic lookup failed message
+    } finally {
+        setMemberCode('');
+        setIsLookingUp(false);
     }
-    setMemberCode('');
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -123,9 +126,9 @@ const MemberCheckInScanner: React.FC<MemberCheckInScannerProps> = ({ onMemberFou
             value={memberCode}
             onChange={(e) => setMemberCode(e.target.value)}
             className="flex-1 h-10"
-            disabled={isCheckingIn || isLoadingMembers}
+            disabled={isCheckingIn || isLookingUp}
           />
-          <Button type="submit" size="sm" disabled={isCheckingIn || isLoadingMembers}>
+          <Button type="submit" size="sm" disabled={isCheckingIn || isLookingUp}>
             <Search className="h-4 w-4" />
           </Button>
         </form>

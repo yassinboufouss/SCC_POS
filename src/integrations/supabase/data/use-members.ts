@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '@/types/supabase';
 import { queryKeys } from './query-keys.ts';
-import { registerNewUserAndProfile, updateProfile, updateMemberStatus, renewMemberPlan, NewMemberInput, processCheckIn } from '@/utils/member-utils';
+import { registerNewUserAndProfile, updateProfile, updateMemberStatus, renewMemberPlan, NewMemberInput, processCheckIn, getProfileByMemberCode } from '@/utils/member-utils';
 import { isFuture } from 'date-fns';
 
 // Re-export NewMemberInput to allow components to import it
@@ -100,6 +100,16 @@ export const useMember = (id: string) => {
     enabled: !!id,
   });
 };
+
+// NEW: Hook to fetch a member by member_code
+export const useMemberByCode = (memberCode: string) => {
+    return useQuery({
+        queryKey: queryKeys.profiles.byCode(memberCode),
+        queryFn: () => getProfileByMemberCode(memberCode),
+        enabled: !!memberCode,
+    });
+};
+
 
 // Renamed hook for member registration (Auth + Profile creation)
 export const useRegisterMember = () => {

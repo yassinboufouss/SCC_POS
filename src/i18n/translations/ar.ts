@@ -235,5 +235,6 @@ export const ar = {
     "items_purchased": "العناصر المشتراة",
     "transaction_date_time": "التاريخ والوقت",
     "total_amount": "المبلغ الإجمالي",
+    "lookup_failed": "فشل البحث عن العضو. الرجاء المحاولة مرة أخرى.",
   }
 };

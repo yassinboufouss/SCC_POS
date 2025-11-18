@@ -235,5 +235,6 @@ export const fr = {
     "items_purchased": "Articles Achetés",
     "transaction_date_time": "Date et Heure",
     "total_amount": "Montant Total",
+    "lookup_failed": "Échec de la recherche de membre. Veuillez réessayer.",
   }
 };

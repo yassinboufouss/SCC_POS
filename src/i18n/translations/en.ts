@@ -235,5 +235,6 @@ export const en = {
     "items_purchased": "Items Purchased",
     "transaction_date_time": "Date & Time",
     "total_amount": "Total Amount",
+    "lookup_failed": "Member lookup failed. Please try again.",
   }
 };

@@ -178,3 +178,31 @@ export const processCheckIn = async (profileId: string, currentCheckIns: number)
   
   return data;
 };
+
+// NEW: Utility to fetch a profile by member code
+export const getProfileByMemberCode = async (memberCode: string): Promise<Profile | null> => {
+    const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .ilike('member_code', memberCode)
+        .single();
+
+    if (error && error.code !== 'PGRST116') { // PGRST116 is 'No rows found'
+        console.error("Supabase getProfileByMemberCode error:", error);
+        throw new Error("Failed to fetch member by code.");
+    }
+    
+    if (!data) return null;
+
+    const profile = data as Profile;
+    
+    // Client-side check for expiration status
+    if (profile.status === 'Active' && profile.expiration_date) {
+        const expirationDate = new Date(profile.expiration_date);
+        if (expirationDate.getTime() < new Date().getTime()) {
+            return { ...profile, status: 'Expired' as const };
+        }
+    }
+    
+    return profile;
+};
