@@ -145,6 +145,7 @@ export const fr = {
     "clear_cart": "Vider le Panier",
     "select_payment_method_error": "Veuillez sélectionner un mode de paiement.",
     "sale_processed_success": "{{type}} traitée avec succès via {{method}} ! Total : {{total}} MAD",
+    "membership_renewal_pos_success": "Adhésion renouvelée pour {{name}} dans le cadre de la vente.",
     "search_select_member": "Rechercher et Sélectionner un Membre",
     "search_by_name_or_id": "Rechercher par nom ou ID...",
     "no_members_found": "Aucun membre trouvé.",

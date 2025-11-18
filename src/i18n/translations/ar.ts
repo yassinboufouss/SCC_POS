@@ -145,6 +145,7 @@ export const ar = {
     "clear_cart": "مسح العربة",
     "select_payment_method_error": "الرجاء تحديد طريقة دفع.",
     "sale_processed_success": "تمت معالجة {{type}} بنجاح عبر {{method}}! الإجمالي: {{total}} MAD",
+    "membership_renewal_pos_success": "تم تجديد العضوية لـ {{name}} كجزء من عملية البيع.",
     "search_select_member": "البحث واختيار العضو",
     "search_by_name_or_id": "البحث بالاسم أو المعرف...",
     "no_members_found": "لم يتم العثور على أعضاء.",

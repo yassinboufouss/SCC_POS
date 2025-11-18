@@ -145,6 +145,7 @@ export const en = {
     "clear_cart": "Clear Cart",
     "select_payment_method_error": "Please select a payment method.",
     "sale_processed_success": "{{type}} processed successfully via {{method}}! Total: {{total}} MAD",
+    "membership_renewal_pos_success": "Membership renewed for {{name}} as part of the sale.",
     "search_select_member": "Search & Select Member",
     "search_by_name_or_id": "Search by name or ID...",
     "no_members_found": "No members found.",

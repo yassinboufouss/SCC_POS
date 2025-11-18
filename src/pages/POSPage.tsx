@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import Layout from '@/components/Layout';
 import { formatCurrency } from '@/utils/currency-utils';
 import { Member } from '@/data/members';
+import { renewMemberPlan } from '@/utils/member-utils';
 
 const POSPage = () => {
   const { t } = useTranslation();
@@ -160,7 +161,27 @@ const POSPage = () => {
         }
     }));
     
-    const hasMembership = cart.some(item => item.type === 'membership');
+    // 2. Process Membership Renewals (if a member is selected)
+    const membershipItemsSold = cart.filter(item => item.type === 'membership');
+    
+    if (selectedMember && membershipItemsSold.length > 0) {
+        // Renew the selected member's plan for each membership item in the cart
+        for (const item of membershipItemsSold) {
+            const planId = item.sourceId;
+            for (let i = 0; i < item.quantity; i++) {
+                // renewMemberPlan updates mockMembers array and returns the updated member object
+                const updatedMember = await renewMemberPlan(selectedMember.id, planId);
+                if (updatedMember) {
+                    // Crucially, update the local state to ensure subsequent renewals (if quantity > 1) stack correctly
+                    setSelectedMember(updatedMember); 
+                }
+            }
+        }
+        showSuccess(t("membership_renewal_pos_success", { name: selectedMember.name }));
+    }
+    
+    // 3. Determine transaction type and description
+    const hasMembership = membershipItemsSold.length > 0;
     const hasInventory = inventoryItemsSold.length > 0;
     
     let transactionType: 'Membership' | 'POS Sale' | 'Mixed Sale';
