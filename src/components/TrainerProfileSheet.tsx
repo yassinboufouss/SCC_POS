@@ -12,6 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from '@/components/ui/input';
 import { showSuccess } from '@/utils/toast';
 import { updateTrainer } from '@/utils/trainer-utils';
 
@@ -27,6 +28,8 @@ const TrainerStatuses = ['Active', 'On Leave'] as const;
 const trainerSchema = z.object({
   specialty: z.enum(TrainerSpecialties, { required_error: "Specialty is required." }),
   status: z.enum(TrainerStatuses, { required_error: "Status is required." }),
+  email: z.string().email({ message: "Invalid email address." }),
+  phone: z.string().min(10, { message: "Phone number is required." }),
 });
 
 type TrainerFormValues = z.infer<typeof trainerSchema>;
@@ -41,6 +44,8 @@ const TrainerProfileSheet: React.FC<TrainerProfileSheetProps> = ({ open, onOpenC
       form.reset({
         specialty: selectedTrainer.specialty as TrainerFormValues['specialty'],
         status: selectedTrainer.status as TrainerFormValues['status'],
+        email: selectedTrainer.email || '', // Assuming email/phone might be missing in mock data, though schema requires it
+        phone: selectedTrainer.phone || '',
       });
     }
   }, [selectedTrainer, form]);
@@ -49,13 +54,13 @@ const TrainerProfileSheet: React.FC<TrainerProfileSheetProps> = ({ open, onOpenC
 
   const trainerClasses = classSchedule.filter(cls => cls.trainer === selectedTrainer.name);
 
-  const statusVariant = selectedTrainer.status === 'Active' ? 'default' : 'destructive';
-
   const onSubmit = (values: TrainerFormValues) => {
     const updatedTrainer: Trainer = {
       ...selectedTrainer,
       specialty: values.specialty,
       status: values.status,
+      email: values.email,
+      phone: values.phone,
     };
 
     updateTrainer(updatedTrainer);
@@ -94,8 +99,41 @@ const TrainerProfileSheet: React.FC<TrainerProfileSheetProps> = ({ open, onOpenC
 
               <Separator />
               
-              {/* Editable Fields */}
-              <h3 className="text-lg font-semibold">Edit Details</h3>
+              {/* Editable Contact Details */}
+              <h3 className="text-lg font-semibold">Contact Details</h3>
+              <div className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input type="email" placeholder="trainer@gym.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone Number</FormLabel>
+                      <FormControl>
+                        <Input placeholder="(555) 555-5555" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              <Separator />
+
+              {/* Editable Professional Details */}
+              <h3 className="text-lg font-semibold">Professional Details</h3>
               <div className="space-y-4">
                 <FormField
                   control={form.control}

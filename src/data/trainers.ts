@@ -5,6 +5,8 @@ export type Trainer = {
   status: 'Active' | 'On Leave';
   classesTaught: number;
   memberRating: number;
+  email: string;
+  phone: string;
 };
 
 export const trainers: Trainer[] = [
@@ -15,6 +17,8 @@ export const trainers: Trainer[] = [
     status: "Active",
     classesTaught: 15,
     memberRating: 4.8,
+    email: "sarah.connor@gym.com",
+    phone: "555-111-2222",
   },
   {
     id: "T002",
@@ -23,6 +27,8 @@ export const trainers: Trainer[] = [
     status: "Active",
     classesTaught: 22,
     memberRating: 4.5,
+    email: "kyle.reese@gym.com",
+    phone: "555-333-4444",
   },
   {
     id: "T003",
@@ -31,5 +37,7 @@ export const trainers: Trainer[] = [
     status: "On Leave",
     classesTaught: 8,
     memberRating: 4.9,
+    email: "marcus.wright@gym.com",
+    phone: "555-555-6666",
   },
 ];
