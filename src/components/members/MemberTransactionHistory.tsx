@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DollarSign } from 'lucide-react';
+import TransactionDetailsDialog from '@/components/transactions/TransactionDetailsDialog';
 
 interface MemberTransactionHistoryProps {
   transactions: Transaction[];
@@ -39,6 +40,7 @@ const MemberTransactionHistory: React.FC<MemberTransactionHistoryProps> = ({ tra
             <TableHead>{t("item_description")}</TableHead>
             <TableHead className="text-right">{t("amount")}</TableHead>
             <TableHead className="w-[100px] text-right">{t("date")}</TableHead>
+            <TableHead className="w-[50px] text-right">{t("actions")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -56,6 +58,9 @@ const MemberTransactionHistory: React.FC<MemberTransactionHistoryProps> = ({ tra
               </TableCell>
               <TableCell className="text-right text-xs text-muted-foreground">
                 {tx.transaction_date ? format(new Date(tx.transaction_date), 'yyyy-MM-dd') : 'N/A'}
+              </TableCell>
+              <TableCell className="text-right">
+                <TransactionDetailsDialog transaction={tx} />
               </TableCell>
             </TableRow>
           ))}
