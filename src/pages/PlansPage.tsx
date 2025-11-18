@@ -10,11 +10,13 @@ import AddPlanForm from '@/components/plans/AddPlanForm.tsx';
 import { usePlans } from '@/integrations/supabase/data/use-plans.ts';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useUserRole } from '@/hooks/use-user-role';
 
 const PlansPage: React.FC = () => {
   const { t } = useTranslation();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const { isOwner } = useUserRole();
   
   const { data: membershipPlans, isLoading } = usePlans(searchTerm);
 
@@ -30,7 +32,7 @@ const PlansPage: React.FC = () => {
             
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
                 <DialogTrigger asChild>
-                    <Button>
+                    <Button disabled={!isOwner}>
                         <Plus className="h-4 w-4 mr-2" />
                         {t("create_new_plan")}
                     </Button>

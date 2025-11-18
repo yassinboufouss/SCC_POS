@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { RefreshCw } from 'lucide-react';
 import { InventoryItem } from '@/types/supabase';
 import { useRestockInventoryItem } from '@/integrations/supabase/data/use-inventory.ts';
+import { useUserRole } from '@/hooks/use-user-role';
 
 interface RestockFormProps {
   item: InventoryItem;
@@ -25,6 +26,7 @@ type RestockFormValues = z.infer<typeof formSchema>;
 const RestockForm: React.FC<RestockFormProps> = ({ item, onSuccess }) => {
   const { t } = useTranslation();
   const { mutateAsync: restockItem, isPending } = useRestockInventoryItem();
+  const { isOwner } = useUserRole();
   
   const form = useForm<RestockFormValues>({
     resolver: zodResolver(formSchema),
@@ -68,15 +70,16 @@ const RestockForm: React.FC<RestockFormProps> = ({ item, onSuccess }) => {
                         min="1" 
                         placeholder="10" 
                         {...field} 
-                        onChange={e => field.onChange(e.target.value)} // Let zod coerce
-                        value={field.value === 0 ? '' : field.value} // Handle 0 for empty input display
+                        onChange={e => field.onChange(e.target.value)}
+                        value={field.value === 0 ? '' : field.value}
+                        disabled={!isOwner}
                     />
                     </FormControl>
                     <FormMessage />
                 </FormItem>
                 )}
             />
-            <Button type="submit" disabled={isPending}>
+            <Button type="submit" disabled={isPending || !isOwner}>
                 <RefreshCw className="h-4 w-4 mr-2" />
                 {t("restock")}
             </Button>

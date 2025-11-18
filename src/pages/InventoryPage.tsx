@@ -10,11 +10,13 @@ import AddItemForm from '@/components/inventory/AddItemForm';
 import { useInventory } from '@/integrations/supabase/data/use-inventory.ts';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useUserRole } from '@/hooks/use-user-role';
 
 const InventoryPage: React.FC = () => {
   const { t } = useTranslation();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const { isOwner } = useUserRole();
   
   const { data: inventoryItems, isLoading } = useInventory(searchTerm);
 
@@ -31,7 +33,7 @@ const InventoryPage: React.FC = () => {
             
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
                 <DialogTrigger asChild>
-                    <Button>
+                    <Button disabled={!isOwner}>
                         <PackagePlus className="h-4 w-4 mr-2" />
                         {t("add_new_item")}
                     </Button>

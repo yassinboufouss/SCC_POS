@@ -11,10 +11,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useUpdatePlan, usePlans } from '@/integrations/supabase/data/use-plans.ts';
-import { useInventory } from '@/integrations/supabase/data/use-inventory.ts'; // Import inventory hook
+import { useUpdatePlan } from '@/integrations/supabase/data/use-plans.ts';
+import { useInventory } from '@/integrations/supabase/data/use-inventory.ts';
 import { showSuccess, showError } from '@/utils/toast';
 import { Separator } from '@/components/ui/separator';
+import { useUserRole } from '@/hooks/use-user-role';
 
 interface PlanActionsProps {
   plan: MembershipPlan;
@@ -25,7 +26,7 @@ const formSchema = z.object({
   duration_days: z.coerce.number().int().min(1, { message: "Duration must be at least 1 day." }),
   price: z.coerce.number().min(0.01, { message: "Price must be greater than zero." }),
   description: z.string().min(5, { message: "Description is required." }),
-  giveaway_item_id: z.string().optional().nullable(), // New field
+  giveaway_item_id: z.string().optional().nullable(),
 });
 
 type EditPlanFormValues = z.infer<typeof formSchema>;
@@ -35,6 +36,7 @@ const PlanActions: React.FC<PlanActionsProps> = ({ plan }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { mutateAsync: updatePlan, isPending } = useUpdatePlan();
   const { data: inventoryItems, isLoading: isLoadingInventory } = useInventory();
+  const { isOwner } = useUserRole();
   
   const form = useForm<EditPlanFormValues>({
     resolver: zodResolver(formSchema),
@@ -69,7 +71,7 @@ const PlanActions: React.FC<PlanActionsProps> = ({ plan }) => {
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" disabled={!isOwner}>
           <Edit className="h-4 w-4" />
         </Button>
       </DialogTrigger>
@@ -95,7 +97,7 @@ const PlanActions: React.FC<PlanActionsProps> = ({ plan }) => {
                   <FormItem>
                     <FormLabel>{t("plan_name")}</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input {...field} disabled={!isOwner} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -114,8 +116,9 @@ const PlanActions: React.FC<PlanActionsProps> = ({ plan }) => {
                         type="number" 
                         min="1" 
                         {...field} 
-                        onChange={e => field.onChange(e.target.value)} // Let zod coerce
-                        value={field.value === 0 ? '' : field.value} // Handle 0 for empty input display
+                        onChange={e => field.onChange(e.target.value)}
+                        value={field.value === 0 ? '' : field.value}
+                        disabled={!isOwner}
                       />
                     </FormControl>
                     <FormMessage />
@@ -136,8 +139,9 @@ const PlanActions: React.FC<PlanActionsProps> = ({ plan }) => {
                         step="0.01" 
                         min="0.01" 
                         {...field} 
-                        onChange={e => field.onChange(e.target.value)} // Let zod coerce
-                        value={field.value === 0 ? '' : field.value} // Handle 0 for empty input display
+                        onChange={e => field.onChange(e.target.value)}
+                        value={field.value === 0 ? '' : field.value}
+                        disabled={!isOwner}
                       />
                     </FormControl>
                     <FormMessage />
@@ -152,7 +156,7 @@ const PlanActions: React.FC<PlanActionsProps> = ({ plan }) => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-1"><Gift className="h-4 w-4 text-green-600" /> {t("free_giveaway_item")}</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || ''} disabled={isLoadingInventory}>
+                    <Select onValueChange={field.onChange} value={field.value || ''} disabled={isLoadingInventory || !isOwner}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder={t("select_optional_item")} />
@@ -181,7 +185,7 @@ const PlanActions: React.FC<PlanActionsProps> = ({ plan }) => {
                 <FormItem>
                   <FormLabel>{t("description_label")}</FormLabel>
                   <FormControl>
-                    <Textarea {...field} />
+                    <Textarea {...field} disabled={!isOwner} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -195,7 +199,7 @@ const PlanActions: React.FC<PlanActionsProps> = ({ plan }) => {
             </h4>
             <p className="text-sm text-muted-foreground">{t("associated_members_placeholder")}</p>
 
-            <Button type="submit" className="w-full mt-4" disabled={isPending}>
+            <Button type="submit" className="w-full mt-4" disabled={isPending || !isOwner}>
               <Save className="h-4 w-4 mr-2" />
               {t("save_plan_changes")}
             </Button>

@@ -7,7 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTranslation } from 'react-i18next';
 import RestockForm from '@/components/inventory/RestockForm';
 import EditItemForm from '@/components/inventory/EditItemForm';
-import { useInventory } from '@/integrations/supabase/data/use-inventory.ts'; // Import hook to get fresh data
+import { useInventory } from '@/integrations/supabase/data/use-inventory.ts';
+import { useUserRole } from '@/hooks/use-user-role';
 
 interface InventoryItemActionsProps {
   item: InventoryItem;
@@ -16,6 +17,7 @@ interface InventoryItemActionsProps {
 const InventoryItemActions: React.FC<InventoryItemActionsProps> = ({ item }) => {
   const { t } = useTranslation();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { isOwner } = useUserRole();
   
   // We use the useInventory hook to ensure the item data displayed in the dialog is fresh 
   // (though the mutation hooks handle invalidation, this ensures the dialog reflects the latest state if opened later)
@@ -30,7 +32,7 @@ const InventoryItemActions: React.FC<InventoryItemActionsProps> = ({ item }) => 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" disabled={!isOwner}>
           <Edit className="h-4 w-4" />
         </Button>
       </DialogTrigger>

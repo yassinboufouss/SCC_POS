@@ -11,6 +11,7 @@ import { showSuccess, showError } from '@/utils/toast';
 import { useTranslation } from 'react-i18next';
 import { PackagePlus } from 'lucide-react';
 import { NewInventoryItemInput } from '@/types/pos';
+import { useUserRole } from '@/hooks/use-user-role';
 
 interface AddItemFormProps {
   onSuccess: () => void;
@@ -32,6 +33,7 @@ type AddItemFormValues = z.infer<typeof formSchema>;
 const AddItemForm: React.FC<AddItemFormProps> = ({ onSuccess }) => {
   const { t } = useTranslation();
   const { mutateAsync: addItem, isPending } = useAddInventoryItem();
+  const { isOwner } = useUserRole();
   
   const form = useForm<AddItemFormValues>({
     resolver: zodResolver(formSchema),
@@ -60,7 +62,7 @@ const AddItemForm: React.FC<AddItemFormProps> = ({ onSuccess }) => {
             showSuccess(t("item_added_success", { name: newItem.name }));
             onSuccess();
         } else {
-            showError(t("restock_failed")); // Reusing a generic error key
+            showError(t("restock_failed"));
         }
     } catch (error) {
         showError(t("restock_failed"));
@@ -80,7 +82,7 @@ const AddItemForm: React.FC<AddItemFormProps> = ({ onSuccess }) => {
               <FormItem>
                 <FormLabel>{t("item_name")}</FormLabel>
                 <FormControl>
-                  <Input placeholder="New Product Name" {...field} />
+                  <Input placeholder="New Product Name" {...field} disabled={!isOwner} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -94,7 +96,7 @@ const AddItemForm: React.FC<AddItemFormProps> = ({ onSuccess }) => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>{t("category")}</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!isOwner}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder={t("select_a_category")} />
@@ -127,8 +129,9 @@ const AddItemForm: React.FC<AddItemFormProps> = ({ onSuccess }) => {
                     min="0.01" 
                     placeholder="19.99" 
                     {...field} 
-                    onChange={e => field.onChange(e.target.value)} // Let zod coerce
-                    value={field.value === 0 ? '' : field.value} // Handle 0 for empty input display
+                    onChange={e => field.onChange(e.target.value)}
+                    value={field.value === 0 ? '' : field.value}
+                    disabled={!isOwner}
                   />
                 </FormControl>
                 <FormMessage />
@@ -149,8 +152,9 @@ const AddItemForm: React.FC<AddItemFormProps> = ({ onSuccess }) => {
                     min="0" 
                     placeholder="10" 
                     {...field} 
-                    onChange={e => field.onChange(e.target.value)} // Let zod coerce
-                    value={field.value === 0 ? '' : field.value} // Handle 0 for empty input display
+                    onChange={e => field.onChange(e.target.value)}
+                    value={field.value === 0 ? '' : field.value}
+                    disabled={!isOwner}
                   />
                 </FormControl>
                 <FormMessage />
@@ -167,14 +171,14 @@ const AddItemForm: React.FC<AddItemFormProps> = ({ onSuccess }) => {
             <FormItem>
               <FormLabel>{t("product_image_url")}</FormLabel>
               <FormControl>
-                <Input placeholder="https://example.com/image.jpg" {...field} />
+                <Input placeholder="https://example.com/image.jpg" {...field} disabled={!isOwner} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <Button type="submit" className="w-full" disabled={isPending}>
+        <Button type="submit" className="w-full" disabled={isPending || !isOwner}>
           <PackagePlus className="h-4 w-4 mr-2" />
           {t("save_item")}
         </Button>

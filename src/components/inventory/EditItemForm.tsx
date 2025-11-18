@@ -11,6 +11,7 @@ import { showSuccess, showError } from '@/utils/toast';
 import { useTranslation } from 'react-i18next';
 import { Save } from 'lucide-react';
 import { InventoryItem } from '@/types/supabase';
+import { useUserRole } from '@/hooks/use-user-role';
 
 interface EditItemFormProps {
   item: InventoryItem;
@@ -33,6 +34,7 @@ type EditItemFormValues = z.infer<typeof formSchema>;
 const EditItemForm: React.FC<EditItemFormProps> = ({ item, onSuccess }) => {
   const { t } = useTranslation();
   const { mutateAsync: updateItem, isPending } = useUpdateInventoryItem();
+  const { isOwner } = useUserRole();
   
   const form = useForm<EditItemFormValues>({
     resolver: zodResolver(formSchema),
@@ -57,7 +59,7 @@ const EditItemForm: React.FC<EditItemFormProps> = ({ item, onSuccess }) => {
     
     try {
         await updateItem(updatedItem);
-        showSuccess(t("plan_updated_success", { name: updatedItem.name })); // Reusing translation key for success message
+        showSuccess(t("plan_updated_success", { name: updatedItem.name }));
         onSuccess();
     } catch (error) {
         showError(t("update_failed"));
@@ -77,7 +79,7 @@ const EditItemForm: React.FC<EditItemFormProps> = ({ item, onSuccess }) => {
               <FormItem>
                 <FormLabel>{t("item_name")}</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input {...field} disabled={!isOwner} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -91,7 +93,7 @@ const EditItemForm: React.FC<EditItemFormProps> = ({ item, onSuccess }) => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>{t("category")}</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!isOwner}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder={t("select_a_category")} />
@@ -123,8 +125,9 @@ const EditItemForm: React.FC<EditItemFormProps> = ({ item, onSuccess }) => {
                     step="0.01" 
                     min="0.01" 
                     {...field} 
-                    onChange={e => field.onChange(e.target.value)} // Let zod coerce
-                    value={field.value === 0 ? '' : field.value} // Handle 0 for empty input display
+                    onChange={e => field.onChange(e.target.value)}
+                    value={field.value === 0 ? '' : field.value}
+                    disabled={!isOwner}
                   />
                 </FormControl>
                 <FormMessage />
@@ -144,8 +147,9 @@ const EditItemForm: React.FC<EditItemFormProps> = ({ item, onSuccess }) => {
                     type="number" 
                     min="0" 
                     {...field} 
-                    onChange={e => field.onChange(e.target.value)} // Let zod coerce
-                    value={field.value === 0 ? '' : field.value} // Handle 0 for empty input display
+                    onChange={e => field.onChange(e.target.value)}
+                    value={field.value === 0 ? '' : field.value}
+                    disabled={!isOwner}
                   />
                 </FormControl>
                 <FormMessage />
@@ -162,14 +166,14 @@ const EditItemForm: React.FC<EditItemFormProps> = ({ item, onSuccess }) => {
             <FormItem>
               <FormLabel>{t("product_image_url")}</FormLabel>
               <FormControl>
-                <Input placeholder="https://example.com/image.jpg" {...field} />
+                <Input placeholder="https://example.com/image.jpg" {...field} disabled={!isOwner} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <Button type="submit" className="w-full mt-4" disabled={isPending}>
+        <Button type="submit" className="w-full mt-4" disabled={isPending || !isOwner}>
           <Save className="h-4 w-4 mr-2" />
           {t("save_item_details")}
         </Button>

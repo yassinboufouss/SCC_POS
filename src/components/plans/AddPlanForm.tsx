@@ -8,11 +8,12 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useAddPlan } from '@/integrations/supabase/data/use-plans.ts';
-import { useInventory } from '@/integrations/supabase/data/use-inventory.ts'; // Import inventory hook
+import { useInventory } from '@/integrations/supabase/data/use-inventory.ts';
 import { showSuccess, showError } from '@/utils/toast';
 import { useTranslation } from 'react-i18next';
 import { Ticket, Gift } from 'lucide-react';
 import { NewPlanInput } from '@/types/pos';
+import { useUserRole } from '@/hooks/use-user-role';
 
 interface AddPlanFormProps {
   onSuccess: () => void;
@@ -23,7 +24,7 @@ const formSchema = z.object({
   duration_days: z.coerce.number().int().min(1, { message: "Duration must be at least 1 day." }),
   price: z.coerce.number().min(0.01, { message: "Price must be greater than zero." }),
   description: z.string().min(5, { message: "Description is required." }),
-  giveaway_item_id: z.string().optional().nullable(), // New field
+  giveaway_item_id: z.string().optional().nullable(),
 });
 
 type AddPlanFormValues = z.infer<typeof formSchema>;
@@ -32,6 +33,7 @@ const AddPlanForm: React.FC<AddPlanFormProps> = ({ onSuccess }) => {
   const { t } = useTranslation();
   const { mutateAsync: addPlan, isPending } = useAddPlan();
   const { data: inventoryItems, isLoading: isLoadingInventory } = useInventory();
+  const { isOwner } = useUserRole();
   
   const form = useForm<AddPlanFormValues>({
     resolver: zodResolver(formSchema),
@@ -60,7 +62,7 @@ const AddPlanForm: React.FC<AddPlanFormProps> = ({ onSuccess }) => {
             showSuccess(t("plan_created_success", { name: newPlan.name }));
             onSuccess();
         } else {
-            showError(t("registration_failed")); // Reusing generic error key
+            showError(t("registration_failed"));
         }
     } catch (error) {
         showError(t("registration_failed"));
@@ -80,7 +82,7 @@ const AddPlanForm: React.FC<AddPlanFormProps> = ({ onSuccess }) => {
               <FormItem>
                 <FormLabel>{t("plan_name")}</FormLabel>
                 <FormControl>
-                  <Input placeholder="Monthly Premium" {...field} />
+                  <Input placeholder="Monthly Premium" {...field} disabled={!isOwner} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -100,8 +102,9 @@ const AddPlanForm: React.FC<AddPlanFormProps> = ({ onSuccess }) => {
                     min="1" 
                     placeholder="30" 
                     {...field} 
-                    onChange={e => field.onChange(e.target.value)} // Let zod coerce
-                    value={field.value === 0 ? '' : field.value} // Handle 0 for empty input display
+                    onChange={e => field.onChange(e.target.value)}
+                    value={field.value === 0 ? '' : field.value}
+                    disabled={!isOwner}
                   />
                 </FormControl>
                 <FormMessage />
@@ -123,8 +126,9 @@ const AddPlanForm: React.FC<AddPlanFormProps> = ({ onSuccess }) => {
                     min="0.01" 
                     placeholder="99.99" 
                     {...field} 
-                    onChange={e => field.onChange(e.target.value)} // Let zod coerce
-                    value={field.value === 0 ? '' : field.value} // Handle 0 for empty input display
+                    onChange={e => field.onChange(e.target.value)}
+                    value={field.value === 0 ? '' : field.value}
+                    disabled={!isOwner}
                   />
                 </FormControl>
                 <FormMessage />
@@ -139,7 +143,7 @@ const AddPlanForm: React.FC<AddPlanFormProps> = ({ onSuccess }) => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="flex items-center gap-1"><Gift className="h-4 w-4 text-green-600" /> {t("free_giveaway_item")}</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value || ''} disabled={isLoadingInventory}>
+                <Select onValueChange={field.onChange} defaultValue={field.value || ''} disabled={isLoadingInventory || !isOwner}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder={t("select_optional_item")} />
@@ -168,14 +172,14 @@ const AddPlanForm: React.FC<AddPlanFormProps> = ({ onSuccess }) => {
             <FormItem>
               <FormLabel>{t("description_label")}</FormLabel>
               <FormControl>
-                <Textarea placeholder="A brief description of the plan features." {...field} />
+                <Textarea placeholder="A brief description of the plan features." {...field} disabled={!isOwner} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <Button type="submit" className="w-full" disabled={isPending}>
+        <Button type="submit" className="w-full" disabled={isPending || !isOwner}>
           <Ticket className="h-4 w-4 mr-2" />
           {t("create_plan")}
         </Button>
