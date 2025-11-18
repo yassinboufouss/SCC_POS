@@ -199,6 +199,7 @@ export const ar = {
     "monthly_sales_total": "إجمالي المبيعات الشهرية",
     "sales_summary": "ملخص المبيعات",
     "print": "طباعة",
-    "print_summary_success": "تمت طباعة ملخص المبيعات إلى وحدة التحكم.",
+    "print_summary_success": "تم إنشاء ملف PDF لملخص المبيعات بنجاح.",
+    "print_summary_failed": "فشل إنشاء ملف PDF لملخص المبيعات.",
   }
 };

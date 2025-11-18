@@ -199,6 +199,7 @@ export const en = {
     "monthly_sales_total": "Monthly Sales Total",
     "sales_summary": "Sales Summary",
     "print": "Print",
-    "print_summary_success": "Sales summary printed to console.",
+    "print_summary_success": "Sales summary PDF generated successfully.",
+    "print_summary_failed": "Failed to generate sales summary PDF.",
   }
 };

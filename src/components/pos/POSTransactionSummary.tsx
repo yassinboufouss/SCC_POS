@@ -1,24 +1,56 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DollarSign, Printer, Calendar, Clock, TrendingUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { getSalesSummary } from '@/utils/transaction-utils';
 import { formatCurrency } from '@/utils/currency-utils';
-import { showSuccess } from '@/utils/toast';
+import { showSuccess, showError } from '@/utils/toast';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const POSTransactionSummary: React.FC = () => {
   const { t } = useTranslation();
+  const summaryRef = useRef<HTMLDivElement>(null);
   
   // Recalculate summary whenever component mounts/updates
   const summary = useMemo(() => getSalesSummary(), []);
 
-  const handlePrint = () => {
-    console.log("--- Sales Summary Report ---");
-    console.log(`Daily Total: ${formatCurrency(summary.dailyTotal)}`);
-    console.log(`Weekly Total: ${formatCurrency(summary.weeklyTotal)}`);
-    console.log(`Monthly Total: ${formatCurrency(summary.monthlyTotal)}`);
-    showSuccess(t("print_summary_success"));
+  const handlePrint = async () => {
+    if (!summaryRef.current) {
+        showError(t("print_summary_failed"));
+        return;
+    }
+
+    try {
+        const element = summaryRef.current;
+        
+        // Use html2canvas to capture the element as an image
+        const canvas = await html2canvas(element, { scale: 2 });
+        const imgData = canvas.toDataURL('image/jpeg', 1.0);
+
+        // Initialize jsPDF
+        const pdf = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4',
+        });
+
+        const imgProps = pdf.getImageProperties(imgData);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+        // Add the image to the PDF
+        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+        
+        // Save the PDF
+        pdf.save(`Sales_Summary_${new Date().toISOString().split('T')[0]}.pdf`);
+        
+        showSuccess(t("print_summary_success"));
+    } catch (error) {
+        console.error("PDF generation failed:", error);
+        showError(t("print_summary_failed"));
+    }
   };
 
   const metrics = [
@@ -53,14 +85,18 @@ const POSTransactionSummary: React.FC = () => {
         </Button>
       </CardHeader>
       <CardContent className="p-0">
-        <div className="grid grid-cols-3 gap-3">
-          {metrics.map((metric) => (
-            <div key={metric.title} className="p-2 border rounded-md bg-secondary/50 text-center">
-              <metric.icon className={`h-5 w-5 mx-auto mb-1 ${metric.color}`} />
-              <p className="text-xs font-medium text-muted-foreground">{metric.title}</p>
-              <p className="text-sm font-bold mt-0.5">{metric.value}</p>
+        {/* Content to be captured by PDF generator */}
+        <div ref={summaryRef} className="p-2"> 
+            <h4 className="text-lg font-bold mb-3">{t("sales_summary")} - {t("today_so_far")}</h4>
+            <div className="grid grid-cols-3 gap-3">
+              {metrics.map((metric) => (
+                <div key={metric.title} className="p-2 border rounded-md bg-secondary/50 text-center">
+                  <metric.icon className={`h-5 w-5 mx-auto mb-1 ${metric.color}`} />
+                  <p className="text-xs font-medium text-muted-foreground">{metric.title}</p>
+                  <p className="text-sm font-bold mt-0.5">{metric.value}</p>
+                </div>
+              ))}
             </div>
-          ))}
         </div>
       </CardContent>
     </Card>

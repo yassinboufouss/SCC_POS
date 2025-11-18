@@ -199,6 +199,7 @@ export const fr = {
     "monthly_sales_total": "Ventes Mensuelles Totales",
     "sales_summary": "Résumé des Ventes",
     "print": "Imprimer",
-    "print_summary_success": "Résumé des ventes imprimé dans la console.",
+    "print_summary_success": "PDF du résumé des ventes généré avec succès.",
+    "print_summary_failed": "Échec de la génération du PDF du résumé des ventes.",
   }
 };
