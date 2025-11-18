@@ -71,6 +71,20 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member, canEd
   // Only Owner can perform status actions (Freeze/Cancel)
   const canChangeStatus = isOwner; 
   
+  const getRoleVariant = (role: Profile['role']) => {
+    switch (role) {
+      case 'owner':
+        return 'destructive';
+      case 'manager':
+      case 'cashier':
+        return 'default';
+      case 'member':
+        return 'secondary';
+      default:
+        return 'outline';
+    }
+  };
+  
   if (isLoadingMember && isDialogOpen) {
       return (
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -102,6 +116,11 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member, canEd
           <DialogTitle className="flex items-center gap-2">
             <User className="h-5 w-5" /> {displayMember.first_name} {displayMember.last_name} ({displayMember.member_code || displayMember.id.substring(0, 8)}...)
           </DialogTitle>
+          <div className="pt-1">
+            <Badge variant={getRoleVariant(displayMember.role)} className="text-sm">
+                {t(displayMember.role || 'member')}
+            </Badge>
+          </div>
         </DialogHeader>
         
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

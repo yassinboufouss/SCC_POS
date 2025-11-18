@@ -20,6 +20,7 @@ interface MemberBasicInfoFormProps {
 const formSchema = z.object({
   first_name: z.string().min(2, { message: "First name must be at least 2 characters." }),
   last_name: z.string().min(2, { message: "Last name must be at least 2 characters." }),
+  email: z.string().email({ message: "Invalid email address." }).optional().or(z.literal('')),
   phone: z.string().min(10, { message: "Phone number must be at least 10 digits." }).optional().or(z.literal('')),
   dob: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, { message: "Date of Birth must be in YYYY-MM-DD format." }).optional().or(z.literal('')),
 });
@@ -35,6 +36,7 @@ const MemberBasicInfoForm: React.FC<MemberBasicInfoFormProps> = ({ member, onSuc
     defaultValues: {
       first_name: member.first_name || '',
       last_name: member.last_name || '',
+      email: member.email || '',
       phone: member.phone || '',
       dob: member.dob || '',
     },
@@ -45,10 +47,11 @@ const MemberBasicInfoForm: React.FC<MemberBasicInfoFormProps> = ({ member, onSuc
       form.reset({
           first_name: member.first_name || '',
           last_name: member.last_name || '',
+          email: member.email || '',
           phone: member.phone || '',
           dob: member.dob || '',
       });
-  }, [member.id, member.first_name, member.last_name, member.phone, member.dob, form.reset]);
+  }, [member.id, member.first_name, member.last_name, member.phone, member.dob, member.email, form.reset]);
 
 
   const onSubmit = async (values: BasicInfoFormValues) => {
@@ -56,6 +59,7 @@ const MemberBasicInfoForm: React.FC<MemberBasicInfoFormProps> = ({ member, onSuc
       id: member.id,
       first_name: values.first_name,
       last_name: values.last_name,
+      email: values.email || null,
       phone: values.phone || null,
       dob: values.dob || null,
     };
@@ -97,6 +101,21 @@ const MemberBasicInfoForm: React.FC<MemberBasicInfoFormProps> = ({ member, onSuc
                 <FormLabel>{t("last_name")}</FormLabel>
                 <FormControl>
                   <Input {...field} disabled={!canEdit} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          {/* Email */}
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("email")}</FormLabel>
+                <FormControl>
+                  <Input placeholder="jane.doe@example.com" {...field} disabled={!canEdit} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
