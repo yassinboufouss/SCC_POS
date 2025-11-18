@@ -10,10 +10,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import MemberRegistrationForm from '@/components/members/MemberRegistrationForm';
 import MemberProfileDialog from '@/components/members/MemberProfileDialog';
 import { useMembers } from '@/integrations/supabase/data/use-members.ts';
-import { Profile } from '@/types/supabase';
+import { Profile, MembershipPlan } from '@/types/supabase';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useAddTransaction } from '@/integrations/supabase/data/use-transactions.ts';
+import { PaymentMethod } from '@/types/pos';
+import { showError } from '@/utils/toast'; // <-- Added missing import
 
 const statusOptions: (Profile['status'] | 'All')[] = ['All', 'Active', 'Pending', 'Expired'];
 
@@ -24,6 +27,7 @@ const MembersPage: React.FC = () => {
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
   
   const { data: members, isLoading } = useMembers(searchTerm, statusFilter);
+  const { mutateAsync: recordTransaction } = useAddTransaction();
 
   const getStatusVariant = (status: Profile['status']) => {
     switch (status) {
@@ -38,8 +42,22 @@ const MembersPage: React.FC = () => {
     }
   };
 
-  const handleRegistrationSuccess = () => {
-    setIsRegistrationOpen(false);
+  const handleRegistrationSuccess = async ({ member, plan, paymentMethod }: { member: Profile, plan: Pick<MembershipPlan, 'id' | 'name' | 'duration_days' | 'price'>, paymentMethod: PaymentMethod }) => {
+    try {
+        // Record Transaction for the membership fee immediately (since this is standalone registration)
+        await recordTransaction({
+            member_id: member.member_code || member.id,
+            member_name: `${member.first_name} ${member.last_name}`,
+            type: 'Membership',
+            item_description: `${plan.name} (${plan.duration_days} days)`,
+            amount: plan.price,
+            payment_method: paymentMethod,
+        });
+        
+        setIsRegistrationOpen(false);
+    } catch (error) {
+        showError(t("registration_failed"));
+    }
   };
   
   return (

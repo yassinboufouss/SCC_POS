@@ -8,18 +8,19 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { usePlans } from '@/integrations/supabase/data/use-plans.ts';
-import { useAddMember, NewMemberInput } from '@/integrations/supabase/data/use-members.ts';
+import { useRegisterMember, NewMemberInput } from '@/integrations/supabase/data/use-members.ts';
 import { showSuccess, showError } from '@/utils/toast';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { CalendarIcon, UserPlus, CreditCard } from 'lucide-react';
 import { formatCurrency } from '@/utils/currency-utils';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Profile } from '@/types/supabase'; // Import Profile type
+import { Profile, MembershipPlan } from '@/types/supabase'; // Import Profile and MembershipPlan type
 import { PaymentMethod } from '@/types/pos'; // Import PaymentMethod type
 
 interface MemberRegistrationFormProps {
-  onSuccess: (member: Profile, planId: string, paymentMethod: PaymentMethod) => void;
+  // Updated onSuccess signature to return registration result for parent to handle transaction
+  onSuccess: (result: { member: Profile, plan: Pick<MembershipPlan, 'id' | 'name' | 'duration_days' | 'price'>, paymentMethod: PaymentMethod }) => void;
 }
 
 const formSchema = z.object({
@@ -37,8 +38,10 @@ type RegistrationFormValues = z.infer<typeof formSchema>;
 const MemberRegistrationForm: React.FC<MemberRegistrationFormProps> = ({ onSuccess }) => {
   const { t } = useTranslation();
   const { data: membershipPlans, isLoading: isLoadingPlans } = usePlans();
-  const { mutateAsync: addMember, isPending } = useAddMember();
+  const { mutateAsync: registerMember, isPending: isRegistering } = useRegisterMember();
   
+  const isPending = isRegistering;
+
   const form = useForm<RegistrationFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -53,38 +56,38 @@ const MemberRegistrationForm: React.FC<MemberRegistrationFormProps> = ({ onSucce
   });
 
   const onSubmit = async (values: RegistrationFormValues) => {
-    const newMemberData: NewMemberInput = {
-      first_name: values.first_name,
-      last_name: values.last_name,
-      email: values.email,
-      phone: values.phone,
-      dob: values.dob,
-      planId: values.planId,
-      paymentMethod: values.paymentMethod, // Pass payment method
+    const { planId, paymentMethod, ...memberDetails } = values;
+    
+    const registrationData: Omit<NewMemberInput, 'paymentMethod'> = {
+      ...(memberDetails as Omit<NewMemberInput, 'paymentMethod'>),
+      planId: planId,
     };
 
     try {
-        const newMember = await addMember(newMemberData);
+        // 1. Register the user and activate the plan (no transaction recorded yet)
+        const result = await registerMember(registrationData);
 
-        if (newMember) {
-            showSuccess(t("registration_success", { name: `${newMember.first_name} ${newMember.last_name}`, date: newMember.expiration_date }));
-            
-            // Call onSuccess with payment method
-            onSuccess(newMember, values.planId, values.paymentMethod); 
-            
-            // Reset form fields except for planId and paymentMethod if desired, but for simplicity, reset all.
-            form.reset({
-                first_name: "",
-                last_name: "",
-                email: "",
-                phone: "",
-                dob: format(new Date(2000, 0, 1), 'yyyy-MM-dd'),
-                planId: values.planId, // Keep selected plan for quick re-registration
-                paymentMethod: values.paymentMethod,
-            });
-        } else {
+        if (!result || !result.profile) {
             showError(t("registration_failed"));
+            return;
         }
+        
+        const { profile: newMember, plan: selectedPlan } = result;
+
+        // 2. Pass data back to parent for transaction handling/cart addition
+        onSuccess({ member: newMember, plan: selectedPlan, paymentMethod }); 
+        
+        // Reset form fields
+        form.reset({
+            first_name: "",
+            last_name: "",
+            email: "",
+            phone: "",
+            dob: format(new Date(2000, 0, 1), 'yyyy-MM-dd'),
+            planId: values.planId, // Keep selected plan for quick re-registration
+            paymentMethod: values.paymentMethod,
+        });
+        
     } catch (error) {
         showError(t("registration_failed"));
     }

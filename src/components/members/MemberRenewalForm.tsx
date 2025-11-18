@@ -77,20 +77,22 @@ const MemberRenewalForm: React.FC<MemberRenewalFormProps> = ({ member }) => {
     if (!selectedPlan) return;
     
     try {
-        const updatedMember = await renewPlan({ profileId: member.id, planId: values.planId });
+        const renewalResult = await renewPlan({ profileId: member.id, planId: values.planId });
 
-        if (updatedMember) {
+        if (renewalResult && renewalResult.profile) {
+            const updatedProfile = renewalResult.profile;
+            
             // 1. Record Transaction
             await recordTransaction({
-                member_id: updatedMember.member_code || updatedMember.id,
-                member_name: `${updatedMember.first_name} ${updatedMember.last_name}`,
+                member_id: updatedProfile.member_code || updatedProfile.id,
+                member_name: `${updatedProfile.first_name} ${updatedProfile.last_name}`,
                 type: 'Membership',
                 item_description: `${selectedPlan.name} Renewal (${selectedPlan.duration_days} days)`,
                 amount: selectedPlan.price,
                 payment_method: values.paymentMethod as PaymentMethod,
             });
             
-            showSuccess(t("renewal_success", { name: `${updatedMember.first_name} ${updatedMember.last_name}`, date: updatedMember.expiration_date }));
+            showSuccess(t("renewal_success", { name: `${updatedProfile.first_name} ${updatedProfile.last_name}`, date: updatedProfile.expiration_date }));
             // Invalidation handled by hook
         } else {
             showError(t("renewal_failed"));

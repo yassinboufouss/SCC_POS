@@ -1,8 +1,7 @@
-import { Profile } from "@/types/supabase";
+import { Profile, MembershipPlan } from "@/types/supabase";
 import { supabase } from "@/integrations/supabase/client";
 import { addDays, format } from "date-fns";
-import { addTransaction } from "./transaction-utils"; // Import transaction utility
-import { PaymentMethod } from "@/types/pos"; // Import PaymentMethod type
+import { PaymentMethod } from "@/types/pos"; 
 
 // Define the expected input structure from the registration form
 export type NewMemberInput = {
@@ -12,7 +11,7 @@ export type NewMemberInput = {
   phone: string;
   dob: string;
   planId: string;
-  paymentMethod: PaymentMethod; // Added payment method
+  paymentMethod: PaymentMethod;
 };
 
 // Utility to update member data (used internally by other utils)
@@ -36,9 +35,10 @@ export const updateMemberStatus = async (profileId: string, newStatus: Profile['
   return updateProfile({ id: profileId, status: newStatus, updated_at: new Date().toISOString() });
 };
 
-// Utility to simulate adding a new member (Used by standalone registration and POS registration tab)
-export const addMember = async (newMemberData: NewMemberInput): Promise<Profile | null> => {
-  const { planId, paymentMethod, ...memberDetails } = newMemberData;
+// Utility to simulate adding a new member (Auth + Profile creation/activation)
+// NOTE: This utility handles Auth and Profile creation/activation but DOES NOT record the transaction.
+export const registerNewUserAndProfile = async (newMemberData: Omit<NewMemberInput, 'paymentMethod'>): Promise<{ profile: Profile, plan: Pick<MembershipPlan, 'id' | 'name' | 'duration_days' | 'price'> } | null> => {
+  const { planId, ...memberDetails } = newMemberData;
   
   // 1. Fetch plan details
   const { data: planData, error: planError } = await supabase
@@ -101,32 +101,17 @@ export const addMember = async (newMemberData: NewMemberInput): Promise<Profile 
     throw new Error("Failed to finalize member registration: Profile update failed.");
   }
   
-  // 4. Record the initial transaction
-  try {
-      await addTransaction({
-          member_id: profile.member_code || profile.id,
-          member_name: `${profile.first_name} ${profile.last_name}`,
-          type: 'Membership',
-          item_description: `${planData.name} (${planData.duration_days} days)`,
-          amount: planData.price,
-          payment_method: paymentMethod,
-      });
-  } catch (txError) {
-      console.error("Failed to record initial registration transaction:", txError);
-      // Proceed anyway
-  }
-
-  return profile;
+  return { profile, plan: planData };
 };
 
 
 // Utility to simulate renewing a member's plan (Used by POS checkout and Member Profile Renewal Form)
 // NOTE: This utility only updates the profile (plan, dates, status). Transaction recording must be handled by the caller.
-export const renewMemberPlan = async (profileId: string, planId: string): Promise<Profile | null> => {
+export const renewMemberPlan = async (profileId: string, planId: string): Promise<{ profile: Profile, plan: Pick<MembershipPlan, 'id' | 'name' | 'duration_days' | 'price'> } | null> => {
   // 1. Fetch current profile and plan details
   const [{ data: profile, error: profileError }, { data: planData, error: planError }] = await Promise.all([
     supabase.from('profiles').select('expiration_date, first_name, last_name, member_code').eq('id', profileId).single(),
-    supabase.from('membership_plans').select('name, duration_days, price').eq('id', planId).single(),
+    supabase.from('membership_plans').select('id, name, duration_days, price').eq('id', planId).single(),
   ]);
 
   if (profileError || !profile) {
@@ -163,9 +148,11 @@ export const renewMemberPlan = async (profileId: string, planId: string): Promis
 
   const updatedProfile = await updateProfile({ id: profileId, ...updatedProfileData });
   
-  // NOTE: Transaction recording is handled by the caller (MemberRenewalForm or POSPage)
+  if (!updatedProfile) {
+      throw new Error("Failed to update profile during renewal.");
+  }
   
-  return updatedProfile;
+  return { profile: updatedProfile, plan: planData };
 };
 
 // Utility to simulate a member check-in

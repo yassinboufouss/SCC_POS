@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '@/types/supabase';
 import { queryKeys } from './query-keys.ts';
-import { addMember, updateProfile, updateMemberStatus, renewMemberPlan, NewMemberInput, processCheckIn } from '@/utils/member-utils';
+import { registerNewUserAndProfile, updateProfile, updateMemberStatus, renewMemberPlan, NewMemberInput, processCheckIn } from '@/utils/member-utils';
 import { isFuture } from 'date-fns';
 
 // Re-export NewMemberInput to allow components to import it
@@ -101,12 +101,11 @@ export const useMember = (id: string) => {
   });
 };
 
-// --- Mutation Hooks ---
-
-export const useAddMember = () => {
+// Renamed hook for member registration (Auth + Profile creation)
+export const useRegisterMember = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (newMemberData: NewMemberInput) => addMember(newMemberData),
+    mutationFn: (newMemberData: Omit<NewMemberInput, 'paymentMethod'>) => registerNewUserAndProfile(newMemberData),
     onSuccess: () => {
       // Invalidate all member lists and dashboard metrics
       queryClient.invalidateQueries({ queryKey: queryKeys.profiles.all });
@@ -148,9 +147,9 @@ export const useRenewMemberPlan = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ profileId, planId }: { profileId: string, planId: string }) => renewMemberPlan(profileId, planId),
-    onSuccess: (data) => {
-      if (data) {
-        queryClient.invalidateQueries({ queryKey: queryKeys.profiles.detail(data.id) });
+    onSuccess: (result) => {
+      if (result?.profile) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.profiles.detail(result.profile.id) });
         queryClient.invalidateQueries({ queryKey: queryKeys.profiles.all });
         queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.metrics });
       }

@@ -29,11 +29,12 @@ const POSPage = () => {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('Cash'); 
   const [discountPercent, setDiscountPercent] = useState(0);
   const [selectedMember, setSelectedMember] = useState<Profile | null>(null);
-  const [activeTab, setActiveTab] = useState<'products' | 'register'>('products'); // New state for tabs
+  const [activeTab, setActiveTab] = useState<'products' | 'register'>('products');
+  const [justRegisteredMemberId, setJustRegisteredMemberId] = useState<string | null>(null); // Track newly registered member
   
   // Fetch live inventory data to check stock limits
   const { data: liveInventoryItems } = useInventory();
-  const { data: membershipPlans } = usePlans(); // Fetch all plans to look up details after registration
+  const { data: membershipPlans } = usePlans();
   const { mutateAsync: addTransaction, isPending: isProcessingSale } = useAddTransaction();
   const { mutateAsync: renewMember } = useRenewMemberPlan();
 
@@ -75,8 +76,6 @@ const POSPage = () => {
   
   const addMembershipToCart = (plan: MembershipPlan) => {
     setCart(prevCart => {
-        // Check if a membership item is already in the cart. We generally only sell one plan at a time in POS.
-        // However, if we allow stacking, we allow multiple. Let's allow multiple for flexibility.
         const existingItem = prevCart.find(i => i.sourceId === plan.id && i.type === 'membership');
 
         if (existingItem) {
@@ -126,34 +125,42 @@ const POSPage = () => {
   
   const handleClearMember = () => {
     setSelectedMember(null);
+    setJustRegisteredMemberId(null);
   };
   
   const handleClearCart = () => {
     setCart([]);
     setDiscountPercent(0);
     setSelectedMember(null);
-    setPaymentMethod('Cash'); // Reset payment method
+    setPaymentMethod('Cash');
+    setJustRegisteredMemberId(null);
   };
   
   // Handler for member lookup via check-in scanner
   const handleMemberFound = (member: Profile) => {
       setSelectedMember(member);
+      setJustRegisteredMemberId(null); // Ensure flag is cleared if member is looked up
   };
   
-  // Handler for successful registration via POS tab
-  const handleRegistrationSuccess = (member: Profile, planId: string, paymentMethod: PaymentMethod) => {
+  // Handler for successful registration via POS tab (UPDATED)
+  const handleRegistrationSuccess = ({ member, plan, paymentMethod }: { member: Profile, plan: Pick<MembershipPlan, 'id' | 'name' | 'duration_days' | 'price'>, paymentMethod: PaymentMethod }) => {
     // 1. Select the new member
     setSelectedMember(member);
     
-    // 2. Set the payment method used for registration (if the user proceeds to buy inventory items)
+    // 2. Set the payment method used for registration
     setPaymentMethod(paymentMethod);
     
-    // 3. The plan is already activated and transaction recorded by addMember utility. 
-    // We do NOT add the plan to the cart here to avoid double activation/transaction.
+    // 3. Mark as just registered
+    setJustRegisteredMemberId(member.id); 
     
-    showSuccess(t("registration_success", { name: `${member.first_name} ${member.last_name}`, date: member.expiration_date }));
+    // 4. Add the plan to the cart. The transaction will be recorded during checkout.
+    // We cast 'plan' to MembershipPlan because addMembershipToCart expects the full type, 
+    // even though it only uses the picked fields.
+    addMembershipToCart(plan as MembershipPlan); 
     
-    // 4. Switch back to the products tab
+    showSuccess(t("registration_and_cart_success", { name: `${member.first_name} ${member.last_name}` }));
+    
+    // 5. Switch back to the products tab
     setActiveTab('products');
   };
 
@@ -189,7 +196,7 @@ const POSPage = () => {
     };
   }, [cart, discountPercent]);
 
-  // --- Checkout ---
+  // --- Checkout (UPDATED) ---
 
   const handleCheckout = async () => {
     if (cart.length === 0) return;
@@ -202,22 +209,34 @@ const POSPage = () => {
             await reduceInventoryStock(item.sourceId, item.quantity);
         }));
         
-        // 2. Process Membership Renewals (if a member is selected AND membership items are in the cart)
+        // 2. Process Membership Renewals/Activation
         const membershipItemsSold = cart.filter(item => item.type === 'membership');
         
         if (selectedMember && membershipItemsSold.length > 0) {
-            // Renew the selected member's plan for each membership item in the cart
+            let renewalPerformed = false;
+            
             for (const item of membershipItemsSold) {
                 const planId = item.sourceId;
-                for (let i = 0; i < item.quantity; i++) {
-                    const updatedMember = await renewMember({ profileId: selectedMember.id, planId });
-                    if (updatedMember) {
-                        // Update local state to reflect the latest expiration date for stacking
-                        setSelectedMember(updatedMember); 
+                
+                // If the selected member is the one just registered, we skip the renewal/activation step 
+                // because registerNewUserAndProfile already handled the profile update.
+                const isInitialRegistrationPlan = selectedMember.id === justRegisteredMemberId;
+                
+                if (!isInitialRegistrationPlan) {
+                    // Case: Renewal or stacking for an existing member
+                    for (let i = 0; i < item.quantity; i++) {
+                        const updatedMemberResult = await renewMember({ profileId: selectedMember.id, planId });
+                        if (updatedMemberResult?.profile) {
+                            setSelectedMember(updatedMemberResult.profile); 
+                            renewalPerformed = true;
+                        }
                     }
                 }
             }
-            showSuccess(t("membership_renewal_pos_success", { name: `${selectedMember.first_name} ${selectedMember.last_name}` }));
+            
+            if (renewalPerformed) {
+                showSuccess(t("membership_renewal_pos_success", { name: `${selectedMember.first_name} ${selectedMember.last_name}` }));
+            }
         }
         
         // 3. Determine transaction type and description
@@ -236,10 +255,10 @@ const POSPage = () => {
         const itemDescription = cart.map(item => `${item.name} x${item.quantity}`).join(', ');
         
         // Use selected member details or default to Guest
-        const memberId = selectedMember?.id || 'GUEST';
+        const memberId = selectedMember?.member_code || selectedMember?.id || 'GUEST';
         const memberName = selectedMember ? `${selectedMember.first_name} ${selectedMember.last_name}` : t('guest_customer');
         
-        // Only record a transaction if the total is greater than zero (i.e., if there are items in the cart)
+        // Only record a transaction if the total is greater than zero
         if (total > 0) {
             const newTransaction = {
                 member_id: memberId,
@@ -264,7 +283,7 @@ const POSPage = () => {
         queryClient.invalidateQueries({ queryKey: ['inventory'] });
         queryClient.invalidateQueries({ queryKey: ['dashboard'] });
         queryClient.invalidateQueries({ queryKey: ['transactions'] });
-        queryClient.invalidateQueries({ queryKey: ['profiles'] }); // Invalidate profiles to reflect renewal status
+        queryClient.invalidateQueries({ queryKey: ['profiles'] });
 
         
         // Reset state
@@ -273,6 +292,7 @@ const POSPage = () => {
         setDiscountPercent(0);
         setSelectedMember(null);
         setPaymentMethod('Cash');
+        setJustRegisteredMemberId(null); // Clear registration flag
         
     } catch (error) {
         console.error("Checkout failed:", error);
@@ -341,7 +361,7 @@ const POSPage = () => {
                   tax={tax}
                   total={total}
                   isProcessingSale={isProcessingSale}
-                  onClearMember={handleClearMember} // Passed the clear function here
+                  onClearMember={handleClearMember}
               />
           </div>
         </div>
