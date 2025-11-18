@@ -37,6 +37,25 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
   const [isLoading, setIsLoading] = useState(true);
 
   const getProfile = async (currentUser: User) => {
+      const minimalProfile: Profile = {
+          id: currentUser.id,
+          email: currentUser.email || null,
+          role: 'member', // Default role
+          first_name: null,
+          last_name: null,
+          avatar_url: null,
+          updated_at: null,
+          member_code: null,
+          phone: null,
+          dob: null,
+          plan_name: null,
+          status: 'Pending',
+          start_date: null,
+          expiration_date: null,
+          last_check_in: null,
+          total_check_ins: 0,
+      };
+
       try {
           const userProfile = await fetchUserProfile(currentUser.id);
           
@@ -45,30 +64,14 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
               const completeProfile = { ...userProfile, email: currentUser.email || null };
               setProfile(completeProfile);
           } else {
-              // If profile doesn't exist yet, create a minimal profile object with email
-              const minimalProfile = {
-                  id: currentUser.id,
-                  email: currentUser.email || null,
-                  role: 'member', // Default role if profile fetch fails, forcing explicit assignment for staff/owner
-                  first_name: null,
-                  last_name: null,
-                  avatar_url: null,
-                  updated_at: null,
-                  member_code: null,
-                  phone: null,
-                  dob: null,
-                  plan_name: null,
-                  status: 'Pending',
-                  start_date: null,
-                  expiration_date: null,
-                  last_check_in: null,
-                  total_check_ins: 0,
-              } as Profile;
+              // If profile doesn't exist yet (PGRST116), use the minimal profile
               setProfile(minimalProfile);
           }
       } catch (e) {
           console.error("Failed to fetch profile after sign in:", e);
-          setProfile(null);
+          // If fetching fails due to an unexpected error (e.g., RLS denial, network), 
+          // we still set a minimal profile to prevent the ProtectedRoute from blocking access entirely.
+          setProfile(minimalProfile);
       }
   };
 
