@@ -222,5 +222,9 @@ export const ar = {
     "all_fields_required": "جميع الحقول مطلوبة.",
     "loading_members_data": "جاري تحميل بيانات الأعضاء...",
     "no_plans_found": "لم يتم العثور على خطط عضوية.",
+    "pos_products_tab": "المنتجات والخطط",
+    "pos_register_tab": "تسجيل عضو جديد",
+    "registration_and_cart_success": "اكتمل التسجيل. تم اختيار {{name}} وإضافة الخطة إلى العربة.",
+    "plan_not_found_after_registration": "لم يتم العثور على تفاصيل الخطة بعد التسجيل، يرجى التحقق من العربة يدويًا.",
   }
 };

@@ -213,7 +213,7 @@ export const fr = {
     "logging_in": "Connexion en cours...",
     "signing_up": "Inscription en cours...",
     "already_have_an_account_sign_in": "Vous avez déjà un compte ? Connectez-vous",
-    "dont_have_un_account_sign_up": "Vous n'avez pas de compte ? Inscrivez-vous",
+    "dont_have_an_account_sign_up": "Vous n'avez pas de compte ? Inscrivez-vous",
     "forgot_your_password": "Mot de passe oublié ?",
     "loading": "Chargement",
     "logout_failed": "Échec de la déconnexion. Veuillez réessayer.",
@@ -222,5 +222,9 @@ export const fr = {
     "all_fields_required": "Tous les champs sont obligatoires.",
     "loading_members_data": "Chargement des données des membres...",
     "no_plans_found": "Aucun plan d'adhésion trouvé.",
+    "pos_products_tab": "Produits et Plans",
+    "pos_register_tab": "Inscription Nouveau Membre",
+    "registration_and_cart_success": "Inscription terminée. تم اختيار {{name}} وإضافة الخطة إلى العربة.",
+    "plan_not_found_after_registration": "Détails du plan introuvables après l'inscription, veuillez vérifier le panier manuellement.",
   }
 };

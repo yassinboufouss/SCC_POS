@@ -15,9 +15,10 @@ import { format } from 'date-fns';
 import { CalendarIcon, UserPlus } from 'lucide-react';
 import { formatCurrency } from '@/utils/currency-utils';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Profile } from '@/types/supabase'; // Import Profile type
 
 interface MemberRegistrationFormProps {
-  onSuccess: () => void;
+  onSuccess: (member: Profile, planId: string) => void;
 }
 
 const formSchema = z.object({
@@ -63,7 +64,7 @@ const MemberRegistrationForm: React.FC<MemberRegistrationFormProps> = ({ onSucce
 
         if (newMember) {
             showSuccess(t("registration_success", { name: `${newMember.first_name} ${newMember.last_name}`, date: newMember.expiration_date }));
-            onSuccess();
+            onSuccess(newMember, values.planId);
         } else {
             showError(t("registration_failed"));
         }

@@ -16,6 +16,10 @@ import Layout from '@/components/Layout';
 import { formatCurrency } from '@/utils/currency-utils';
 import { Profile, InventoryItem, MembershipPlan } from '@/types/supabase';
 import { useQueryClient } from '@tanstack/react-query';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Package, UserPlus } from 'lucide-react';
+import MemberRegistrationForm from '@/components/members/MemberRegistrationForm';
+import { usePlans } from '@/integrations/supabase/data/use-plans.ts';
 
 const POSPage = () => {
   const { t } = useTranslation();
@@ -25,9 +29,11 @@ const POSPage = () => {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('Cash'); 
   const [discountPercent, setDiscountPercent] = useState(0);
   const [selectedMember, setSelectedMember] = useState<Profile | null>(null);
+  const [activeTab, setActiveTab] = useState<'products' | 'register'>('products'); // New state for tabs
   
   // Fetch live inventory data to check stock limits
   const { data: liveInventoryItems } = useInventory();
+  const { data: membershipPlans } = usePlans(); // Fetch all plans to look up details after registration
   const { mutateAsync: addTransaction, isPending: isProcessingSale } = useAddTransaction();
   const { mutateAsync: renewMember } = useRenewMemberPlan();
 
@@ -133,6 +139,24 @@ const POSPage = () => {
       // If the member is not active, prompt for renewal by adding a generic membership item to the cart
       // NOTE: We won't automatically add an item, but selecting the member is enough to proceed with renewal in the POS flow.
   };
+  
+  const handleRegistrationSuccess = (member: Profile, planId: string) => {
+    // 1. Select the new member
+    setSelectedMember(member);
+    
+    // 2. Add the purchased plan to the cart
+    const plan = membershipPlans?.find(p => p.id === planId);
+    if (plan) {
+        addMembershipToCart(plan);
+        showSuccess(t("registration_and_cart_success", { name: `${member.first_name} ${member.last_name}` }));
+    } else {
+        showError(t("plan_not_found_after_registration"));
+    }
+    
+    // 3. Switch back to the products tab
+    setActiveTab('products');
+  };
+
 
   // --- Calculations ---
 
@@ -256,17 +280,34 @@ const POSPage = () => {
       <div className="min-h-screen p-4 lg:p-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
-          {/* Product Selection (2/3 width) */}
+          {/* Left Column (2/3 width) - Product Selection / Registration Tabs */}
           <div className="lg:col-span-2">
-            <POSProductSelection
-              inventorySearchTerm={inventorySearchTerm}
-              setInventorySearchTerm={setInventorySearchTerm}
-              addInventoryToCart={addInventoryToCart}
-              addMembershipToCart={addMembershipToCart}
-            />
+            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'products' | 'register')}>
+                <TabsList className="grid w-full grid-cols-2 mb-4">
+                    <TabsTrigger value="products">
+                        <Package className="h-4 w-4 mr-2" /> {t("pos_products_tab")}
+                    </TabsTrigger>
+                    <TabsTrigger value="register">
+                        <UserPlus className="h-4 w-4 mr-2" /> {t("pos_register_tab")}
+                    </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="products">
+                    <POSProductSelection
+                      inventorySearchTerm={inventorySearchTerm}
+                      setInventorySearchTerm={setInventorySearchTerm}
+                      addInventoryToCart={addInventoryToCart}
+                      addMembershipToCart={addMembershipToCart}
+                    />
+                </TabsContent>
+                
+                <TabsContent value="register">
+                    <MemberRegistrationForm onSuccess={handleRegistrationSuccess} />
+                </TabsContent>
+            </Tabs>
           </div>
 
-          {/* Cart & Checkout (1/3 width) */}
+          {/* Right Column (1/3 width) - Cart & Checkout */}
           <div className="lg:col-span-1 flex flex-col space-y-6">
               <POSTransactionSummary />
               

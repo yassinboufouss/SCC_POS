@@ -222,5 +222,9 @@ export const en = {
     "all_fields_required": "All fields are required.",
     "loading_members_data": "Loading members data...",
     "no_plans_found": "No membership plans found.",
+    "pos_products_tab": "Products & Plans",
+    "pos_register_tab": "New Member Registration",
+    "registration_and_cart_success": "Registration complete. {{name}} selected and plan added to cart.",
+    "plan_not_found_after_registration": "Plan details not found after registration, please check cart manually.",
   }
 };
