@@ -16,6 +16,7 @@ import FinancePage from "./pages/FinancePage";
 import SettingsPage from "./pages/SettingsPage";
 import POSPage from "./pages/POSPage";
 import MembershipPlansPage from "./pages/MembershipPlansPage";
+import TransactionsPage from "./pages/TransactionsPage"; // Import new page
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="/inventory" element={<InventoryPage />} />
             <Route path="/plans" element={<MembershipPlansPage />} />
             <Route path="/finance" element={<FinancePage />} />
+            <Route path="/finance/transactions" element={<TransactionsPage />} /> {/* New Route */}
             <Route path="/settings" element={<SettingsPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           </Route>

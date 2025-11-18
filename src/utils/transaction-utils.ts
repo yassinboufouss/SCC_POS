@@ -19,3 +19,7 @@ export const addTransaction = (newTransaction: Omit<Transaction, 'id'>): Transac
   
   return transactionWithId;
 };
+
+export const getTransactionsByMemberId = (memberId: string): Transaction[] => {
+    return mockTransactions.filter(tx => tx.memberId === memberId).slice(0, 10); // Limit to 10 recent transactions
+};

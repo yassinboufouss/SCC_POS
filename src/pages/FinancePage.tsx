@@ -1,11 +1,12 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, TrendingUp, Users, FileText } from 'lucide-react';
+import { DollarSign, TrendingUp, Users, FileText, ArrowRight } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import RecentTransactions from '@/components/RecentTransactions';
 import { calculateDashboardMetrics } from '@/utils/dashboard-metrics';
 import RevenueBreakdownChart from '@/components/RevenueBreakdownChart';
+import { Link } from 'react-router-dom';
 
 const FinancePage = () => {
   const metrics = calculateDashboardMetrics();
@@ -97,6 +98,12 @@ const FinancePage = () => {
               <Button variant="outline" className="justify-start">Inventory Profit Report</Button>
               <Button variant="outline" className="justify-start">Trainer Payroll Summary</Button>
             </div>
+            <Separator />
+            <Button asChild className="w-full">
+                <Link to="/finance/transactions">
+                    View All Transactions <ArrowRight className="h-4 w-4 ml-2" />
+                </Link>
+            </Button>
           </CardContent>
         </Card>
       </div>

@@ -5,7 +5,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Button } from "@/components/ui/button";
 import { Separator } from '@/components/ui/separator';
-import { User, Mail, Phone, Calendar, Clock, Eye } from 'lucide-react';
+import { User, Mail, Phone, Calendar, Clock, Eye, DollarSign } from 'lucide-react';
 import { format } from 'date-fns';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,6 +18,8 @@ import { showSuccess } from '@/utils/toast';
 import { updateMember } from '@/utils/member-utils';
 import MembershipRenewalDialog from './MembershipRenewalDialog';
 import MembershipActionDialog from './MembershipActionDialog';
+import { getTransactionsByMemberId } from '@/utils/transaction-utils'; // Import utility
+import { Transaction } from '@/data/transactions'; // Import type
 
 interface MemberProfileSheetProps {
   open: boolean;
@@ -41,6 +43,7 @@ const MemberProfileSheet: React.FC<MemberProfileSheetProps> = ({ open, onOpenCha
   const [localMember, setLocalMember] = useState<Member | null>(selectedMember);
   const [isRenewalDialogOpen, setIsRenewalDialogOpen] = useState(false);
   const [isActionDialogOpen, setIsActionDialogOpen] = useState(false);
+  const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([]);
     
   const form = useForm<MemberFormValues>({
     resolver: zodResolver(memberSchema),
@@ -56,6 +59,9 @@ const MemberProfileSheet: React.FC<MemberProfileSheetProps> = ({ open, onOpenCha
         plan: selectedMember.plan,
         status: selectedMember.status as MemberFormValues['status'],
       });
+      
+      // Fetch transactions when member changes
+      setRecentTransactions(getTransactionsByMemberId(selectedMember.id));
     }
   }, [selectedMember, form]);
 
@@ -92,6 +98,8 @@ const MemberProfileSheet: React.FC<MemberProfileSheetProps> = ({ open, onOpenCha
         plan: renewedMember.plan,
         status: renewedMember.status as MemberFormValues['status'],
       });
+      // Refresh transactions
+      setRecentTransactions(getTransactionsByMemberId(renewedMember.id));
   };
   
   const handleActionSuccess = (updatedMember: Member) => {
@@ -260,12 +268,24 @@ const MemberProfileSheet: React.FC<MemberProfileSheetProps> = ({ open, onOpenCha
                 </div>
               </div>
               
-              {/* Placeholder for Transaction History */}
+              {/* Transaction History */}
               <div className="space-y-3">
-                <h3 className="text-lg font-semibold">Transaction History</h3>
-                <p className="text-sm text-muted-foreground">
-                  (Placeholder for recent payments and purchases)
-                </p>
+                <h3 className="text-lg font-semibold">Recent Transactions ({recentTransactions.length})</h3>
+                <div className="border rounded-md max-h-48 overflow-y-auto">
+                    {recentTransactions.length > 0 ? (
+                        recentTransactions.map(tx => (
+                            <div key={tx.id} className="flex justify-between items-center p-3 border-b last:border-b-0 hover:bg-accent">
+                                <div>
+                                    <p className="text-sm font-medium truncate">{tx.item}</p>
+                                    <p className="text-xs text-muted-foreground">{tx.date} ({tx.type})</p>
+                                </div>
+                                <span className="font-semibold text-green-600 shrink-0">${tx.amount.toFixed(2)}</span>
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-center text-muted-foreground py-4 text-sm">No recent transactions found.</p>
+                    )}
+                </div>
               </div>
               
               <div className="pt-4">
