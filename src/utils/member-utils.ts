@@ -47,15 +47,7 @@ export const addMember = async (newMemberData: NewMemberInput): Promise<Profile 
     throw new Error("Plan not found.");
   }
   
-  // NOTE: In a real app, the user must be created via Auth first, and the profile inserted via trigger.
-  // Since we are using mock data flow for registration, we will skip the Auth step and just insert the profile directly.
-  // We need a user ID (UUID) for the profile table. Since we don't have a real user ID from auth.users, we must rely on the database to generate the UUID for the profile ID.
-  // However, the profiles table references auth.users(id), so we must use a real user ID.
-  // For the purpose of this mock migration, we will assume the user is already created and we are updating their profile, or we use a placeholder UUID if we cannot create a user via the client here.
-  
-  // Since the profiles table references auth.users(id), we cannot insert a profile without a corresponding auth.user entry.
-  // We will simulate the registration by signing up the user first, then updating their profile.
-  
+  // 1. Sign up the user via Auth
   const { data: authData, error: authError } = await supabase.auth.signUp({
       email: newMemberData.email,
       password: 'password123', // Mock password for registration flow
@@ -68,8 +60,8 @@ export const addMember = async (newMemberData: NewMemberInput): Promise<Profile 
   });
   
   if (authError || !authData.user) {
-      console.error("Supabase Auth Signup Error:", authError);
-      throw new Error("Failed to create user account.");
+      console.error("Supabase Auth Signup Error:", authError?.message || "Unknown Auth Error");
+      throw new Error(authError?.message || "Failed to create user account.");
   }
   
   const userId = authData.user.id;
@@ -77,7 +69,7 @@ export const addMember = async (newMemberData: NewMemberInput): Promise<Profile 
   const startDate = new Date();
   const expirationDate = addDays(startDate, planData.duration_days);
   
-  // The handle_new_user trigger should have created a basic profile. We now update it with membership details.
+  // 2. Update the profile created by the trigger (handle_new_user) with membership details.
   const newProfileData = {
     id: userId,
     first_name: newMemberData.first_name,
@@ -92,7 +84,6 @@ export const addMember = async (newMemberData: NewMemberInput): Promise<Profile 
     email: newMemberData.email, // Include email for consistency with the new type
   };
 
-  // Update the profile created by the trigger
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .update(newProfileData)
@@ -102,8 +93,8 @@ export const addMember = async (newMemberData: NewMemberInput): Promise<Profile 
 
   if (profileError) {
     console.error("Supabase Profile Update Error:", profileError);
-    // Clean up the auth user if profile update fails? Too complex for simple migration. We throw.
-    throw new Error("Failed to finalize member registration.");
+    // If profile update fails, we should ideally delete the auth user, but for simplicity, we throw the error.
+    throw new Error("Failed to finalize member registration: Profile update failed.");
   }
   
   return profile;
