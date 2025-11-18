@@ -1,7 +1,7 @@
 import React from 'react';
 import Layout from '@/components/Layout';
 import { useTranslation } from 'react-i18next';
-import { Users, DollarSign, Package, QrCode } from 'lucide-react';
+import { Users, DollarSign, Package, QrCode, LucideIcon } from 'lucide-react';
 import DashboardMetricCard from '@/components/dashboard/DashboardMetricCard';
 import ExpiringMemberships from '@/components/dashboard/ExpiringMemberships';
 import LowStockAlerts from '@/components/dashboard/LowStockAlerts';
@@ -37,7 +37,7 @@ const DashboardPage: React.FC = () => {
   
   const currentMetrics = metrics || defaultMetrics;
 
-  const renderMetricCard = (titleKey: string, value: React.ReactNode, icon: React.FC<any>, descriptionKey: string, isAlert = false) => (
+  const renderMetricCard = (titleKey: string, value: React.ReactNode, icon: LucideIcon, descriptionKey: string, isAlert = false) => (
     <DashboardMetricCard
       title={t(titleKey)}
       value={isLoading ? <Skeleton className="h-8 w-20" /> : value}

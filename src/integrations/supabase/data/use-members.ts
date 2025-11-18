@@ -4,6 +4,9 @@ import { Profile } from '@/types/supabase';
 import { queryKeys } from './query-keys.ts';
 import { addMember, updateProfile, updateMemberStatus, renewMemberPlan, NewMemberInput, processCheckIn } from '@/utils/member-utils';
 
+// Re-export NewMemberInput to allow components to import it
+export { NewMemberInput };
+
 // --- Fetch Hooks ---
 
 export const useMembers = (searchTerm: string = '') => {
