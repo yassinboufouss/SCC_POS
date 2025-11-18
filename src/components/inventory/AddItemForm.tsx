@@ -43,8 +43,8 @@ const AddItemForm: React.FC<AddItemFormProps> = ({ onSuccess }) => {
     },
   });
 
-  const onSubmit = (values: AddItemFormValues) => {
-    const newItem = addInventoryItem({
+  const onSubmit = async (values: AddItemFormValues) => {
+    const newItem = await addInventoryItem({
       name: values.name,
       category: values.category as CategoryType,
       price: values.price,

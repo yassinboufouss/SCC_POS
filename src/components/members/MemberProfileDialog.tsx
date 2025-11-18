@@ -55,7 +55,7 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member, onUpd
     onUpdate(updatedMember);
   };
   
-  const handleSaveBasicDetails = () => {
+  const handleSaveBasicDetails = async () => {
     if (!editName || !editEmail || !editPhone || !editDob) {
         showError("All fields are required.");
         return;
@@ -69,7 +69,7 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member, onUpd
         dob: editDob,
     };
     
-    updateMember(updatedMember);
+    await updateMember(updatedMember);
     handleMemberUpdate(updatedMember);
     showSuccess(t("member_profile_updated_success", { name: updatedMember.name }));
     setIsEditing(false);

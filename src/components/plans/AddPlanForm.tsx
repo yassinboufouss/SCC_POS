@@ -37,7 +37,7 @@ const AddPlanForm: React.FC<AddPlanFormProps> = ({ onSuccess }) => {
     },
   });
 
-  const onSubmit = (values: AddPlanFormValues) => {
+  const onSubmit = async (values: AddPlanFormValues) => {
     const newPlanData: NewPlanInput = {
         name: values.name,
         durationDays: values.durationDays,
@@ -45,7 +45,7 @@ const AddPlanForm: React.FC<AddPlanFormProps> = ({ onSuccess }) => {
         description: values.description,
     };
     
-    const newPlan = addMembershipPlan(newPlanData);
+    const newPlan = await addMembershipPlan(newPlanData);
 
     if (newPlan) {
       showSuccess(t("plan_created_success", { name: newPlan.name }));

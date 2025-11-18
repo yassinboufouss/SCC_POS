@@ -17,8 +17,8 @@ const MemberStatusActions: React.FC<MemberStatusActionsProps> = ({ member, onSta
   const [isFreezeOpen, setIsFreezeOpen] = useState(false);
   const [isCancelOpen, setIsCancelOpen] = useState(false);
 
-  const handleStatusChange = (newStatus: 'Pending' | 'Expired', actionKey: 'freeze' | 'cancel') => {
-    const updatedMember = updateMemberStatus(member.id, newStatus);
+  const handleStatusChange = async (newStatus: 'Pending' | 'Expired', actionKey: 'freeze' | 'cancel') => {
+    const updatedMember = await updateMemberStatus(member.id, newStatus);
 
     if (updatedMember) {
       showSuccess(t(`${actionKey}_success`, { name: updatedMember.name }));

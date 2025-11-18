@@ -45,7 +45,7 @@ const EditItemForm: React.FC<EditItemFormProps> = ({ item, onSuccess }) => {
     },
   });
 
-  const onSubmit = (values: EditItemFormValues) => {
+  const onSubmit = async (values: EditItemFormValues) => {
     const updatedItem: InventoryItem = {
       ...item,
       name: values.name,
@@ -55,7 +55,7 @@ const EditItemForm: React.FC<EditItemFormProps> = ({ item, onSuccess }) => {
       imageUrl: values.imageUrl || undefined,
     };
     
-    updateInventoryItem(updatedItem);
+    await updateInventoryItem(updatedItem);
     showSuccess(t("plan_updated_success", { name: updatedItem.name })); // Reusing translation key for success message
     onSuccess(updatedItem);
   };

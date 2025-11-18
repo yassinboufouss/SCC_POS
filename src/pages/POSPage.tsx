@@ -141,22 +141,24 @@ const POSPage = () => {
 
   // --- Checkout ---
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (cart.length === 0) return;
     // Payment method is always 'Cash' now
 
     // 1. Process inventory stock reduction (mock)
     const inventoryItemsSold = cart.filter(item => item.type === 'inventory');
-    inventoryItemsSold.forEach(item => {
+    
+    // Use Promise.all to wait for all inventory updates
+    await Promise.all(inventoryItemsSold.map(async item => {
         const inventoryItem = inventoryItems.find(i => i.id === item.sourceId);
         if (inventoryItem) {
             const updatedItem = {
                 ...inventoryItem,
                 stock: inventoryItem.stock - item.quantity,
             };
-            updateInventoryItem(updatedItem); 
+            await updateInventoryItem(updatedItem); 
         }
-    });
+    }));
     
     const hasMembership = cart.some(item => item.type === 'membership');
     const hasInventory = inventoryItemsSold.length > 0;
@@ -186,7 +188,7 @@ const POSPage = () => {
         paymentMethod: paymentMethod, // Always 'Cash'
     };
 
-    addTransaction(newTransaction);
+    await addTransaction(newTransaction);
 
     console.log("Processing sale:", newTransaction);
     showSuccess(t("sale_processed_success", { 

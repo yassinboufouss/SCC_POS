@@ -14,33 +14,31 @@ const POSCheckIn: React.FC = () => {
   const [memberInfo, setMemberInfo] = useState<Member | null>(null);
   const [isCheckingIn, setIsCheckingIn] = useState(false);
 
-  const handleCheckIn = (code: string) => {
+  const handleCheckIn = async (code: string) => {
     setIsCheckingIn(true);
     setMemberInfo(null);
     
-    setTimeout(() => {
-      const member = mockMembers.find(m => m.id === code.toUpperCase());
-      
-      if (member) {
-        if (member.status === 'Active') {
-          const checkedInMember = processCheckIn(member.id);
-          if (checkedInMember) {
-            setMemberInfo(checkedInMember);
-            showSuccess(`${checkedInMember.name} ${t("checked_in_successfully")} ${t("total_check_ins")}: ${checkedInMember.totalCheckIns}`);
-          } else {
-            setMemberInfo(member);
-            showError(t("checkin_failed", { name: member.name }));
-          }
+    const member = mockMembers.find(m => m.id === code.toUpperCase());
+    
+    if (member) {
+      if (member.status === 'Active') {
+        const checkedInMember = await processCheckIn(member.id);
+        if (checkedInMember) {
+          setMemberInfo(checkedInMember);
+          showSuccess(`${checkedInMember.name} ${t("checked_in_successfully")} ${t("total_check_ins")}: ${checkedInMember.totalCheckIns}`);
         } else {
           setMemberInfo(member);
-          showError(`${member.name}: ${t("membership_is", { status: member.status })} ${t("cannot_check_in")}`);
+          showError(t("checkin_failed", { name: member.name }));
         }
       } else {
-        showError(t("member_code_not_found", { code }));
+        setMemberInfo(member);
+        showError(`${member.name}: ${t("membership_is", { status: member.status })} ${t("cannot_check_in")}`);
       }
-      setIsCheckingIn(false);
-      setMemberCode('');
-    }, 500);
+    } else {
+      showError(t("member_code_not_found", { code }));
+    }
+    setIsCheckingIn(false);
+    setMemberCode('');
   };
 
   const handleSubmit = (e: React.FormEvent) => {

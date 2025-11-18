@@ -43,8 +43,8 @@ const MemberRegistrationForm: React.FC<MemberRegistrationFormProps> = ({ onSucce
     },
   });
 
-  const onSubmit = (values: RegistrationFormValues) => {
-    const newMember = addMember({
+  const onSubmit = async (values: RegistrationFormValues) => {
+    const newMember = await addMember({
       fullName: values.fullName,
       email: values.email,
       phone: values.phone,

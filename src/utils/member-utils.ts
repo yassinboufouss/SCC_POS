@@ -1,6 +1,7 @@
 import { Member, mockMembers } from "@/data/members";
 import { membershipPlans } from "@/data/membership-plans";
 import { addDays, format } from "date-fns";
+import { simulateApiCall } from "./api-simulation";
 
 // Define the expected input structure from the registration form
 export type NewMemberInput = {
@@ -12,21 +13,22 @@ export type NewMemberInput = {
 };
 
 // Utility to simulate updating member data
-export const updateMember = (updatedMember: Member) => {
+export const updateMember = async (updatedMember: Member): Promise<void> => {
   const index = mockMembers.findIndex(member => member.id === updatedMember.id);
   if (index !== -1) {
     // Simulate updating the item in the mock array
     mockMembers[index] = updatedMember;
     console.log(`Mock Member Updated: ${updatedMember.name}`);
   }
+  await simulateApiCall(undefined);
 };
 
 // Utility to simulate updating member status
-export const updateMemberStatus = (memberId: string, newStatus: Member['status']) => {
+export const updateMemberStatus = async (memberId: string, newStatus: Member['status']): Promise<Member | null> => {
   const member = mockMembers.find(m => m.id === memberId);
   if (!member) {
     console.error("Member not found for status update.");
-    return null;
+    return simulateApiCall(null);
   }
   
   const updatedMember: Member = {
@@ -34,16 +36,16 @@ export const updateMemberStatus = (memberId: string, newStatus: Member['status']
     status: newStatus,
   };
 
-  updateMember(updatedMember);
-  return updatedMember;
+  await updateMember(updatedMember);
+  return simulateApiCall(updatedMember);
 };
 
-// Utility to simulate adding a new member (kept for POS/Check-in future expansion, though currently unused)
-export const addMember = (newMemberData: NewMemberInput): Member | null => {
+// Utility to simulate adding a new member
+export const addMember = async (newMemberData: NewMemberInput): Promise<Member | null> => {
   const plan = membershipPlans.find(p => p.id === newMemberData.planId);
   if (!plan) {
     console.error("Plan not found for new member registration.");
-    return null;
+    return simulateApiCall(null);
   }
   
   const id = `M${(mockMembers.length + 1).toString().padStart(3, '0')}`; // Mock ID generation
@@ -66,18 +68,18 @@ export const addMember = (newMemberData: NewMemberInput): Member | null => {
 
   mockMembers.push(newMember);
   console.log("Registered Member:", newMember);
-  return newMember;
+  return simulateApiCall(newMember);
 };
 
 
-// Utility to simulate renewing a member's plan (kept for POS/Check-in future expansion)
-export const renewMemberPlan = (memberId: string, planId: string) => {
+// Utility to simulate renewing a member's plan
+export const renewMemberPlan = async (memberId: string, planId: string): Promise<Member | null> => {
   const member = mockMembers.find(m => m.id === memberId);
   const plan = membershipPlans.find(p => p.id === planId);
 
   if (!member || !plan) {
     console.error("Member or Plan not found for renewal.");
-    return null;
+    return simulateApiCall(null);
   }
 
   // Determine the new start date: either today, or the day after the old expiration date if it's in the future (stacking plans).
@@ -101,16 +103,16 @@ export const renewMemberPlan = (memberId: string, planId: string) => {
     expirationDate: format(newExpirationDate, 'yyyy-MM-dd'),
   };
 
-  updateMember(updatedMember);
-  return updatedMember;
+  await updateMember(updatedMember);
+  return simulateApiCall(updatedMember);
 };
 
 // Utility to simulate a member check-in
-export const processCheckIn = (memberId: string) => {
+export const processCheckIn = async (memberId: string): Promise<Member | null> => {
   const member = mockMembers.find(m => m.id === memberId);
 
   if (!member || member.status !== 'Active') {
-    return null;
+    return simulateApiCall(null);
   }
   
   const now = new Date();
@@ -120,6 +122,6 @@ export const processCheckIn = (memberId: string) => {
     totalCheckIns: member.totalCheckIns + 1, // Increment count
   };
 
-  updateMember(updatedMember);
-  return updatedMember;
+  await updateMember(updatedMember);
+  return simulateApiCall(updatedMember);
 };

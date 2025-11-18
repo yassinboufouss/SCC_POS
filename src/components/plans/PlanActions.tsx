@@ -43,7 +43,7 @@ const PlanActions: React.FC<PlanActionsProps> = ({ plan, onUpdate }) => {
     },
   });
 
-  const onSubmit = (values: EditPlanFormValues) => {
+  const onSubmit = async (values: EditPlanFormValues) => {
     const updatedPlan: MembershipPlan = {
       ...plan,
       name: values.name,
@@ -52,7 +52,7 @@ const PlanActions: React.FC<PlanActionsProps> = ({ plan, onUpdate }) => {
       description: values.description,
     };
     
-    updateMembershipPlan(updatedPlan);
+    await updateMembershipPlan(updatedPlan);
     showSuccess(t("plan_updated_success", { name: updatedPlan.name }));
     onUpdate(updatedPlan);
     setIsDialogOpen(false);

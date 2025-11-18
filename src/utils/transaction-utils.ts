@@ -1,8 +1,9 @@
 import { Transaction, mockTransactions } from "@/data/transactions";
 import { format, isToday, isThisWeek, isThisMonth } from "date-fns";
+import { simulateApiCall } from "./api-simulation";
 
 // Utility to simulate adding a new transaction
-export const addTransaction = (newTransaction: Omit<Transaction, 'id'>) => {
+export const addTransaction = async (newTransaction: Omit<Transaction, 'id'>): Promise<Transaction> => {
     const id = `T${(mockTransactions.length + 1).toString().padStart(3, '0')}`; // Mock ID generation
     const transaction: Transaction = {
         ...newTransaction,
@@ -11,12 +12,12 @@ export const addTransaction = (newTransaction: Omit<Transaction, 'id'>) => {
     };
     mockTransactions.unshift(transaction); // Add to the beginning for "recent" view
     console.log("Transaction recorded:", transaction);
-    return transaction;
+    return simulateApiCall(transaction);
 };
 
 // Utility to retrieve transactions for a specific member
 export const getTransactionsByMemberId = (memberId: string): Transaction[] => {
-    // In a real app, this would query a database. Here we filter the mock array.
+    // This is a synchronous read operation, no need to simulate API call here unless we fetch all data async
     return mockTransactions
         .filter(tx => tx.memberId === memberId)
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -29,7 +30,7 @@ export interface SalesSummary {
 }
 
 export const getSalesSummary = (): SalesSummary => {
-    // Note: We use the date part of the transaction (YYYY-MM-DD) for filtering.
+    // This is a synchronous read operation, no need to simulate API call here unless we fetch all data async
     
     const dailyTransactions = mockTransactions.filter(tx => isToday(new Date(tx.date)));
     // Assuming week starts on Monday (weekStartsOn: 1)

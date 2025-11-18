@@ -32,8 +32,8 @@ const RestockForm: React.FC<RestockFormProps> = ({ item, onSuccess }) => {
     },
   });
 
-  const onSubmit = (values: RestockFormValues) => {
-    const updatedItem = restockInventoryItem(item.id, values.quantity);
+  const onSubmit = async (values: RestockFormValues) => {
+    const updatedItem = await restockInventoryItem(item.id, values.quantity);
 
     if (updatedItem) {
       showSuccess(t("restock_success", { quantity: values.quantity, name: updatedItem.name, stock: updatedItem.stock }));

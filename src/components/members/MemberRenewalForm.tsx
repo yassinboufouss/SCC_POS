@@ -66,8 +66,8 @@ const MemberRenewalForm: React.FC<MemberRenewalFormProps> = ({ member, onRenewal
   }, [selectedPlan, member.expirationDate]);
 
 
-  const onSubmit = (values: RenewalFormValues) => {
-    const updatedMember = renewMemberPlan(member.id, values.planId);
+  const onSubmit = async (values: RenewalFormValues) => {
+    const updatedMember = await renewMemberPlan(member.id, values.planId);
 
     if (updatedMember) {
       // In a real app, we would also record a transaction here using values.paymentMethod
