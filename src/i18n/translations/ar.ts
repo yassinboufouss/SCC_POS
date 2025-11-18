@@ -59,6 +59,7 @@ export const ar = {
     "Active": "نشط",
     "Expired": "منتهي الصلاحية",
     "Pending": "معلق",
+    "member_role": "عضو",
     "actions": "الإجراءات",
     "select_plan_error": "الرجاء تحديد خطة عضوية.",
     "registration_success": "تم تسجيل {{name}} بنجاح! ينتهي في: {{date}}",
@@ -248,5 +249,8 @@ export const ar = {
     "giveaway_item_not_found": "لم يتم العثور على عنصر الهدية في المخزون.",
     "checkout_failed_stock_issue": "فشل الدفع: مخزون غير كافٍ لـ {{name}}.",
     "plan_creation_failed": "فشل إنشاء خطة العضوية.",
+    "welcome_member": "مرحبًا بك، {{name}}",
+    "check_in_status": "حالة تسجيل الدخول",
+    "never_checked_in": "لم يسجل الدخول مطلقًا",
   }
 };

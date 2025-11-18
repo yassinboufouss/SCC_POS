@@ -59,6 +59,7 @@ export const fr = {
     "Active": "Actif",
     "Expired": "Expiré",
     "Pending": "En Attente",
+    "member_role": "Membre",
     "actions": "Actions",
     "select_plan_error": "Veuillez sélectionner un plan d'adhésion.",
     "registration_success": "{{name}} enregistré avec succès ! Expire le : {{date}}",
@@ -248,5 +249,8 @@ export const fr = {
     "giveaway_item_not_found": "Article cadeau introuvable dans l'inventaire.",
     "checkout_failed_stock_issue": "Échec du paiement : Stock insuffisant pour {{name}}.",
     "plan_creation_failed": "Échec de la création du plan d'adhésion.",
+    "welcome_member": "Bienvenue, {{name}}",
+    "check_in_status": "Statut d'Enregistrement",
+    "never_checked_in": "Jamais enregistré",
   }
 };

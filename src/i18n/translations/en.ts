@@ -59,6 +59,7 @@ export const en = {
     "Active": "Active",
     "Expired": "Expired",
     "Pending": "Pending",
+    "member_role": "Member",
     "actions": "Actions",
     "select_plan_error": "Please select a membership plan.",
     "registration_success": "{{name}} registered successfully! Expires: {{date}}",
@@ -248,5 +249,8 @@ export const en = {
     "giveaway_item_not_found": "Giveaway item not found in inventory.",
     "checkout_failed_stock_issue": "Checkout failed: Insufficient stock for {{name}}.",
     "plan_creation_failed": "Failed to create membership plan.",
+    "welcome_member": "Welcome, {{name}}",
+    "check_in_status": "Check-In Status",
+    "never_checked_in": "Never checked in",
   }
 };

@@ -10,12 +10,14 @@ export const useUserRole = () => {
 
   const isOwner = role === 'owner';
   const isStaff = role === 'staff';
+  const isMember = role === 'member'; // NEW
   const isAuthenticated = !!profile;
 
   return {
     role,
     isOwner,
     isStaff,
+    isMember, // Export new role check
     isAuthenticated,
     isLoading,
   };
