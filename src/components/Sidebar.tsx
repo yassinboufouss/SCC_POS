@@ -1,6 +1,5 @@
 import { cn } from "@/lib/utils";
 import {
-  LogIn,
   ShoppingCart,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -8,12 +7,6 @@ import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 
 const navItems = [
-  {
-    nameKey: "check_in",
-    icon: LogIn,
-    path: "/checkin",
-    roles: ["Admin", "Receptionist"],
-  },
   {
     nameKey: "pos",
     icon: ShoppingCart,
@@ -70,7 +63,6 @@ const Sidebar = ({ className }: SidebarProps) => {
         ))}
       </nav>
       <div className="mt-auto pt-4 border-t border-sidebar-border space-y-2">
-        {/* Language Switcher removed */}
         <Button 
           variant="ghost" 
           className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent"

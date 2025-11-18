@@ -7,6 +7,7 @@ import { inventoryItems, InventoryItem } from '@/data/inventory';
 import { membershipPlans, MembershipPlan } from '@/data/membership-plans';
 import POSProductSelection from '@/components/pos/POSProductSelection';
 import POSCartAndCheckout from '@/components/pos/POSCartAndCheckout';
+import POSCheckIn from '@/components/pos/POSCheckIn';
 import { CartItem, PaymentMethod } from '@/types/pos';
 import { useTranslation } from 'react-i18next';
 
@@ -14,7 +15,6 @@ const POSPage = () => {
   const { t } = useTranslation();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [inventorySearchTerm, setInventorySearchTerm] = useState('');
-  // Removed selectedMember state
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('Card');
   const [discountPercent, setDiscountPercent] = useState(0);
 
@@ -200,32 +200,33 @@ const POSPage = () => {
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
+        {/* Cart & Checkout (1/3 width) */}
+        <div className="lg:col-span-1 flex flex-col space-y-6">
+            <POSCheckIn />
+            <POSCartAndCheckout
+                cart={cart}
+                paymentMethod={paymentMethod}
+                setPaymentMethod={setPaymentMethod}
+                discountPercent={discountPercent}
+                setDiscountPercent={setDiscountPercent}
+                updateQuantity={updateQuantity}
+                removeItem={removeItem}
+                handleCheckout={handleCheckout}
+                handleClearCart={handleClearCart}
+                subtotal={subtotal}
+                discountAmount={discountAmount}
+                tax={tax}
+                total={total}
+            />
+        </div>
+
         {/* Product Selection (2/3 width) */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 order-first lg:order-last">
           <POSProductSelection
             inventorySearchTerm={inventorySearchTerm}
             setInventorySearchTerm={setInventorySearchTerm}
             addInventoryToCart={addInventoryToCart}
             addMembershipToCart={addMembershipToCart}
-          />
-        </div>
-
-        {/* Cart & Checkout (1/3 width) */}
-        <div className="lg:col-span-1">
-          <POSCartAndCheckout
-            cart={cart}
-            paymentMethod={paymentMethod}
-            setPaymentMethod={setPaymentMethod}
-            discountPercent={discountPercent}
-            setDiscountPercent={setDiscountPercent}
-            updateQuantity={updateQuantity}
-            removeItem={removeItem}
-            handleCheckout={handleCheckout}
-            handleClearCart={handleClearCart}
-            subtotal={subtotal}
-            discountAmount={discountAmount}
-            tax={tax}
-            total={total}
           />
         </div>
       </div>
