@@ -1,9 +1,11 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Settings, Sun, Moon } from 'lucide-react';
+import { Settings, Sun, Moon, Database, AlertTriangle } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
+import { showSuccess } from '@/utils/toast';
 
 const SettingsPage = () => {
   // Placeholder for theme state management (using next-themes is common, but we'll simulate the toggle)
@@ -13,6 +15,13 @@ const SettingsPage = () => {
     setIsDarkMode(checked);
     // In a real app, this would update the theme context/storage
     document.documentElement.classList.toggle('dark', checked);
+  };
+  
+  const handleDataReset = () => {
+    // In a real application, this would trigger a server-side data wipe/reset.
+    console.log("Simulating full application data reset...");
+    showSuccess("Application data reset simulated successfully.");
+    // Note: Since we are using mock data arrays, a true reset would require reloading the app or re-initializing the mock data.
   };
 
   return (
@@ -54,6 +63,28 @@ const SettingsPage = () => {
               Last Updated: October 2024
             </p>
           </div>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Database className="h-5 w-5" /> Data Management
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-start gap-4 p-4 border border-red-300 rounded-md bg-red-50 dark:bg-red-950/50">
+            <AlertTriangle className="h-5 w-5 text-red-600 mt-1 shrink-0" />
+            <div>
+                <p className="font-semibold text-red-600 dark:text-red-400">Danger Zone: Reset All Data</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                    This action will simulate wiping all mock data (members, inventory, transactions, etc.) and restoring the application to its initial state. This cannot be undone.
+                </p>
+            </div>
+          </div>
+          <Button variant="destructive" onClick={handleDataReset} className="w-full">
+            Simulate Full Data Reset
+          </Button>
         </CardContent>
       </Card>
       
