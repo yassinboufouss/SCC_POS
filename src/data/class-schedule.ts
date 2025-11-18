@@ -46,3 +46,7 @@ export const classSchedule: GymClass[] = [
     currentEnrollment: 8,
   },
 ];
+
+export const findClassById = (classId: string) => {
+    return classSchedule.find(cls => cls.id === classId);
+}

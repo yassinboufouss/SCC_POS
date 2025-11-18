@@ -1,3 +1,5 @@
+import { format } from "date-fns";
+
 export type Enrollment = {
   memberId: string;
   memberName: string;
@@ -29,6 +31,6 @@ export const mockEnrollments: Enrollment[] = [
     memberId: `M${100 + i}`,
     memberName: `Enrolled Member ${i + 1}`,
     classId: "spin-mon",
-    enrollmentDate: "2024-10-01",
+    enrollmentDate: format(new Date(), 'yyyy-MM-dd'),
   })),
 ];

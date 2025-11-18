@@ -10,9 +10,10 @@ import { Badge } from '@/components/ui/badge';
 interface MemberSelectDialogProps {
   onSelectMember: (member: Member | null) => void;
   selectedMember: Member | null;
+  trigger?: React.ReactNode; // New optional trigger prop
 }
 
-const MemberSelectDialog: React.FC<MemberSelectDialogProps> = ({ onSelectMember, selectedMember }) => {
+const MemberSelectDialog: React.FC<MemberSelectDialogProps> = ({ onSelectMember, selectedMember, trigger }) => {
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -34,10 +35,12 @@ const MemberSelectDialog: React.FC<MemberSelectDialogProps> = ({ onSelectMember,
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="w-full justify-start text-left">
-          <User className="mr-2 h-4 w-4" /> 
-          {selectedMember ? `Member: ${selectedMember.name}` : 'Select Member (Optional)'}
-        </Button>
+        {trigger ? trigger : (
+            <Button variant="outline" className="w-full justify-start text-left">
+              <User className="mr-2 h-4 w-4" /> 
+              {selectedMember ? `Member: ${selectedMember.name}` : 'Select Member (Optional)'}
+            </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] p-0">
         <DialogHeader className="p-6 pb-0">
