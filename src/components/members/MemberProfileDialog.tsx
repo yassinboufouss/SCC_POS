@@ -11,7 +11,8 @@ import { useTranslation } from 'react-i18next';
 import MemberRenewalForm from './MemberRenewalForm';
 import MemberStatusActions from './MemberStatusActions';
 import MemberDetailsCard from './MemberDetailsCard';
-import { useUpdateProfile, useMember } from '@/integrations/supabase/data/use-members.ts';
+import MemberBasicInfoForm from './MemberBasicInfoForm'; // New import
+import { useMember } from '@/integrations/supabase/data/use-members.ts';
 import { useMemberTransactions } from '@/integrations/supabase/data/use-transactions.ts';
 import { showSuccess, showError } from '@/utils/toast';
 import { Input } from '@/components/ui/input';
@@ -36,26 +37,8 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member }) => 
   // Use the freshest data available, fall back to prop if loading or not fetched yet
   const displayMember = currentMember || member;
 
-  // Local state for editing basic info, initialized from displayMember
-  const [editFirstName, setEditFirstName] = useState(displayMember.first_name || '');
-  const [editLastName, setEditLastName] = useState(displayMember.last_name || '');
-  const [editEmail, setEditEmail] = useState(displayMember.email || '');
-  const [editPhone, setEditPhone] = useState(displayMember.phone || '');
-  const [editDob, setEditDob] = useState(displayMember.dob || '');
-  
-  const { mutateAsync: updateProfile, isPending: isSaving } = useUpdateProfile();
   const { data: transactions, isLoading: isLoadingTransactions } = useMemberTransactions(displayMember.id);
 
-  // Reset local state when the member data changes (either prop or fetched data)
-  React.useEffect(() => {
-    setEditFirstName(displayMember.first_name || '');
-    setEditLastName(displayMember.last_name || '');
-    setEditEmail(displayMember.email || '');
-    setEditPhone(displayMember.phone || '');
-    setEditDob(displayMember.dob || '');
-    setIsEditing(false);
-  }, [displayMember]);
-  
   const handleOpenChange = (open: boolean) => {
       setIsDialogOpen(open);
       if (open) {
@@ -66,32 +49,14 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member }) => 
               setActiveTab('profile');
           }
       } else {
-          // Reset tab when closing
+          // Reset tab and editing state when closing
           setActiveTab('profile');
+          setIsEditing(false);
       }
   };
 
-  const handleSaveBasicDetails = async () => {
-    if (!editFirstName || !editLastName || !editPhone || !editDob) {
-        showError(t("all_fields_required"));
-        return;
-    }
-    
-    const updatedData: Partial<Profile> & { id: string } = {
-        id: displayMember.id,
-        first_name: editFirstName,
-        last_name: editLastName,
-        phone: editPhone,
-        dob: editDob,
-    };
-    
-    try {
-        await updateProfile(updatedData);
-        showSuccess(t("member_profile_updated_success", { name: `${editFirstName} ${editLastName}` }));
-        setIsEditing(false);
-    } catch (error) {
-        showError(t("update_failed"));
-    }
+  const handleSaveBasicDetailsSuccess = () => {
+      setIsEditing(false);
   };
   
   if (isLoadingMember && isDialogOpen) {
@@ -145,33 +110,7 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member }) => 
               </CardHeader>
               <CardContent className="space-y-2">
                 {isEditing ? (
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-1">
-                            <Label htmlFor="edit-first-name">{t("first_name")}</Label>
-                            <Input id="edit-first-name" value={editFirstName} onChange={(e) => setEditFirstName(e.target.value)} />
-                        </div>
-                        <div className="space-y-1">
-                            <Label htmlFor="edit-last-name">{t("last_name")}</Label>
-                            <Input id="edit-last-name" value={editLastName} onChange={(e) => setEditLastName(e.target.value)} />
-                        </div>
-                        <div className="space-y-1">
-                            <Label htmlFor="edit-email">{t("email")}</Label>
-                            <Input id="edit-email" type="email" value={editEmail || ''} disabled /> {/* Email is read-only (Auth managed) */}
-                        </div>
-                        <div className="space-y-1">
-                            <Label htmlFor="edit-phone">{t("phone_number")}</Label>
-                            <Input id="edit-phone" value={editPhone || ''} onChange={(e) => setEditPhone(e.target.value)} />
-                        </div>
-                        <div className="space-y-1">
-                            <Label htmlFor="edit-dob">{t("date_of_birth")}</Label>
-                            <Input id="edit-dob" type="date" value={editDob || ''} onChange={(e) => setEditDob(e.target.value)} />
-                        </div>
-                        <div className="col-span-2 pt-2">
-                            <Button onClick={handleSaveBasicDetails} className="w-full" disabled={isSaving}>
-                                <Save className="h-4 w-4 mr-2" /> {t("save_member_changes")}
-                            </Button>
-                        </div>
-                    </div>
+                    <MemberBasicInfoForm member={displayMember} onSuccess={handleSaveBasicDetailsSuccess} />
                 ) : (
                     <div className="grid grid-cols-2 gap-4 text-sm">
                         <p className="flex items-center gap-2"><User className="h-4 w-4 text-muted-foreground" /> {displayMember.first_name} {displayMember.last_name}</p>
