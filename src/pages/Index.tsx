@@ -24,7 +24,7 @@ const Index = () => {
     )} style={{ backgroundImage: `url('/gym-background.jpg')` }}>
       
       {/* Overlay to ensure readability of the card */}
-      <div className="absolute inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-sm"></div>
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
 
       <Card className={cn(
         "w-full max-w-sm shadow-2xl opacity-0 relative z-10",

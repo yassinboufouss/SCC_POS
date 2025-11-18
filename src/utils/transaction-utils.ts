@@ -1,25 +1,23 @@
 import { Transaction, mockTransactions } from "@/data/transactions";
+import { format } from "date-fns";
 
-export const addTransaction = (newTransaction: Omit<Transaction, 'id'>): Transaction => {
-  // Generate a mock ID
-  const id = `T${Math.floor(Math.random() * 100000).toString().padStart(5, '0')}`;
-  
-  const transactionWithId: Transaction = {
-    ...newTransaction,
-    id,
-  };
-  
-  // Add to the beginning of the mock array to appear immediately in RecentTransactions
-  mockTransactions.unshift(transactionWithId);
-  
-  // Keep the mock array size manageable (e.g., last 20 transactions)
-  if (mockTransactions.length > 20) {
-    mockTransactions.pop();
-  }
-  
-  return transactionWithId;
+// Utility to simulate adding a new transaction
+export const addTransaction = (newTransaction: Omit<Transaction, 'id'>) => {
+    const id = `T${(mockTransactions.length + 1).toString().padStart(3, '0')}`; // Mock ID generation
+    const transaction: Transaction = {
+        ...newTransaction,
+        id,
+        date: format(new Date(), 'yyyy-MM-dd'), // Ensure date is current
+    };
+    mockTransactions.unshift(transaction); // Add to the beginning for "recent" view
+    console.log("Transaction recorded:", transaction);
+    return transaction;
 };
 
+// Utility to retrieve transactions for a specific member
 export const getTransactionsByMemberId = (memberId: string): Transaction[] => {
-    return mockTransactions.filter(tx => tx.memberId === memberId).slice(0, 10); // Limit to 10 recent transactions
+    // In a real app, this would query a database. Here we filter the mock array.
+    return mockTransactions
+        .filter(tx => tx.memberId === memberId)
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 };

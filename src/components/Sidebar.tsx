@@ -2,11 +2,7 @@ import { cn } from "@/lib/utils";
 import {
   Home,
   Users,
-  Calendar,
-  Dumbbell,
-  DollarSign,
   Package,
-  Settings,
   LogIn,
   ShoppingCart,
   Ticket,
@@ -14,7 +10,6 @@ import {
 import { NavLink, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
-import LanguageSwitcher from "./LanguageSwitcher";
 
 const navItems = [
   {
@@ -42,18 +37,6 @@ const navItems = [
     roles: ["Admin", "Manager", "Receptionist"],
   },
   {
-    nameKey: "classes",
-    icon: Calendar,
-    path: "/classes",
-    roles: ["Admin", "Manager", "Trainer"],
-  },
-  {
-    nameKey: "trainers",
-    icon: Dumbbell,
-    path: "/trainers",
-    roles: ["Admin", "Manager"],
-  },
-  {
     nameKey: "inventory",
     icon: Package,
     path: "/inventory",
@@ -64,18 +47,6 @@ const navItems = [
     icon: Ticket,
     path: "/plans",
     roles: ["Admin", "Manager"],
-  },
-  {
-    nameKey: "finance_reports",
-    icon: DollarSign,
-    path: "/finance",
-    roles: ["Admin", "Manager"],
-  },
-  {
-    nameKey: "settings",
-    icon: Settings,
-    path: "/settings",
-    roles: ["Admin"],
   },
 ];
 
@@ -127,7 +98,7 @@ const Sidebar = ({ className }: SidebarProps) => {
         ))}
       </nav>
       <div className="mt-auto pt-4 border-t border-sidebar-border space-y-2">
-        <LanguageSwitcher />
+        {/* Language Switcher removed */}
         <Button 
           variant="ghost" 
           className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent"
