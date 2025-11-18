@@ -263,9 +263,13 @@ export const ar = {
     "role_update_success": "تم تحديث دور {{name}} بنجاح إلى {{role}}.",
     "role_update_failed": "فشل تحديث دور المستخدم.",
     "no_users_found": "لم يتم العثور على مستخدمين.",
-    "access_denied": "تم رفض الوصول. يمكن للمالك فقط عرض هذه الصفحة.",
+    "access_denied": "تم رفض الوصول.",
     "owner": "المالك",
     "manager": "المدير",
     "cashier": "أمين الصندوق",
+    
+    // New keys for ProtectedRoute error handling
+    "please_refresh_or_contact_support": "تعذر تحميل بيانات ملفك الشخصي. يرجى تحديث الصفحة أو الاتصال بالدعم.",
+    "refresh": "تحديث",
   }
 };

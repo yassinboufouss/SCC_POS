@@ -263,9 +263,13 @@ export const en = {
     "role_update_success": "Successfully updated {{name}}'s role to {{role}}.",
     "role_update_failed": "Failed to update user role.",
     "no_users_found": "No users found.",
-    "access_denied": "Access Denied. Only the Owner can view this page.",
+    "access_denied": "Access Denied.",
     "owner": "Owner",
     "manager": "Manager",
     "cashier": "Cashier",
+    
+    // New keys for ProtectedRoute error handling
+    "please_refresh_or_contact_support": "Your profile data could not be loaded. Please refresh the page or contact support.",
+    "refresh": "Refresh",
   }
 };
