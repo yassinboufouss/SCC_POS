@@ -6,17 +6,19 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const LOW_STOCK_THRESHOLD = 10;
 
 const LowStockAlerts = () => {
+  const { t } = useTranslation();
   const lowStockItems = inventoryItems.filter(item => item.stock <= LOW_STOCK_THRESHOLD);
 
   return (
     <Card className="h-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-orange-500">
-          <AlertTriangle className="h-5 w-5" /> Low Stock Alerts ({lowStockItems.length})
+          <AlertTriangle className="h-5 w-5" /> {t("low_stock_alerts")} ({lowStockItems.length})
         </CardTitle>
       </CardHeader>
       <CardContent className="h-80 flex flex-col">
@@ -36,7 +38,7 @@ const LowStockAlerts = () => {
                         </div>
                       </div>
                       <Badge variant={isCritical ? 'destructive' : 'secondary'} className="flex items-center gap-1">
-                        {item.stock} {item.stock === 0 ? 'OUT' : 'left'}
+                        {item.stock} {item.stock === 0 ? t('out_of_stock') : t('left')}
                       </Badge>
                     </div>
                   );
@@ -44,7 +46,7 @@ const LowStockAlerts = () => {
               ) : (
                 <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
                   <Package className="h-8 w-8 mb-2 text-green-500" />
-                  <p>All inventory levels are healthy!</p>
+                  <p>{t("all_inventory_healthy")}</p>
                 </div>
               )}
             </div>
@@ -53,7 +55,7 @@ const LowStockAlerts = () => {
         <div className="mt-4 pt-4 border-t">
             <Button variant="outline" className="w-full" asChild>
                 <Link to="/inventory">
-                    Manage Inventory <ArrowRight className="h-4 w-4 ml-2" />
+                    {t("manage_inventory")} <ArrowRight className="h-4 w-4 ml-2" />
                 </Link>
             </Button>
         </div>

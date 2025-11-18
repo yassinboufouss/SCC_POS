@@ -9,8 +9,10 @@ import { Member } from '@/data/members';
 import POSProductSelection from '@/components/pos/POSProductSelection';
 import POSCartAndCheckout from '@/components/pos/POSCartAndCheckout';
 import { CartItem, PaymentMethod } from '@/types/pos';
+import { useTranslation } from 'react-i18next';
 
 const POSPage = () => {
+  const { t } = useTranslation();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [inventorySearchTerm, setInventorySearchTerm] = useState('');
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
@@ -25,7 +27,7 @@ const POSPage = () => {
       
       if (existingItem) {
         if (existingItem.quantity + 1 > item.stock) {
-            showSuccess(`Cannot add more ${item.name}. Stock limit reached.`);
+            showSuccess(t("cannot_add_more_stock_limit", { defaultValue: `Cannot add more ${item.name}. Stock limit reached.` }));
             return prevCart;
         }
         return prevCart.map(i =>
@@ -57,7 +59,7 @@ const POSPage = () => {
 
         return [...prevCart, { 
             sourceId: plan.id, 
-            name: `${plan.name} (${plan.durationDays} days)`, 
+            name: `${plan.name} (${plan.durationDays} ${t("days")})`, 
             price: plan.price, 
             quantity: 1, 
             type: 'membership' 
@@ -79,7 +81,7 @@ const POSPage = () => {
       if (item.type === 'inventory') {
         const inventoryStock = inventoryItems.find(i => i.id === sourceId)?.stock || 0;
         if (newQuantity > inventoryStock) {
-          showError(`Cannot add more ${item.name}. Stock limit reached.`);
+          showError(t("cannot_add_more_stock_limit", { defaultValue: `Cannot add more ${item.name}. Stock limit reached.` }));
           return prevCart;
         }
       }
@@ -135,7 +137,7 @@ const POSPage = () => {
   const handleCheckout = () => {
     if (cart.length === 0) return;
     if (!paymentMethod) {
-        showError("Please select a payment method.");
+        showError(t("select_payment_method_error", { defaultValue: "Please select a payment method." }));
         return;
     }
 
@@ -179,7 +181,12 @@ const POSPage = () => {
     addTransaction(newTransaction);
 
     console.log("Processing sale:", newTransaction);
-    showSuccess(`${transactionType} processed successfully via ${paymentMethod}! Total: $${total.toFixed(2)}`);
+    showSuccess(t("sale_processed_success", { 
+        type: transactionType, 
+        method: t(paymentMethod.toLowerCase()), 
+        total: total.toFixed(2),
+        defaultValue: `${transactionType} processed successfully via ${paymentMethod}! Total: $${total.toFixed(2)}`
+    }));
     
     // Reset state
     setCart([]);
@@ -191,7 +198,7 @@ const POSPage = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Point of Sale (POS)</h1>
+      <h1 className="text-3xl font-bold">{t("point_of_sale")}</h1>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         

@@ -6,6 +6,7 @@ import { showSuccess, showError } from '@/utils/toast';
 import { freezeMemberPlan, cancelMemberPlan } from '@/utils/member-utils';
 import { AlertTriangle, PauseCircle, XCircle } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { useTranslation } from 'react-i18next';
 
 interface MembershipActionDialogProps {
   member: Member;
@@ -15,6 +16,7 @@ interface MembershipActionDialogProps {
 }
 
 const MembershipActionDialog: React.FC<MembershipActionDialogProps> = ({ member, open, onOpenChange, onActionSuccess }) => {
+  const { t } = useTranslation();
   const [actionType, setActionType] = useState<'freeze' | 'cancel' | null>(null);
 
   const handleAction = () => {
@@ -23,16 +25,16 @@ const MembershipActionDialog: React.FC<MembershipActionDialogProps> = ({ member,
     if (actionType === 'freeze') {
       updatedMember = freezeMemberPlan(member.id);
       if (updatedMember) {
-        showSuccess(`${member.name}'s membership has been frozen (Status: Pending).`);
+        showSuccess(t("freeze_success", { name: member.name }));
       } else {
-        showError(`Failed to freeze membership for ${member.name}.`);
+        showError(t("freeze_failed", { name: member.name }));
       }
     } else if (actionType === 'cancel') {
       updatedMember = cancelMemberPlan(member.id);
       if (updatedMember) {
-        showSuccess(`${member.name}'s membership has been permanently cancelled.`);
+        showSuccess(t("cancel_success", { name: member.name }));
       } else {
-        showError(`Failed to cancel membership for ${member.name}.`);
+        showError(t("cancel_failed", { name: member.name }));
       }
     }
 
@@ -55,10 +57,10 @@ const MembershipActionDialog: React.FC<MembershipActionDialogProps> = ({ member,
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <AlertTriangle className="h-6 w-6 text-red-500" /> Membership Action
+            <AlertTriangle className="h-6 w-6 text-red-500" /> {t("membership_action")}
           </DialogTitle>
           <DialogDescription>
-            Select an action for {member.name}'s membership ({member.plan}).
+            {t("select_action_for", { name: member.name, plan: member.plan })}
           </DialogDescription>
         </DialogHeader>
         
@@ -71,8 +73,8 @@ const MembershipActionDialog: React.FC<MembershipActionDialogProps> = ({ member,
                 <div className="flex items-center gap-3">
                     <PauseCircle className="h-5 w-5 text-blue-500" />
                     <div>
-                        <p className="font-semibold">Freeze Membership</p>
-                        <p className="text-sm text-muted-foreground">Temporarily suspend access. Status will be set to 'Pending'.</p>
+                        <p className="font-semibold">{t("freeze_membership")}</p>
+                        <p className="text-sm text-muted-foreground">{t("freeze_description")}</p>
                     </div>
                 </div>
             </div>
@@ -87,8 +89,8 @@ const MembershipActionDialog: React.FC<MembershipActionDialogProps> = ({ member,
                 <div className="flex items-center gap-3">
                     <XCircle className="h-5 w-5 text-red-500" />
                     <div>
-                        <p className="font-semibold">Cancel Membership</p>
-                        <p className="text-sm text-muted-foreground">Permanently terminate the membership. Status will be set to 'Expired'.</p>
+                        <p className="font-semibold">{t("cancel_membership")}</p>
+                        <p className="text-sm text-muted-foreground">{t("cancel_description")}</p>
                     </div>
                 </div>
             </div>
@@ -96,14 +98,14 @@ const MembershipActionDialog: React.FC<MembershipActionDialogProps> = ({ member,
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Close
+            {t("close")}
           </Button>
           <Button 
             variant={actionType === 'cancel' ? 'destructive' : 'default'} 
             onClick={handleAction} 
             disabled={!actionType}
           >
-            Confirm {actionType === 'freeze' ? 'Freeze' : actionType === 'cancel' ? 'Cancellation' : 'Action'}
+            {t("confirm_action", { action: t(actionType || 'action') })}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { showSuccess } from '@/utils/toast';
 import { format } from 'date-fns';
 import ImageUploadField from './ImageUploadField';
+import { useTranslation } from 'react-i18next';
 
 const InventoryCategories = ['Apparel', 'Supplements', 'Equipment'] as const;
 
@@ -25,6 +26,7 @@ const newItemSchema = z.object({
 type NewItemFormValues = z.infer<typeof newItemSchema>;
 
 const NewInventoryItemDialog = () => {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   
   const form = useForm<NewItemFormValues>({
@@ -47,7 +49,7 @@ const NewInventoryItemDialog = () => {
     };
     
     console.log("Adding new inventory item:", newItem);
-    showSuccess(`New item '${values.name}' added to inventory.`);
+    showSuccess(t("item_added_success", { name: values.name }));
     
     form.reset();
     setOpen(false);
@@ -57,12 +59,12 @@ const NewInventoryItemDialog = () => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>
-          <PlusCircle className="mr-2 h-4 w-4" /> Add New Item
+          <PlusCircle className="mr-2 h-4 w-4" /> {t("add_new_item")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add New Inventory Item</DialogTitle>
+          <DialogTitle>{t("add_new_inventory_item")}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-2">
@@ -72,7 +74,7 @@ const NewInventoryItemDialog = () => {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Item Name</FormLabel>
+                  <FormLabel>{t("item_name")}</FormLabel>
                   <FormControl>
                     <Input placeholder="Protein Bar" {...field} />
                   </FormControl>
@@ -86,11 +88,11 @@ const NewInventoryItemDialog = () => {
               name="category"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Category</FormLabel>
+                  <FormLabel>{t("category")}</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a category" />
+                        <SelectValue placeholder={t("select_a_category")} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -112,7 +114,7 @@ const NewInventoryItemDialog = () => {
                 name="price"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Price ($)</FormLabel>
+                    <FormLabel>{t("price")} ($)</FormLabel>
                     <FormControl>
                       <Input 
                         type="number" 
@@ -131,7 +133,7 @@ const NewInventoryItemDialog = () => {
                 name="stock"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Initial Stock</FormLabel>
+                    <FormLabel>{t("initial_stock")}</FormLabel>
                     <FormControl>
                       <Input 
                         type="number" 
@@ -153,7 +155,7 @@ const NewInventoryItemDialog = () => {
                 <FormItem>
                   <FormControl>
                     <ImageUploadField 
-                      label="Product Image URL (Optional)"
+                      label={t("product_image_url")}
                       value={field.value || ''}
                       onChange={field.onChange}
                     />
@@ -164,7 +166,7 @@ const NewInventoryItemDialog = () => {
             />
 
             <Button type="submit" className="w-full mt-6" disabled={!form.formState.isValid}>
-              Save Item
+              {t("save_item")}
             </Button>
           </form>
         </Form>

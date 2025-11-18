@@ -2,10 +2,12 @@ import React from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { calculateMonthlyRevenueBreakdown } from '@/utils/dashboard-metrics';
+import { useTranslation } from 'react-i18next';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28']; // Blue (Membership), Green (POS Sale), Yellow (Mixed Sale)
 
 const RevenueBreakdownChart = () => {
+  const { t } = useTranslation();
   const data = calculateMonthlyRevenueBreakdown();
 
   const renderCustomizedLabel = ({ name, percent }: any) => {
@@ -16,7 +18,7 @@ const RevenueBreakdownChart = () => {
   return (
     <Card className="h-full">
       <CardHeader>
-        <CardTitle>Revenue Breakdown (MTD)</CardTitle>
+        <CardTitle>{t("revenue_breakdown_mtd")}</CardTitle>
       </CardHeader>
       <CardContent className="h-80 p-4">
         {data.length > 0 ? (
@@ -50,7 +52,7 @@ const RevenueBreakdownChart = () => {
           </ResponsiveContainer>
         ) : (
           <div className="flex items-center justify-center h-full text-muted-foreground">
-            No revenue data this month.
+            {t("no_revenue_data_this_month")}
           </div>
         )}
       </CardContent>

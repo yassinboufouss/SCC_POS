@@ -16,6 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useTranslation } from 'react-i18next';
 
 interface InventoryItemSheetProps {
   open: boolean;
@@ -37,6 +38,7 @@ type ItemFormValues = z.infer<typeof itemSchema>;
 
 
 const InventoryItemSheet: React.FC<InventoryItemSheetProps> = ({ open, onOpenChange, selectedItem }) => {
+  const { t } = useTranslation();
   const [localItem, setLocalItem] = useState<InventoryItem | null>(selectedItem);
   const [restockQuantity, setRestockQuantity] = useState(0);
 
@@ -75,13 +77,13 @@ const InventoryItemSheet: React.FC<InventoryItemSheetProps> = ({ open, onOpenCha
 
     updateInventoryItem(updatedData);
     setLocalItem(updatedData); // Update local state immediately
-    showSuccess(`Inventory item ${updatedData.name} details updated.`);
+    showSuccess(t("item_details_updated_success", { name: updatedData.name }));
     onOpenChange(false);
   };
   
   const handleRestock = () => {
     if (!localItem || restockQuantity <= 0) {
-        showError("Please enter a valid quantity to restock.");
+        showError(t("restock_invalid_quantity"));
         return;
     }
     
@@ -91,10 +93,10 @@ const InventoryItemSheet: React.FC<InventoryItemSheetProps> = ({ open, onOpenCha
         setLocalItem(updatedItem); // Update local state with new stock/date
         // Also update the form state to reflect the new stock count
         form.setValue('stock', updatedItem.stock);
-        showSuccess(`Restocked ${restockQuantity} units of ${updatedItem.name}. New stock: ${updatedItem.stock}`);
+        showSuccess(t("restock_success", { quantity: restockQuantity, name: updatedItem.name, stock: updatedItem.stock }));
         setRestockQuantity(0);
     } else {
-        showError("Failed to restock item.");
+        showError(t("restock_failed"));
     }
   };
 
@@ -104,10 +106,10 @@ const InventoryItemSheet: React.FC<InventoryItemSheetProps> = ({ open, onOpenCha
       <SheetContent className="sm:max-w-lg flex flex-col">
         <SheetHeader>
           <SheetTitle className="text-2xl flex items-center gap-2">
-            <Package className="h-6 w-6" /> {localItem.name}
+            <Package className="h-6 w-6" /> {t("edit_item", { name: localItem.name })}
           </SheetTitle>
           <SheetDescription>
-            Category: {localItem.category} | ID: {localItem.id}
+            {t("category")}: {localItem.category} | {t("item_id", { id: localItem.id })}
           </SheetDescription>
         </SheetHeader>
 
@@ -117,27 +119,27 @@ const InventoryItemSheet: React.FC<InventoryItemSheetProps> = ({ open, onOpenCha
             {/* Stock Status */}
             <div className="p-4 border rounded-lg bg-muted/50 space-y-2">
               <div className="flex justify-between items-center">
-                <p className="text-sm font-medium text-muted-foreground">Current Stock Status</p>
+                <p className="text-sm font-medium text-muted-foreground">{t("current_stock_status")}</p>
                 <Badge variant={stockBadgeVariant} className="text-base py-1 flex items-center gap-1">
                   {isLowStock && <AlertTriangle className="h-4 w-4" />}
-                  {localItem.stock} in Stock
+                  {localItem.stock} {t("in_stock")}
                 </Badge>
               </div>
               <Separator />
               <div className="text-sm space-y-1">
                 <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-muted-foreground" />
-                    <p>Last Restock: <span className="font-semibold">{localItem.lastRestock}</span></p>
+                    <p>{t("last_restock")}: <span className="font-semibold">{localItem.lastRestock}</span></p>
                 </div>
               </div>
             </div>
             
             {/* Restock Action */}
             <div className="space-y-4 p-4 border rounded-lg bg-card shadow-sm">
-                <h3 className="text-lg font-semibold">Restock Inventory</h3>
+                <h3 className="text-lg font-semibold">{t("restock_inventory")}</h3>
                 <div className="flex gap-2">
                     <div className="space-y-2 flex-1">
-                        <Label htmlFor="restock-qty">Quantity to Add</Label>
+                        <Label htmlFor="restock-qty">{t("quantity_to_add")}</Label>
                         <Input 
                             id="restock-qty" 
                             type="number" 
@@ -151,7 +153,7 @@ const InventoryItemSheet: React.FC<InventoryItemSheetProps> = ({ open, onOpenCha
                         disabled={restockQuantity <= 0}
                         className="self-end h-10"
                     >
-                        <Plus className="h-4 w-4 mr-2" /> Restock
+                        <Plus className="h-4 w-4 mr-2" /> {t("restock")}
                     </Button>
                 </div>
             </div>
@@ -160,14 +162,14 @@ const InventoryItemSheet: React.FC<InventoryItemSheetProps> = ({ open, onOpenCha
             {/* Editable Fields */}
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(handleSave)} className="space-y-4">
-                    <h3 className="text-lg font-semibold">Edit Item Details</h3>
+                    <h3 className="text-lg font-semibold">{t("edit_item_details")}</h3>
                     
                     <FormField
                         control={form.control}
                         name="name"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Item Name</FormLabel>
+                                <FormLabel>{t("item_name")}</FormLabel>
                                 <FormControl>
                                     <Input placeholder="Protein Bar" {...field} />
                                 </FormControl>
@@ -181,11 +183,11 @@ const InventoryItemSheet: React.FC<InventoryItemSheetProps> = ({ open, onOpenCha
                         name="category"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Category</FormLabel>
+                                <FormLabel>{t("category")}</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select a category" />
+                                            <SelectValue placeholder={t("select_a_category")} />
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
@@ -207,7 +209,7 @@ const InventoryItemSheet: React.FC<InventoryItemSheetProps> = ({ open, onOpenCha
                             name="price"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Price ($)</FormLabel>
+                                    <FormLabel>{t("price")} ($)</FormLabel>
                                     <FormControl>
                                         <Input 
                                             type="number" 
@@ -226,7 +228,7 @@ const InventoryItemSheet: React.FC<InventoryItemSheetProps> = ({ open, onOpenCha
                             name="stock"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Current Stock (Manual Override)</FormLabel>
+                                    <FormLabel>{t("current_stock_manual")}</FormLabel>
                                     <FormControl>
                                         <Input 
                                             type="number" 
@@ -248,7 +250,7 @@ const InventoryItemSheet: React.FC<InventoryItemSheetProps> = ({ open, onOpenCha
                             <FormItem>
                                 <FormControl>
                                     <ImageUploadField 
-                                        label="Product Image URL"
+                                        label={t("product_image_url")}
                                         value={field.value || ''}
                                         onChange={field.onChange}
                                     />
@@ -260,7 +262,7 @@ const InventoryItemSheet: React.FC<InventoryItemSheetProps> = ({ open, onOpenCha
                     
                     <div className="pt-4">
                         <Button type="submit" className="w-full" disabled={!form.formState.isValid}>
-                            Save Item Details
+                            {t("save_item_details")}
                         </Button>
                     </div>
                 </form>

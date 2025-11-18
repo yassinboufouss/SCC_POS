@@ -9,6 +9,7 @@ import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { showSuccess } from '@/utils/toast';
+import { useTranslation } from 'react-i18next';
 
 const TrainerSpecialties = ['Yoga & Flexibility', 'HIIT & Spin', 'Weightlifting & Strength', 'Cardio', 'Pilates'] as const;
 
@@ -22,6 +23,7 @@ const newTrainerSchema = z.object({
 type NewTrainerFormValues = z.infer<typeof newTrainerSchema>;
 
 const NewTrainerDialog = () => {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   
   const form = useForm<NewTrainerFormValues>({
@@ -44,7 +46,7 @@ const NewTrainerDialog = () => {
     };
     
     console.log("Registering new trainer:", newTrainer);
-    showSuccess(`Trainer ${values.name} registered successfully!`);
+    showSuccess(t("trainer_registered_success", { name: values.name }));
     
     form.reset();
     setOpen(false);
@@ -54,12 +56,12 @@ const NewTrainerDialog = () => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>
-          <PlusCircle className="mr-2 h-4 w-4" /> Add New Trainer
+          <PlusCircle className="mr-2 h-4 w-4" /> {t("add_new_trainer")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[450px]">
         <DialogHeader>
-          <DialogTitle>Register New Trainer</DialogTitle>
+          <DialogTitle>{t("register_new_trainer")}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-2">
@@ -69,7 +71,7 @@ const NewTrainerDialog = () => {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Full Name</FormLabel>
+                  <FormLabel>{t("full_name_label")}</FormLabel>
                   <FormControl>
                     <Input placeholder="Jane Doe" {...field} />
                   </FormControl>
@@ -83,11 +85,11 @@ const NewTrainerDialog = () => {
               name="specialty"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Specialty</FormLabel>
+                  <FormLabel>{t("specialty")}</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select primary specialty" />
+                        <SelectValue placeholder={t("select_primary_specialty")} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -108,7 +110,7 @@ const NewTrainerDialog = () => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>{t("email")}</FormLabel>
                   <FormControl>
                     <Input type="email" placeholder="jane.doe@gym.com" {...field} />
                   </FormControl>
@@ -122,7 +124,7 @@ const NewTrainerDialog = () => {
               name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone Number</FormLabel>
+                  <FormLabel>{t("phone_number")}</FormLabel>
                   <FormControl>
                     <Input placeholder="(555) 555-5555" {...field} />
                   </FormControl>
@@ -132,7 +134,7 @@ const NewTrainerDialog = () => {
             />
 
             <Button type="submit" className="w-full mt-6" disabled={!form.formState.isValid}>
-              Register Trainer
+              {t("register_trainer")}
             </Button>
           </form>
         </Form>

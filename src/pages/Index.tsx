@@ -38,13 +38,13 @@ const Index = () => {
             {t("app_title")}
           </CardTitle>
           <CardDescription>
-            {t("login_description", { defaultValue: "Enter your credentials to access the management dashboard." })}
+            {t("login_description")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="username">{t("username", { defaultValue: "Username" })}</Label>
+              <Label htmlFor="username">{t("username")}</Label>
               <Input 
                 id="username" 
                 type="email" 
@@ -52,7 +52,7 @@ const Index = () => {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="password">{t("password", { defaultValue: "Password" })}</Label>
+              <Label htmlFor="password">{t("password")}</Label>
               <Input 
                 id="password" 
                 type="password" 

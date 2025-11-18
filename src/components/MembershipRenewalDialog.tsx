@@ -12,6 +12,7 @@ import { membershipPlans } from '@/data/membership-plans';
 import { renewMemberPlan } from '@/utils/member-utils';
 import { format, addDays } from 'date-fns';
 import { Ticket, Calendar } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface MembershipRenewalDialogProps {
   member: Member;
@@ -27,6 +28,7 @@ const renewalSchema = z.object({
 type RenewalFormValues = z.infer<typeof renewalSchema>;
 
 const MembershipRenewalDialog: React.FC<MembershipRenewalDialogProps> = ({ member, open, onOpenChange, onRenewalSuccess }) => {
+  const { t } = useTranslation();
   const form = useForm<RenewalFormValues>({
     resolver: zodResolver(renewalSchema),
     defaultValues: {
@@ -41,12 +43,15 @@ const MembershipRenewalDialog: React.FC<MembershipRenewalDialogProps> = ({ membe
     const renewedMember = renewMemberPlan(member.id, values.planId);
     
     if (renewedMember) {
-      showSuccess(`Renewal successful! ${renewedMember.name}'s new expiration date is ${format(new Date(renewedMember.expirationDate), 'MMM dd, yyyy')}.`);
+      showSuccess(t("renewal_success", { 
+          name: renewedMember.name, 
+          date: format(new Date(renewedMember.expirationDate), 'MMM dd, yyyy') 
+      }));
       onRenewalSuccess(renewedMember);
       form.reset({ planId: "" });
       onOpenChange(false);
     } else {
-      showError("Failed to process renewal.");
+      showError(t("renewal_failed"));
     }
   };
   
@@ -67,7 +72,7 @@ const MembershipRenewalDialog: React.FC<MembershipRenewalDialogProps> = ({ membe
       <DialogContent className="sm:max-w-[450px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Ticket className="h-6 w-6 text-blue-500" /> Renew Membership for {member.name}
+            <Ticket className="h-6 w-6 text-blue-500" /> {t("renew_membership_for", { name: member.name })}
           </DialogTitle>
         </DialogHeader>
         <Form {...form}>
@@ -75,10 +80,10 @@ const MembershipRenewalDialog: React.FC<MembershipRenewalDialogProps> = ({ membe
             
             <div className="p-3 border rounded-md bg-red-50 dark:bg-red-950/50 text-sm">
                 <p className="font-semibold text-red-600 dark:text-red-400">
-                    Current Status: {member.status}
+                    {t("current_status_colon")} {member.status}
                 </p>
                 <p className="text-muted-foreground">
-                    Previous Expiration: {format(currentExpiration, 'MMM dd, yyyy')}
+                    {t("previous_expiration")}: {format(currentExpiration, 'MMM dd, yyyy')}
                 </p>
             </div>
 
@@ -87,11 +92,11 @@ const MembershipRenewalDialog: React.FC<MembershipRenewalDialogProps> = ({ membe
               name="planId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Select New Plan</FormLabel>
+                  <FormLabel>{t("select_new_plan")}</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Choose a membership plan" />
+                        <SelectValue placeholder={t("choose_a_membership_plan")} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -109,21 +114,21 @@ const MembershipRenewalDialog: React.FC<MembershipRenewalDialogProps> = ({ membe
             
             {selectedPlan && (
                 <div className="space-y-2 p-3 border rounded-md bg-accent/50">
-                    <h4 className="font-semibold text-sm">Renewal Summary</h4>
+                    <h4 className="font-semibold text-sm">{t("renewal_summary")}</h4>
                     <div className="flex items-center gap-2 text-sm">
                         <Calendar className="h-4 w-4 text-muted-foreground" />
-                        <p>Start Date: <span className="font-medium">{format(newStartDatePreview, 'MMM dd, yyyy')}</span></p>
+                        <p>{t("start_date_colon")} <span className="font-medium">{format(newStartDatePreview, 'MMM dd, yyyy')}</span></p>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                         <Calendar className="h-4 w-4 text-green-600" />
-                        <p>New Expiration: <span className="font-medium text-green-600 dark:text-green-400">{format(newExpirationDatePreview!, 'MMM dd, yyyy')}</span></p>
+                        <p>{t("new_expiration")}: <span className="font-medium text-green-600 dark:text-green-400">{format(newExpirationDatePreview!, 'MMM dd, yyyy')}</span></p>
                     </div>
-                    <p className="text-lg font-bold mt-2">Total Due: ${selectedPlan.price.toFixed(2)}</p>
+                    <p className="text-lg font-bold mt-2">{t("total_due")} ${selectedPlan.price.toFixed(2)}</p>
                 </div>
             )}
 
             <Button type="submit" className="w-full mt-6" disabled={!form.formState.isValid || !selectedPlan}>
-              Process Renewal Payment
+              {t("process_renewal_payment")}
             </Button>
           </form>
         </Form>

@@ -10,6 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { showSuccess } from '@/utils/toast';
 import { trainers } from '@/data/trainers';
+import { useTranslation } from 'react-i18next';
 
 const DaysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as const;
 
@@ -24,6 +25,7 @@ const newClassSchema = z.object({
 type NewClassFormValues = z.infer<typeof newClassSchema>;
 
 const NewClassDialog = () => {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   
   const form = useForm<NewClassFormValues>({
@@ -46,7 +48,7 @@ const NewClassDialog = () => {
     };
     
     console.log("Adding new class:", newClass);
-    showSuccess(`New class '${values.name}' scheduled successfully.`);
+    showSuccess(t("class_scheduled_success", { name: values.name }));
     
     form.reset();
     setOpen(false);
@@ -56,12 +58,12 @@ const NewClassDialog = () => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>
-          <PlusCircle className="mr-2 h-4 w-4" /> Add New Class
+          <PlusCircle className="mr-2 h-4 w-4" /> {t("add_new_class")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[450px]">
         <DialogHeader>
-          <DialogTitle>Schedule New Class</DialogTitle>
+          <DialogTitle>{t("schedule_new_class")}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-2">
@@ -71,7 +73,7 @@ const NewClassDialog = () => {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Class Name</FormLabel>
+                  <FormLabel>{t("class_name_label")}</FormLabel>
                   <FormControl>
                     <Input placeholder="Zumba Basics" {...field} />
                   </FormControl>
@@ -85,11 +87,11 @@ const NewClassDialog = () => {
               name="trainerName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Trainer</FormLabel>
+                  <FormLabel>{t("trainer_label")}</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select an assigned trainer" />
+                        <SelectValue placeholder={t("select_assigned_trainer")} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -111,17 +113,17 @@ const NewClassDialog = () => {
                 name="day"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Day</FormLabel>
+                    <FormLabel>{t("day")}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Day" />
+                          <SelectValue placeholder={t("day")} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
                         {DaysOfWeek.map((day) => (
                           <SelectItem key={day} value={day}>
-                            {day}
+                            {t(day.toLowerCase(), { defaultValue: day })}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -135,7 +137,7 @@ const NewClassDialog = () => {
                 name="time"
                 render={({ field }) => (
                   <FormItem className="col-span-2">
-                    <FormLabel>Time (HH:MM AM/PM)</FormLabel>
+                    <FormLabel>{t("time_format")}</FormLabel>
                     <FormControl>
                       <Input placeholder="06:30 PM" {...field} />
                     </FormControl>
@@ -150,7 +152,7 @@ const NewClassDialog = () => {
               name="capacity"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Max Capacity</FormLabel>
+                  <FormLabel>{t("max_capacity")}</FormLabel>
                   <FormControl>
                     <Input 
                       type="number" 
@@ -165,7 +167,7 @@ const NewClassDialog = () => {
             />
 
             <Button type="submit" className="w-full mt-6" disabled={!form.formState.isValid}>
-              Schedule Class
+              {t("schedule_class")}
             </Button>
           </form>
         </Form>

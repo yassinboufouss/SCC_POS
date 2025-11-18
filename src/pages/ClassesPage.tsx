@@ -14,8 +14,10 @@ import {
 import { Badge } from '@/components/ui/badge';
 import ClassEnrollmentSheet from '@/components/ClassEnrollmentSheet';
 import NewClassDialog from '@/components/NewClassDialog';
+import { useTranslation } from 'react-i18next';
 
 const ClassesPage = () => {
+  const { t } = useTranslation();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedClass, setSelectedClass] = useState<GymClass | null>(null);
 
@@ -27,25 +29,25 @@ const ClassesPage = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Class Schedule Management</h1>
+        <h1 className="text-3xl font-bold">{t("schedule_management")}</h1>
         <NewClassDialog />
       </div>
 
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" /> Upcoming Classes
+            <Calendar className="h-5 w-5" /> {t("upcoming_classes")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Class Name</TableHead>
-                <TableHead>Day & Time</TableHead>
-                <TableHead>Trainer</TableHead>
-                <TableHead className="text-center">Enrollment</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>{t("class_name")}</TableHead>
+                <TableHead>{t("day_time")}</TableHead>
+                <TableHead>{t("trainer")}</TableHead>
+                <TableHead className="text-center">{t("enrollment")}</TableHead>
+                <TableHead className="text-right">{t("actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -57,7 +59,7 @@ const ClassesPage = () => {
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-muted-foreground" />
-                        {cls.day} at {cls.time}
+                        {cls.day} {t("at")} {cls.time}
                       </div>
                     </TableCell>
                     <TableCell>{cls.trainer}</TableCell>
@@ -67,7 +69,7 @@ const ClassesPage = () => {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="outline" size="sm" onClick={() => handleViewDetails(cls)}>View Details</Button>
+                      <Button variant="outline" size="sm" onClick={() => handleViewDetails(cls)}>{t("view_details_button")}</Button>
                     </TableCell>
                   </TableRow>
                 );

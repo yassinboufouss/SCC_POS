@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from '@/components/ui/input';
 import { showSuccess } from '@/utils/toast';
 import { updateTrainer } from '@/utils/trainer-utils';
+import { useTranslation } from 'react-i18next';
 
 interface TrainerProfileSheetProps {
   open: boolean;
@@ -35,6 +36,7 @@ const trainerSchema = z.object({
 type TrainerFormValues = z.infer<typeof trainerSchema>;
 
 const TrainerProfileSheet: React.FC<TrainerProfileSheetProps> = ({ open, onOpenChange, selectedTrainer }) => {
+  const { t } = useTranslation();
   const form = useForm<TrainerFormValues>({
     resolver: zodResolver(trainerSchema),
   });
@@ -64,7 +66,7 @@ const TrainerProfileSheet: React.FC<TrainerProfileSheetProps> = ({ open, onOpenC
     };
 
     updateTrainer(updatedTrainer);
-    showSuccess(`Trainer ${updatedTrainer.name} profile updated.`);
+    showSuccess(t("trainer_profile_updated_success", { name: updatedTrainer.name }));
     onOpenChange(false);
   };
 
@@ -74,7 +76,7 @@ const TrainerProfileSheet: React.FC<TrainerProfileSheetProps> = ({ open, onOpenC
         <SheetHeader>
           <SheetTitle className="text-2xl">{selectedTrainer.name}</SheetTitle>
           <SheetDescription>
-            Specialty: {selectedTrainer.specialty}
+            {t("specialty")}: {selectedTrainer.specialty}
           </SheetDescription>
         </SheetHeader>
 
@@ -85,14 +87,14 @@ const TrainerProfileSheet: React.FC<TrainerProfileSheetProps> = ({ open, onOpenC
               {/* Trainer Stats */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-3 border rounded-md bg-muted/50">
-                  <p className="text-sm font-medium text-muted-foreground">Member Rating</p>
+                  <p className="text-sm font-medium text-muted-foreground">{t("member_rating")}</p>
                   <div className="flex items-center gap-1 mt-1">
                     <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                     <span className="text-lg font-bold">{selectedTrainer.memberRating.toFixed(1)}</span>
                   </div>
                 </div>
                 <div className="p-3 border rounded-md bg-muted/50">
-                  <p className="text-sm font-medium text-muted-foreground">Total Classes Taught</p>
+                  <p className="text-sm font-medium text-muted-foreground">{t("total_classes_taught")}</p>
                   <span className="text-lg font-bold">{selectedTrainer.classesTaught}</span>
                 </div>
               </div>
@@ -100,14 +102,14 @@ const TrainerProfileSheet: React.FC<TrainerProfileSheetProps> = ({ open, onOpenC
               <Separator />
               
               {/* Editable Contact Details */}
-              <h3 className="text-lg font-semibold">Contact Details</h3>
+              <h3 className="text-lg font-semibold">{t("contact_details")}</h3>
               <div className="space-y-4">
                 <FormField
                   control={form.control}
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>{t("email")}</FormLabel>
                       <FormControl>
                         <Input type="email" placeholder="trainer@gym.com" {...field} />
                       </FormControl>
@@ -120,7 +122,7 @@ const TrainerProfileSheet: React.FC<TrainerProfileSheetProps> = ({ open, onOpenC
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone Number</FormLabel>
+                      <FormLabel>{t("phone_number")}</FormLabel>
                       <FormControl>
                         <Input placeholder="(555) 555-5555" {...field} />
                       </FormControl>
@@ -133,18 +135,18 @@ const TrainerProfileSheet: React.FC<TrainerProfileSheetProps> = ({ open, onOpenC
               <Separator />
 
               {/* Editable Professional Details */}
-              <h3 className="text-lg font-semibold">Professional Details</h3>
+              <h3 className="text-lg font-semibold">{t("professional_details")}</h3>
               <div className="space-y-4">
                 <FormField
                   control={form.control}
                   name="specialty"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Specialty</FormLabel>
+                      <FormLabel>{t("specialty")}</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select primary specialty" />
+                            <SelectValue placeholder={t("select_primary_specialty")} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -165,11 +167,11 @@ const TrainerProfileSheet: React.FC<TrainerProfileSheetProps> = ({ open, onOpenC
                   name="status"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Status</FormLabel>
+                      <FormLabel>{t("status")}</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select status" />
+                            <SelectValue placeholder={t("select_status")} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -190,7 +192,7 @@ const TrainerProfileSheet: React.FC<TrainerProfileSheetProps> = ({ open, onOpenC
 
               {/* Assigned Classes */}
               <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Dumbbell className="h-4 w-4" /> Assigned Classes ({trainerClasses.length})
+                <Dumbbell className="h-4 w-4" /> {t("assigned_classes", { count: trainerClasses.length })}
               </h3>
 
               <div className="border rounded-md h-64">
@@ -211,7 +213,7 @@ const TrainerProfileSheet: React.FC<TrainerProfileSheetProps> = ({ open, onOpenC
                         </div>
                       ))
                     ) : (
-                      <p className="text-center text-muted-foreground py-8">No classes currently assigned.</p>
+                      <p className="text-center text-muted-foreground py-8">{t("no_classes_assigned")}</p>
                     )}
                   </div>
                 </ScrollArea>
@@ -219,7 +221,7 @@ const TrainerProfileSheet: React.FC<TrainerProfileSheetProps> = ({ open, onOpenC
               
               <div className="pt-4">
                 <Button type="submit" className="w-full" disabled={!form.formState.isValid}>
-                    Save Trainer Changes
+                    {t("save_trainer_changes")}
                 </Button>
               </div>
             </form>

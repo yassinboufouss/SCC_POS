@@ -3,6 +3,7 @@ import { Transaction } from "@/data/transactions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, DollarSign, CreditCard, Receipt } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const getPaymentIcon = (method: string) => {
   switch (method) {
@@ -21,12 +22,14 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
   {
     accessorKey: "id",
     header: ({ column }) => {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const { t } = useTranslation();
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          ID
+          {t("id")}
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -36,12 +39,14 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
   {
     accessorKey: "date",
     header: ({ column }) => {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const { t } = useTranslation();
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Date
+          {t("date")}
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -49,11 +54,19 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
   },
   {
     accessorKey: "memberName",
-    header: "Member/Customer",
+    header: () => {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const { t } = useTranslation();
+      return t("member_customer");
+    },
   },
   {
     accessorKey: "type",
-    header: "Type",
+    header: () => {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const { t } = useTranslation();
+      return t("type");
+    },
     cell: ({ row }) => {
       const type = row.getValue("type") as Transaction['type'];
       const variant = type === 'Membership' ? 'default' : 'secondary';
@@ -62,19 +75,25 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
   },
   {
     accessorKey: "item",
-    header: "Description",
+    header: () => {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const { t } = useTranslation();
+      return t("item_description");
+    },
     cell: ({ row }) => <div className="text-sm text-muted-foreground max-w-xs truncate">{row.getValue("item")}</div>,
   },
   {
     accessorKey: "amount",
     header: ({ column }) => {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const { t } = useTranslation();
       return (
         <div className="text-right">
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Amount
+            {t("amount")}
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         </div>
@@ -87,13 +106,19 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
   },
   {
     accessorKey: "paymentMethod",
-    header: "Payment",
+    header: () => {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const { t } = useTranslation();
+      return t("payment");
+    },
     cell: ({ row }) => {
       const method = row.getValue("paymentMethod") as Transaction['paymentMethod'];
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const { t } = useTranslation();
       return (
         <div className="flex items-center justify-center gap-1">
           {getPaymentIcon(method)}
-          <span className="text-xs">{method}</span>
+          <span className="text-xs">{t(method.toLowerCase())}</span>
         </div>
       );
     },

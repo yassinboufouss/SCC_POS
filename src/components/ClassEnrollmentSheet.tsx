@@ -9,6 +9,7 @@ import { addEnrollment, removeEnrollment, getEnrollmentsByClass } from '@/utils/
 import { showSuccess, showError } from '@/utils/toast';
 import { Member } from '@/data/members';
 import MemberSelectDialog from './MemberSelectDialog';
+import { useTranslation } from 'react-i18next';
 
 interface ClassEnrollmentSheetProps {
   open: boolean;
@@ -17,6 +18,7 @@ interface ClassEnrollmentSheetProps {
 }
 
 const ClassEnrollmentSheet: React.FC<ClassEnrollmentSheetProps> = ({ open, onOpenChange, selectedClass }) => {
+  const { t } = useTranslation();
   const [enrollments, setEnrollments] = useState(getEnrollmentsByClass(selectedClass?.id || ''));
   const [localClass, setLocalClass] = useState(selectedClass);
 
@@ -37,9 +39,9 @@ const ClassEnrollmentSheet: React.FC<ClassEnrollmentSheetProps> = ({ open, onOpe
       // Update local state and class count
       setEnrollments(prev => prev.filter(e => e.memberId !== memberId));
       setLocalClass(prev => prev ? { ...prev, currentEnrollment: prev.currentEnrollment - 1 } : null);
-      showSuccess(`${memberName} removed from ${localClass.name}.`);
+      showSuccess(t("member_removed_success", { name: memberName, class: localClass.name }));
     } else {
-      showError(`Failed to remove member ${memberName}.`);
+      showError(t("member_remove_failed", { name: memberName }));
     }
   };
   
@@ -47,13 +49,13 @@ const ClassEnrollmentSheet: React.FC<ClassEnrollmentSheetProps> = ({ open, onOpe
     if (!member) return;
     
     if (isFull) {
-        showError(`Class ${localClass.name} is full.`);
+        showError(t("class_is_full", { name: localClass.name }));
         return;
     }
     
     // Check if member is already enrolled (client-side check before utility call)
     if (enrollments.some(e => e.memberId === member.id)) {
-        showError(`${member.name} is already enrolled in this class.`);
+        showError(t("member_already_enrolled", { name: member.name }));
         return;
     }
 
@@ -63,9 +65,9 @@ const ClassEnrollmentSheet: React.FC<ClassEnrollmentSheetProps> = ({ open, onOpe
         // Update local state and class count
         setEnrollments(prev => [...prev, newEnrollment]);
         setLocalClass(prev => prev ? { ...prev, currentEnrollment: prev.currentEnrollment + 1 } : null);
-        showSuccess(`${member.name} successfully enrolled in ${localClass.name}.`);
+        showSuccess(t("member_enrolled_success", { name: member.name, class: localClass.name }));
     } else {
-        showError(`Failed to enroll ${member.name}. Check class capacity or member status.`);
+        showError(t("enrollment_failed", { name: member.name }));
     }
   };
 
@@ -75,20 +77,20 @@ const ClassEnrollmentSheet: React.FC<ClassEnrollmentSheetProps> = ({ open, onOpe
         <SheetHeader>
           <SheetTitle className="text-2xl">{localClass.name}</SheetTitle>
           <SheetDescription>
-            {localClass.day} at {localClass.time} with {localClass.trainer}
+            {localClass.day} {t("at")} {localClass.time} {t("with")} {localClass.trainer}
           </SheetDescription>
         </SheetHeader>
 
         <div className="space-y-4 py-4 flex-1 flex flex-col">
           <div className="flex justify-between items-center p-3 border rounded-md bg-muted/50">
-            <p className="font-semibold">Capacity:</p>
+            <p className="font-semibold">{t("capacity")}</p>
             <Badge variant={isFull ? "destructive" : "default"} className="text-base py-1">
-              {localClass.currentEnrollment} / {localClass.capacity} Enrolled
+              {localClass.currentEnrollment} / {localClass.capacity} {t("enrolled")}
             </Badge>
           </div>
           
           <h3 className="text-lg font-semibold flex items-center gap-2">
-            <User className="h-4 w-4" /> Enrolled Members ({enrollments.length})
+            <User className="h-4 w-4" /> {t("enrolled_members", { count: enrollments.length })}
           </h3>
 
           <ScrollArea className="flex-1 border rounded-md">
@@ -98,7 +100,7 @@ const ClassEnrollmentSheet: React.FC<ClassEnrollmentSheetProps> = ({ open, onOpe
                   <div key={enrollment.memberId} className="flex items-center justify-between p-2 border-b last:border-b-0">
                     <div>
                       <p className="font-medium">{enrollment.memberName}</p>
-                      <p className="text-xs text-muted-foreground">ID: {enrollment.memberId} | Enrolled: {enrollment.enrollmentDate}</p>
+                      <p className="text-xs text-muted-foreground">{t("id")}: {enrollment.memberId} | {t("enrolled")}: {enrollment.enrollmentDate}</p>
                     </div>
                     <Button 
                       variant="ghost" 
@@ -111,7 +113,7 @@ const ClassEnrollmentSheet: React.FC<ClassEnrollmentSheetProps> = ({ open, onOpe
                   </div>
                 ))
               ) : (
-                <p className="text-center text-muted-foreground py-8">No members currently enrolled.</p>
+                <p className="text-center text-muted-foreground py-8">{t("no_members_enrolled")}</p>
               )}
             </div>
           </ScrollArea>
@@ -123,7 +125,7 @@ const ClassEnrollmentSheet: React.FC<ClassEnrollmentSheetProps> = ({ open, onOpe
             selectedMember={null} 
             trigger={
                 <Button className="w-full mt-auto" disabled={isFull}>
-                    <PlusCircle className="mr-2 h-4 w-4" /> Add Member to Class
+                    <PlusCircle className="mr-2 h-4 w-4" /> {t("add_member_to_class")}
                 </Button>
             }
         />

@@ -13,6 +13,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { useTranslation } from 'react-i18next';
 
 interface MembershipPlanSheetProps {
   open: boolean;
@@ -30,6 +31,7 @@ const planSchema = z.object({
 type PlanFormValues = z.infer<typeof planSchema>;
 
 const MembershipPlanSheet: React.FC<MembershipPlanSheetProps> = ({ open, onOpenChange, selectedPlan }) => {
+  const { t } = useTranslation();
   const form = useForm<PlanFormValues>({
     resolver: zodResolver(planSchema),
   });
@@ -57,7 +59,7 @@ const MembershipPlanSheet: React.FC<MembershipPlanSheetProps> = ({ open, onOpenC
     };
 
     updateMembershipPlan(updatedPlan);
-    showSuccess(`Membership plan '${updatedPlan.name}' updated successfully.`);
+    showSuccess(t("plan_updated_success", { name: updatedPlan.name }));
     onOpenChange(false);
   };
 
@@ -66,10 +68,10 @@ const MembershipPlanSheet: React.FC<MembershipPlanSheetProps> = ({ open, onOpenC
       <SheetContent className="sm:max-w-lg flex flex-col">
         <SheetHeader>
           <SheetTitle className="text-2xl flex items-center gap-2">
-            <Ticket className="h-6 w-6" /> Edit Plan: {selectedPlan.name}
+            <Ticket className="h-6 w-6" /> {t("edit_plan", { name: selectedPlan.name })}
           </SheetTitle>
           <SheetDescription>
-            Plan ID: {selectedPlan.id}
+            {t("plan_id", { id: selectedPlan.id })}
           </SheetDescription>
         </SheetHeader>
 
@@ -79,14 +81,14 @@ const MembershipPlanSheet: React.FC<MembershipPlanSheetProps> = ({ open, onOpenC
               
               {/* Plan Details */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Core Details</h3>
+                <h3 className="text-lg font-semibold">{t("core_details")}</h3>
                 
                 <FormField
                   control={form.control}
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Plan Name</FormLabel>
+                      <FormLabel>{t("plan_name")}</FormLabel>
                       <FormControl>
                         <Input placeholder="Annual Premium" {...field} />
                       </FormControl>
@@ -101,7 +103,7 @@ const MembershipPlanSheet: React.FC<MembershipPlanSheetProps> = ({ open, onOpenC
                     name="price"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Price ($)</FormLabel>
+                        <FormLabel>{t("price")} ($)</FormLabel>
                         <FormControl>
                           <Input 
                             type="number" 
@@ -120,7 +122,7 @@ const MembershipPlanSheet: React.FC<MembershipPlanSheetProps> = ({ open, onOpenC
                     name="durationDays"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Duration (Days)</FormLabel>
+                        <FormLabel>{t("duration_days_label")}</FormLabel>
                         <FormControl>
                           <Input 
                             type="number" 
@@ -144,7 +146,7 @@ const MembershipPlanSheet: React.FC<MembershipPlanSheetProps> = ({ open, onOpenC
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel>{t("description_label")}</FormLabel>
                     <FormControl>
                       <Textarea placeholder="Detailed description of plan benefits..." {...field} />
                     </FormControl>
@@ -155,12 +157,12 @@ const MembershipPlanSheet: React.FC<MembershipPlanSheetProps> = ({ open, onOpenC
               
               {/* Placeholder for associated members/analytics */}
               <div className="p-3 border rounded-md bg-background text-sm text-muted-foreground">
-                <p>Associated Members: (Feature Placeholder)</p>
+                <p>{t("associated_members_placeholder")}</p>
               </div>
 
               <div className="pt-4">
                 <Button type="submit" className="w-full" disabled={!form.formState.isValid}>
-                  Save Plan Changes
+                  {t("save_plan_changes")}
                 </Button>
               </div>
             </form>

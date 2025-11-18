@@ -11,8 +11,10 @@ import {
 import { DollarSign, CreditCard, Receipt } from 'lucide-react';
 import { mockTransactions, Transaction } from '@/data/transactions';
 import { Badge } from '@/components/ui/badge';
+import { useTranslation } from 'react-i18next';
 
 const RecentTransactions = () => {
+  const { t } = useTranslation();
   const transactions = mockTransactions;
 
   const getPaymentIcon = (method: string) => {
@@ -32,19 +34,19 @@ const RecentTransactions = () => {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <DollarSign className="h-5 w-5" /> Recent Transactions
+          <DollarSign className="h-5 w-5" /> {t("recent_transactions")}
         </CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Member</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Item/Description</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
-              <TableHead className="text-center">Date</TableHead>
-              <TableHead className="text-center">Payment</TableHead>
+              <TableHead>{t("member")}</TableHead>
+              <TableHead>{t("type")}</TableHead>
+              <TableHead>{t("item_description")}</TableHead>
+              <TableHead className="text-right">{t("amount")}</TableHead>
+              <TableHead className="text-center">{t("date")}</TableHead>
+              <TableHead className="text-center">{t("payment")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -66,7 +68,7 @@ const RecentTransactions = () => {
                 <TableCell className="text-center">
                   <div className="flex items-center justify-center gap-1">
                     {getPaymentIcon(tx.paymentMethod)}
-                    <span className="text-xs">{tx.paymentMethod}</span>
+                    <span className="text-xs">{t(tx.paymentMethod.toLowerCase())}</span>
                   </div>
                 </TableCell>
               </TableRow>

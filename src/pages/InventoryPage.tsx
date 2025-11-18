@@ -7,8 +7,10 @@ import InventoryItemSheet from '@/components/InventoryItemSheet';
 import NewInventoryItemDialog from '@/components/NewInventoryItemDialog';
 import { DataTable } from '@/components/DataTable';
 import { createInventoryColumns } from './inventory/inventory-columns';
+import { useTranslation } from 'react-i18next';
 
 const InventoryPage = () => {
+  const { t } = useTranslation();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
 
@@ -22,14 +24,14 @@ const InventoryPage = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Inventory Management</h1>
+        <h1 className="text-3xl font-bold">{t("inventory_management")}</h1>
         <NewInventoryItemDialog />
       </div>
 
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Package className="h-5 w-5" /> Current Stock ({inventoryItems.length} unique items)
+            <Package className="h-5 w-5" /> {t("current_stock", { count: inventoryItems.length })}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -37,7 +39,7 @@ const InventoryPage = () => {
             columns={columns}
             data={inventoryItems}
             filterColumnId="name"
-            filterPlaceholder="Search items by name..."
+            filterPlaceholder={t("search_items_by_name")}
           />
         </CardContent>
       </Card>

@@ -20,6 +20,7 @@ import MembershipRenewalDialog from './MembershipRenewalDialog';
 import MembershipActionDialog from './MembershipActionDialog';
 import { getTransactionsByMemberId } from '@/utils/transaction-utils'; // Import utility
 import { Transaction } from '@/data/transactions'; // Import type
+import { useTranslation } from 'react-i18next';
 
 interface MemberProfileSheetProps {
   open: boolean;
@@ -40,6 +41,7 @@ const memberSchema = z.object({
 type MemberFormValues = z.infer<typeof memberSchema>;
 
 const MemberProfileSheet: React.FC<MemberProfileSheetProps> = ({ open, onOpenChange, selectedMember }) => {
+  const { t } = useTranslation();
   const [localMember, setLocalMember] = useState<Member | null>(selectedMember);
   const [isRenewalDialogOpen, setIsRenewalDialogOpen] = useState(false);
   const [isActionDialogOpen, setIsActionDialogOpen] = useState(false);
@@ -85,7 +87,7 @@ const MemberProfileSheet: React.FC<MemberProfileSheetProps> = ({ open, onOpenCha
 
     updateMember(updatedMember);
     setLocalMember(updatedMember); // Update local state immediately
-    showSuccess(`Member ${updatedMember.name} profile updated.`);
+    showSuccess(t("member_profile_updated_success", { name: updatedMember.name }));
     onOpenChange(false);
   };
   
@@ -121,7 +123,7 @@ const MemberProfileSheet: React.FC<MemberProfileSheetProps> = ({ open, onOpenCha
             <User className="h-6 w-6" /> {localMember.name}
           </SheetTitle>
           <SheetDescription>
-            Member ID: {localMember.id}
+            {t("member_id", { id: localMember.id })}
           </SheetDescription>
         </SheetHeader>
 
@@ -132,30 +134,30 @@ const MemberProfileSheet: React.FC<MemberProfileSheetProps> = ({ open, onOpenCha
               {/* Status Card (Display only) */}
               <div className="p-4 border rounded-lg bg-muted/50 space-y-2">
                 <div className="flex justify-between items-center">
-                  <p className="text-sm font-medium text-muted-foreground">Current Status</p>
+                  <p className="text-sm font-medium text-muted-foreground">{t("current_status")}</p>
                   <Badge variant={statusVariant} className="text-base py-1">
                     {localMember.status}
                   </Badge>
                 </div>
                 <Separator />
                 <div className="text-sm">
-                  <p>Start Date: {format(new Date(localMember.startDate), 'MMM dd, yyyy')}</p>
+                  <p>{t("start_date")}: {format(new Date(localMember.startDate), 'MMM dd, yyyy')}</p>
                   <p className={isExpired ? 'text-red-500 font-semibold' : 'text-green-600 font-semibold'}>
-                    Expiration: {format(expirationDate, 'MMM dd, yyyy')}
+                    {t("expiration")}: {format(expirationDate, 'MMM dd, yyyy')}
                   </p>
                 </div>
               </div>
 
               {/* Editable Contact Details */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Contact Information</h3>
+                <h3 className="text-lg font-semibold">{t("contact_information")}</h3>
                 
                 <FormField
                   control={form.control}
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>{t("email")}</FormLabel>
                       <FormControl>
                         <Input type="email" {...field} />
                       </FormControl>
@@ -168,7 +170,7 @@ const MemberProfileSheet: React.FC<MemberProfileSheetProps> = ({ open, onOpenCha
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone Number</FormLabel>
+                      <FormLabel>{t("phone_number")}</FormLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
@@ -181,7 +183,7 @@ const MemberProfileSheet: React.FC<MemberProfileSheetProps> = ({ open, onOpenCha
                   name="dob"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Date of Birth</FormLabel>
+                      <FormLabel>{t("date_of_birth")}</FormLabel>
                       <FormControl>
                         <Input type="date" {...field} />
                       </FormControl>
@@ -195,18 +197,18 @@ const MemberProfileSheet: React.FC<MemberProfileSheetProps> = ({ open, onOpenCha
 
               {/* Editable Membership Details */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Membership Details</h3>
+                <h3 className="text-lg font-semibold">{t("membership_details")}</h3>
                 
                 <FormField
                   control={form.control}
                   name="plan"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Membership Plan</FormLabel>
+                      <FormLabel>{t("membership_plan")}</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select a plan" />
+                            <SelectValue placeholder={t("select_a_plan")} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -227,11 +229,11 @@ const MemberProfileSheet: React.FC<MemberProfileSheetProps> = ({ open, onOpenCha
                   name="status"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Status</FormLabel>
+                      <FormLabel>{t("status")}</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select status" />
+                            <SelectValue placeholder={t("select_status")} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -252,14 +254,14 @@ const MemberProfileSheet: React.FC<MemberProfileSheetProps> = ({ open, onOpenCha
 
               {/* Activity Stats (Display only) */}
               <div className="space-y-3">
-                <h3 className="text-lg font-semibold">Activity & History</h3>
+                <h3 className="text-lg font-semibold">{t("activity_history")}</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-3 border rounded-md bg-background">
-                    <p className="text-sm font-medium text-muted-foreground">Total Check-ins</p>
+                    <p className="text-sm font-medium text-muted-foreground">{t("total_check_ins")}</p>
                     <span className="text-xl font-bold">{localMember.totalCheckIns}</span>
                   </div>
                   <div className="p-3 border rounded-md bg-background">
-                    <p className="text-sm font-medium text-muted-foreground">Last Check-in</p>
+                    <p className="text-sm font-medium text-muted-foreground">{t("last_check_in")}</p>
                     <div className="flex items-center gap-1 mt-1">
                       <Clock className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm font-semibold">{localMember.lastCheckIn || 'N/A'}</span>
@@ -270,7 +272,7 @@ const MemberProfileSheet: React.FC<MemberProfileSheetProps> = ({ open, onOpenCha
               
               {/* Transaction History */}
               <div className="space-y-3">
-                <h3 className="text-lg font-semibold">Recent Transactions ({recentTransactions.length})</h3>
+                <h3 className="text-lg font-semibold">{t("recent_transactions_title", { count: recentTransactions.length })}</h3>
                 <div className="border rounded-md max-h-48 overflow-y-auto">
                     {recentTransactions.length > 0 ? (
                         recentTransactions.map(tx => (
@@ -283,14 +285,14 @@ const MemberProfileSheet: React.FC<MemberProfileSheetProps> = ({ open, onOpenCha
                             </div>
                         ))
                     ) : (
-                        <p className="text-center text-muted-foreground py-4 text-sm">No recent transactions found.</p>
+                        <p className="text-center text-muted-foreground py-4 text-sm">{t("no_recent_transactions")}</p>
                     )}
                 </div>
               </div>
               
               <div className="pt-4">
                 <Button type="submit" className="w-full" disabled={!form.formState.isValid}>
-                    Save Member Changes
+                    {t("save_member_changes")}
                 </Button>
               </div>
             </form>
@@ -300,7 +302,7 @@ const MemberProfileSheet: React.FC<MemberProfileSheetProps> = ({ open, onOpenCha
         <div className="mt-auto pt-4 border-t space-y-2">
             {localMember.status !== 'Active' && (
                 <Button variant="default" className="w-full" onClick={() => setIsRenewalDialogOpen(true)}>
-                    Renew Membership
+                    {t("renew_membership")}
                 </Button>
             )}
             <Button 
@@ -308,7 +310,7 @@ const MemberProfileSheet: React.FC<MemberProfileSheetProps> = ({ open, onOpenCha
                 className="w-full text-red-500"
                 onClick={() => setIsActionDialogOpen(true)}
             >
-                Freeze/Cancel Membership
+                {t("freeze_cancel_membership")}
             </Button>
         </div>
         

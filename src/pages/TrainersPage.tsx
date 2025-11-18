@@ -6,8 +6,10 @@ import TrainerProfileSheet from '@/components/TrainerProfileSheet';
 import NewTrainerDialog from '@/components/NewTrainerDialog';
 import { DataTable } from '@/components/DataTable';
 import { createTrainerColumns } from './trainers/trainer-columns';
+import { useTranslation } from 'react-i18next';
 
 const TrainersPage = () => {
+  const { t } = useTranslation();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedTrainer, setSelectedTrainer] = useState<Trainer | null>(null);
 
@@ -21,14 +23,14 @@ const TrainersPage = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Trainer Management</h1>
+        <h1 className="text-3xl font-bold">{t("trainer_management")}</h1>
         <NewTrainerDialog />
       </div>
 
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Dumbbell className="h-5 w-5" /> Current Staff ({trainers.length})
+            <Dumbbell className="h-5 w-5" /> {t("current_staff", { count: trainers.length })}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -36,7 +38,7 @@ const TrainersPage = () => {
             columns={columns}
             data={trainers}
             filterColumnId="name"
-            filterPlaceholder="Search trainers by name..."
+            filterPlaceholder={t("search_by_name")}
           />
         </CardContent>
       </Card>

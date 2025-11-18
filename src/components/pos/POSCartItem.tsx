@@ -2,6 +2,7 @@ import React from 'react';
 import { CartItem } from '@/types/pos';
 import { Button } from "@/components/ui/button";
 import { X, Plus, Minus, Ticket, Image } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface POSCartItemProps {
   item: CartItem;
@@ -10,6 +11,8 @@ interface POSCartItemProps {
 }
 
 const POSCartItem: React.FC<POSCartItemProps> = ({ item, updateQuantity, removeItem }) => {
+  const { t } = useTranslation();
+  
   return (
     <div className="flex items-center justify-between border-b pb-2 last:border-b-0">
       <div className="flex items-center gap-2 flex-1 min-w-0">

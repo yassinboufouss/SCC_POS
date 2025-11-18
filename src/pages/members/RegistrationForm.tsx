@@ -14,6 +14,7 @@ import { showSuccess, showError } from "@/utils/toast";
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { addMember, NewMemberInput } from '@/utils/member-utils'; // Import utility and type
+import { useTranslation } from 'react-i18next';
 
 const memberRegistrationSchema = z.object({
   fullName: z.string().min(2, { message: "Full name is required." }),
@@ -26,6 +27,7 @@ const memberRegistrationSchema = z.object({
 type MemberRegistrationFormValues = z.infer<typeof memberRegistrationSchema>;
 
 const RegistrationForm = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const form = useForm<MemberRegistrationFormValues>({
     resolver: zodResolver(memberRegistrationSchema),
@@ -43,7 +45,7 @@ const RegistrationForm = () => {
 
   const onSubmit = (values: MemberRegistrationFormValues) => {
     if (!selectedPlan) {
-        showError("Please select a valid membership plan.");
+        showError(t("select_plan_error"));
         return;
     }
 
@@ -51,13 +53,16 @@ const RegistrationForm = () => {
     const newMember = addMember(values as NewMemberInput);
 
     if (newMember) {
-        showSuccess(`Member ${newMember.name} registered successfully! Expires: ${format(new Date(newMember.expirationDate), 'MMM dd, yyyy')}`);
+        showSuccess(t("registration_success", { 
+            name: newMember.name, 
+            date: format(new Date(newMember.expirationDate), 'MMM dd, yyyy') 
+        }));
         
         // Simulate successful registration and navigate back to the list
         form.reset();
         navigate('/members');
     } else {
-        showError("Registration failed. Please check plan selection.");
+        showError(t("registration_failed"));
     }
   };
 
@@ -67,12 +72,12 @@ const RegistrationForm = () => {
         <Button variant="outline" size="icon" onClick={() => navigate('/members')}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <h1 className="text-3xl font-bold">Register New Member</h1>
+        <h1 className="text-3xl font-bold">{t("register_new_member")}</h1>
       </div>
       
       <Card>
         <CardHeader>
-          <CardTitle>New Member Details & Plan Selection</CardTitle>
+          <CardTitle>{t("new_member_details_plan_selection", { defaultValue: "New Member Details & Plan Selection" })}</CardTitle>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -85,7 +90,7 @@ const RegistrationForm = () => {
                   name="fullName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Full Name</FormLabel>
+                      <FormLabel>{t("full_name")}</FormLabel>
                       <FormControl>
                         <Input placeholder="John Doe" {...field} />
                       </FormControl>
@@ -98,7 +103,7 @@ const RegistrationForm = () => {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>{t("email")}</FormLabel>
                       <FormControl>
                         <Input type="email" placeholder="john@example.com" {...field} />
                       </FormControl>
@@ -111,7 +116,7 @@ const RegistrationForm = () => {
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone Number</FormLabel>
+                      <FormLabel>{t("phone_number")}</FormLabel>
                       <FormControl>
                         <Input placeholder="(555) 123-4567" {...field} />
                       </FormControl>
@@ -124,7 +129,7 @@ const RegistrationForm = () => {
                   name="dob"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Date of Birth</FormLabel>
+                      <FormLabel>{t("date_of_birth")}</FormLabel>
                       <FormControl>
                         <Input type="date" {...field} />
                       </FormControl>
@@ -136,18 +141,18 @@ const RegistrationForm = () => {
 
               {/* Membership Plan Selection */}
               <Card className="p-4 bg-muted/50">
-                <CardTitle className="text-lg mb-4">Membership Plan</CardTitle>
+                <CardTitle className="text-lg mb-4">{t("membership_plan")}</CardTitle>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="planId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Select Plan</FormLabel>
+                        <FormLabel>{t("select_plan")}</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Choose a membership plan" />
+                              <SelectValue placeholder={t("choose_a_membership_plan")} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -165,16 +170,16 @@ const RegistrationForm = () => {
                   
                   {selectedPlan && (
                     <div className="space-y-2">
-                      <Label>Plan Details</Label>
+                      <Label>{t("plan_details")}</Label>
                       <div className="p-3 border rounded-md bg-background text-sm">
-                        <p>Duration: {selectedPlan.durationDays} days</p>
-                        <p>Price: ${selectedPlan.price.toFixed(2)}</p>
+                        <p>{t("duration")}: {selectedPlan.durationDays} {t("days")}</p>
+                        <p>{t("price")}: ${selectedPlan.price.toFixed(2)}</p>
                         <p className="text-muted-foreground">{selectedPlan.description}</p>
                         
                         {/* Calculate Expiration Date Preview */}
                         {form.formState.isValid && (
                           <p className="mt-2 font-medium text-green-600 dark:text-green-400">
-                            Expires: {format(addDays(new Date(), selectedPlan.durationDays), 'MMM dd, yyyy')}
+                            {t("expires")}: {format(addDays(new Date(), selectedPlan.durationDays), 'MMM dd, yyyy')}
                           </p>
                         )}
                       </div>
@@ -185,7 +190,7 @@ const RegistrationForm = () => {
 
               <div className="pt-4">
                 <Button type="submit" disabled={!form.formState.isValid}>
-                  Register Member & Process Payment
+                  {t("register_member_process_payment")}
                 </Button>
               </div>
             </form>

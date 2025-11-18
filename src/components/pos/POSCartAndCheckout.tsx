@@ -11,6 +11,7 @@ import MemberSelectDialog from '@/components/MemberSelectDialog';
 import POSCartItem from './POSCartItem.tsx';
 import { CartItem, PaymentMethod } from '@/types/pos.ts';
 import { Member } from '@/data/members';
+import { useTranslation } from 'react-i18next';
 
 interface POSCartAndCheckoutProps {
   cart: CartItem[];
@@ -47,6 +48,7 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
   tax,
   total,
 }) => {
+  const { t } = useTranslation();
   
   const handleDiscountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
@@ -63,7 +65,7 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
     <Card className="h-full flex flex-col">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <ShoppingCart className="h-5 w-5" /> Shopping Cart ({cart.length})
+          <ShoppingCart className="h-5 w-5" /> {t("shopping_cart", { count: cart.length })}
         </CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col flex-1">
@@ -90,7 +92,7 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
         <div className="flex-1 overflow-y-auto space-y-3 pr-2 mb-4">
           {cart.length === 0 ? (
             <div className="text-center text-muted-foreground py-10">
-              Cart is empty. Add items to start a sale.
+              {t("cart_is_empty")}
             </div>
           ) : (
             cart.map((item, index) => (
@@ -108,14 +110,14 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
         <div className="mt-auto pt-4 border-t">
           <div className="space-y-1 text-sm">
             <div className="flex justify-between">
-              <span>Subtotal:</span>
+              <span>{t("subtotal")}</span>
               <span className="font-medium">${subtotal.toFixed(2)}</span>
             </div>
             
             {/* Discount Input */}
             <div className="flex items-center justify-between gap-2">
               <Label htmlFor="discount-input" className="flex items-center gap-1 text-muted-foreground">
-                  <Percent className="h-3 w-3" /> Discount (%)
+                  <Percent className="h-3 w-3" /> {t("discount")}
               </Label>
               <Input
                   id="discount-input"
@@ -131,19 +133,19 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
             
             {discountAmount > 0 && (
               <div className="flex justify-between text-red-500">
-                  <span>Discount Applied:</span>
+                  <span>{t("discount_applied")}</span>
                   <span className="font-medium">-${discountAmount.toFixed(2)}</span>
               </div>
             )}
             
             <div className="flex justify-between">
-              <span>Tax (8% on inventory):</span>
+              <span>{t("tax_inventory")}</span>
               <span className="font-medium">${tax.toFixed(2)}</span>
             </div>
             
             <Separator className="my-2" />
             <div className="flex justify-between text-lg font-bold">
-              <span>Total:</span>
+              <span>{t("total")}</span>
               <span>${total.toFixed(2)}</span>
             </div>
           </div>
@@ -152,7 +154,7 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
       
           {/* Payment Method Selection */}
           <div className="space-y-2">
-              <h4 className="font-semibold text-sm mb-2">Select Payment Method</h4>
+              <h4 className="font-semibold text-sm mb-2">{t("select_payment_method")}</h4>
               <RadioGroup 
                   defaultValue="Card" 
                   value={paymentMethod} 
@@ -167,7 +169,7 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
                       )}
                   >
                       <CreditCard className="mb-1 h-5 w-5" />
-                      Card
+                      {t("card")}
                       <RadioGroupItem value="Card" id="payment-card" className="sr-only" />
                   </Label>
                   <Label
@@ -178,7 +180,7 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
                       )}
                   >
                       <DollarSign className="mb-1 h-5 w-5" />
-                      Cash
+                      {t("cash")}
                       <RadioGroupItem value="Cash" id="payment-cash" className="sr-only" />
                   </Label>
                   <Label
@@ -189,7 +191,7 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
                       )}
                   >
                       <Receipt className="mb-1 h-5 w-5" />
-                      Transfer
+                      {t("transfer")}
                       <RadioGroupItem value="Transfer" id="payment-transfer" className="sr-only" />
                   </Label>
               </RadioGroup>
@@ -200,7 +202,7 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
             onClick={handleCheckout}
             disabled={cart.length === 0}
           >
-            Process Sale
+            {t("process_sale")}
           </Button>
           <Button 
             variant="outline" 
@@ -208,7 +210,7 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
             onClick={handleClearCart}
             disabled={cart.length === 0}
           >
-            <Trash2 className="h-4 w-4 mr-2" /> Clear Cart
+            <Trash2 className="h-4 w-4 mr-2" /> {t("clear_cart")}
           </Button>
         </div>
       </CardContent>

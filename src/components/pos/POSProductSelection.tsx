@@ -5,6 +5,7 @@ import { Ticket, Image } from 'lucide-react';
 import { inventoryItems, InventoryItem } from '@/data/inventory';
 import { membershipPlans, MembershipPlan } from '@/data/membership-plans';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 interface POSProductSelectionProps {
   inventorySearchTerm: string;
@@ -19,6 +20,8 @@ const POSProductSelection: React.FC<POSProductSelectionProps> = ({
   addInventoryToCart,
   addMembershipToCart,
 }) => {
+  const { t } = useTranslation();
+  
   const filteredInventoryItems = inventoryItems.filter(item =>
     item.name.toLowerCase().includes(inventorySearchTerm.toLowerCase()) ||
     item.category.toLowerCase().includes(inventorySearchTerm.toLowerCase())
@@ -31,7 +34,7 @@ const POSProductSelection: React.FC<POSProductSelectionProps> = ({
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Ticket className="h-5 w-5" /> Membership Plans
+            <Ticket className="h-5 w-5" /> {t("membership_plans_title")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -44,7 +47,7 @@ const POSProductSelection: React.FC<POSProductSelectionProps> = ({
               >
                 <div>
                   <p className="font-medium truncate">{plan.name}</p>
-                  <p className="text-xs text-muted-foreground">{plan.durationDays} days</p>
+                  <p className="text-xs text-muted-foreground">{plan.durationDays} {t("days")}</p>
                 </div>
                 <div className="mt-2">
                   <span className="text-lg font-bold text-blue-600 dark:text-blue-400">${plan.price.toFixed(2)}</span>
@@ -58,11 +61,11 @@ const POSProductSelection: React.FC<POSProductSelectionProps> = ({
       {/* Inventory Products Section */}
       <Card>
         <CardHeader>
-          <CardTitle>Available Products</CardTitle>
+          <CardTitle>{t("available_products")}</CardTitle>
         </CardHeader>
         <CardContent>
           <Input
-            placeholder="Search inventory products..."
+            placeholder={t("search_inventory_products")}
             value={inventorySearchTerm}
             onChange={(e) => setInventorySearchTerm(e.target.value)}
             className="mb-4"
@@ -98,13 +101,13 @@ const POSProductSelection: React.FC<POSProductSelectionProps> = ({
                 <div className="mt-2 flex justify-between items-center">
                   <span className="text-lg font-bold text-primary">${item.price.toFixed(2)}</span>
                   <span className={`text-xs font-semibold ${item.stock < 10 ? 'text-red-500' : 'text-green-500'}`}>
-                    Stock: {item.stock}
+                    {t("stock")} {item.stock}
                   </span>
                 </div>
               </div>
             ))}
             {filteredInventoryItems.length === 0 && (
-                <p className="text-muted-foreground col-span-full text-center py-8">No products found matching "{inventorySearchTerm}"</p>
+                <p className="text-muted-foreground col-span-full text-center py-8">{t("no_products_found", { term: inventorySearchTerm })}</p>
             )}
           </div>
         </CardContent>

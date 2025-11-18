@@ -5,8 +5,10 @@ import { getExpiringMembers } from '@/utils/member-utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { format, differenceInDays } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
+import { useTranslation } from 'react-i18next';
 
 const ExpiringMembersList = () => {
+  const { t } = useTranslation();
   // Fetch members expiring within the next 30 days
   const expiringMembers = getExpiringMembers(30);
 
@@ -14,7 +16,7 @@ const ExpiringMembersList = () => {
     <Card className="h-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <List className="h-5 w-5 text-orange-500" /> Expiring Memberships
+          <List className="h-5 w-5 text-orange-500" /> {t("expiring_memberships")}
         </CardTitle>
       </CardHeader>
       <CardContent className="h-80">
@@ -36,7 +38,7 @@ const ExpiringMembersList = () => {
                     </div>
                     <Badge variant={isUrgent ? 'destructive' : 'secondary'} className="flex items-center gap-1">
                       <Clock className="h-3 w-3" />
-                      {daysLeft} days left
+                      {t("days_left", { count: daysLeft })}
                     </Badge>
                   </div>
                 );
@@ -46,7 +48,7 @@ const ExpiringMembersList = () => {
         ) : (
           <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
             <AlertTriangle className="h-8 w-8 mb-2 text-green-500" />
-            <p>No memberships expiring in the next 30 days.</p>
+            <p>{t("no_expiring_members")}</p>
           </div>
         )}
       </CardContent>

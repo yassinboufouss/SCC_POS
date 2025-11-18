@@ -6,6 +6,7 @@ import { Search, User, Check } from 'lucide-react';
 import { mockMembers, Member } from '@/data/members';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
+import { useTranslation } from 'react-i18next';
 
 interface MemberSelectDialogProps {
   onSelectMember: (member: Member | null) => void;
@@ -14,6 +15,7 @@ interface MemberSelectDialogProps {
 }
 
 const MemberSelectDialog: React.FC<MemberSelectDialogProps> = ({ onSelectMember, selectedMember, trigger }) => {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -38,18 +40,18 @@ const MemberSelectDialog: React.FC<MemberSelectDialogProps> = ({ onSelectMember,
         {trigger ? trigger : (
             <Button variant="outline" className="w-full justify-start text-left">
               <User className="mr-2 h-4 w-4" /> 
-              {selectedMember ? `Member: ${selectedMember.name}` : 'Select Member (Optional)'}
+              {selectedMember ? `${t("member")}: ${selectedMember.name}` : t("select_member_optional")}
             </Button>
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] p-0">
         <DialogHeader className="p-6 pb-0">
-          <DialogTitle>Search & Select Member</DialogTitle>
+          <DialogTitle>{t("search_select_member")}</DialogTitle>
         </DialogHeader>
         
         <div className="p-4">
           <Input
-            placeholder="Search by name or ID..."
+            placeholder={t("search_by_name_or_id")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="mb-4"
@@ -66,7 +68,7 @@ const MemberSelectDialog: React.FC<MemberSelectDialogProps> = ({ onSelectMember,
                   >
                     <div>
                       <p className="font-medium">{member.name}</p>
-                      <p className="text-xs text-muted-foreground">ID: {member.id} | Plan: {member.plan}</p>
+                      <p className="text-xs text-muted-foreground">{t("id")}: {member.id} | {t("plan")}: {member.plan}</p>
                     </div>
                     <Badge variant={member.status === 'Active' ? 'default' : 'destructive'}>
                       {member.status}
@@ -75,7 +77,7 @@ const MemberSelectDialog: React.FC<MemberSelectDialogProps> = ({ onSelectMember,
                   </div>
                 ))
               ) : (
-                <p className="text-center text-muted-foreground py-8">No members found.</p>
+                <p className="text-center text-muted-foreground py-8">{t("no_members_found")}</p>
               )}
             </div>
           </ScrollArea>
@@ -83,7 +85,7 @@ const MemberSelectDialog: React.FC<MemberSelectDialogProps> = ({ onSelectMember,
         
         <div className="p-6 pt-0 border-t">
             <Button variant="secondary" onClick={() => onSelectMember(null)} className="w-full">
-                Clear Selected Member
+                {t("clear_selected_member")}
             </Button>
         </div>
       </DialogContent>

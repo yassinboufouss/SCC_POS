@@ -9,6 +9,7 @@ import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Textarea } from '@/components/ui/textarea';
 import { showSuccess } from '@/utils/toast';
+import { useTranslation } from 'react-i18next';
 
 const newPlanSchema = z.object({
   name: z.string().min(2, { message: "Plan name is required." }),
@@ -20,6 +21,7 @@ const newPlanSchema = z.object({
 type NewPlanFormValues = z.infer<typeof newPlanSchema>;
 
 const NewMembershipPlanDialog = () => {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   
   const form = useForm<NewPlanFormValues>({
@@ -39,7 +41,7 @@ const NewMembershipPlanDialog = () => {
     };
     
     console.log("Adding new membership plan:", newPlan);
-    showSuccess(`New plan '${values.name}' created successfully.`);
+    showSuccess(t("plan_created_success", { name: values.name }));
     
     form.reset();
     setOpen(false);
@@ -49,12 +51,12 @@ const NewMembershipPlanDialog = () => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>
-          <PlusCircle className="mr-2 h-4 w-4" /> Create New Plan
+          <PlusCircle className="mr-2 h-4 w-4" /> {t("create_new_plan")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[450px]">
         <DialogHeader>
-          <DialogTitle>Create New Membership Plan</DialogTitle>
+          <DialogTitle>{t("create_new_membership_plan")}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-2">
@@ -64,7 +66,7 @@ const NewMembershipPlanDialog = () => {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Plan Name</FormLabel>
+                  <FormLabel>{t("plan_name")}</FormLabel>
                   <FormControl>
                     <Input placeholder="Premium Annual" {...field} />
                   </FormControl>
@@ -79,7 +81,7 @@ const NewMembershipPlanDialog = () => {
                 name="price"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Price ($)</FormLabel>
+                    <FormLabel>{t("price")} ($)</FormLabel>
                     <FormControl>
                       <Input 
                         type="number" 
@@ -98,7 +100,7 @@ const NewMembershipPlanDialog = () => {
                 name="durationDays"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Duration (Days)</FormLabel>
+                    <FormLabel>{t("duration_days_label")}</FormLabel>
                     <FormControl>
                       <Input 
                         type="number" 
@@ -118,7 +120,7 @@ const NewMembershipPlanDialog = () => {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>{t("description_label")}</FormLabel>
                   <FormControl>
                     <Textarea placeholder="Detailed description of plan benefits..." {...field} />
                   </FormControl>
@@ -128,7 +130,7 @@ const NewMembershipPlanDialog = () => {
             />
 
             <Button type="submit" className="w-full mt-6" disabled={!form.formState.isValid}>
-              Create Plan
+              {t("create_plan")}
             </Button>
           </form>
         </Form>

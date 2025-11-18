@@ -1,6 +1,7 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useTranslation } from 'react-i18next';
 
 const data = [
   { name: 'Jan', Revenue: 25000 },
@@ -12,10 +13,12 @@ const data = [
 ];
 
 const RevenueChart = () => {
+  const { t } = useTranslation();
+  
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Monthly Revenue Trend</CardTitle>
+        <CardTitle>{t("monthly_revenue_trend")}</CardTitle>
       </CardHeader>
       <CardContent className="h-80 p-4">
         <ResponsiveContainer width="100%" height="100%">
@@ -35,7 +38,7 @@ const RevenueChart = () => {
                 borderColor: 'hsl(var(--border))', 
                 borderRadius: '0.5rem' 
               }}
-              formatter={(value: number) => [`$${value.toLocaleString()}`, 'Revenue']}
+              formatter={(value: number) => [`$${value.toLocaleString()}`, t('revenue')]}
             />
             <Bar dataKey="Revenue" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
           </BarChart>

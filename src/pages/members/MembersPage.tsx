@@ -8,12 +8,14 @@ import { mockMembers, Member } from '@/data/members';
 import MemberProfileSheet from '@/components/MemberProfileSheet';
 import { DataTable } from '@/components/DataTable';
 import { createMemberColumns } from './member-columns';
+import { useTranslation } from 'react-i18next';
 
 interface MembersListProps {
   onViewMember: (member: Member) => void;
 }
 
 const MembersList: React.FC<MembersListProps> = ({ onViewMember }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   
   const columns = createMemberColumns(onViewMember);
@@ -21,22 +23,22 @@ const MembersList: React.FC<MembersListProps> = ({ onViewMember }) => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Member Management</h1>
+        <h1 className="text-3xl font-bold">{t("member_management")}</h1>
         <Button onClick={() => navigate('register')}>
-          <PlusCircle className="mr-2 h-4 w-4" /> Register New Member
+          <PlusCircle className="mr-2 h-4 w-4" /> {t("register_new_member")}
         </Button>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Member Directory ({mockMembers.length})</CardTitle>
+          <CardTitle>{t("member_directory", { count: mockMembers.length })}</CardTitle>
         </CardHeader>
         <CardContent>
           <DataTable 
             columns={columns} 
             data={mockMembers} 
             filterColumnId="name"
-            filterPlaceholder="Search members by name..."
+            filterPlaceholder={t("search_members_by_name")}
           />
         </CardContent>
       </Card>

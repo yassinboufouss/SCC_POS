@@ -7,8 +7,10 @@ import RecentTransactions from '@/components/RecentTransactions';
 import { calculateDashboardMetrics } from '@/utils/dashboard-metrics';
 import RevenueBreakdownChart from '@/components/RevenueBreakdownChart';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const FinancePage = () => {
+  const { t } = useTranslation();
   const metrics = calculateDashboardMetrics();
   
   // Mock Financial Data (using calculated revenue)
@@ -21,14 +23,14 @@ const FinancePage = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Finance & Reports</h1>
+      <h1 className="text-3xl font-bold">{t("finance_reports_title")}</h1>
       
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {/* Monthly Revenue */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Monthly Revenue
+              {t("total_revenue_mtd")}
             </CardTitle>
             <DollarSign className="h-4 w-4 text-green-600" />
           </CardHeader>
@@ -42,13 +44,13 @@ const FinancePage = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Active Members
+              {t("active_members")}
             </CardTitle>
             <Users className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{financialData.newMembers}</div>
-            <p className="text-xs text-muted-foreground">Currently active</p>
+            <p className="text-xs text-muted-foreground">{t("total_active_memberships")}</p>
           </CardContent>
         </Card>
         
@@ -56,13 +58,13 @@ const FinancePage = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Outstanding Invoices
+              {t("outstanding_invoices")}
             </CardTitle>
             <DollarSign className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">${financialData.outstandingInvoices.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">Awaiting payment (Mock)</p>
+            <p className="text-xs text-muted-foreground">{t("awaiting_payment_mock")}</p>
           </CardContent>
         </Card>
         
@@ -70,13 +72,13 @@ const FinancePage = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Expenses (MTD)
+              {t("expenses_mtd")}
             </CardTitle>
             <TrendingUp className="h-4 w-4 text-orange-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">${financialData.expenseMTD.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">Includes payroll & utilities (Mock)</p>
+            <p className="text-xs text-muted-foreground">{t("includes_payroll_mock")}</p>
           </CardContent>
         </Card>
       </div>
@@ -87,21 +89,23 @@ const FinancePage = () => {
         <Card className="h-full">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" /> Detailed Reports
+              <FileText className="h-5 w-5" /> {t("detailed_reports")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-muted-foreground">Generate and view detailed financial reports for various periods.</p>
+            <p className="text-muted-foreground">
+              {t("generate_view_reports")}
+            </p>
             <Separator />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Button variant="outline" className="justify-start">Membership Sales Report</Button>
-              <Button variant="outline" className="justify-start">Inventory Profit Report</Button>
-              <Button variant="outline" className="justify-start">Trainer Payroll Summary</Button>
+              <Button variant="outline" className="justify-start">{t("membership_sales_report")}</Button>
+              <Button variant="outline" className="justify-start">{t("inventory_profit_report")}</Button>
+              <Button variant="outline" className="justify-start">{t("trainer_payroll_summary")}</Button>
             </div>
             <Separator />
             <Button asChild className="w-full">
                 <Link to="/finance/transactions">
-                    View All Transactions <ArrowRight className="h-4 w-4 ml-2" />
+                    {t("view_all_transactions")} <ArrowRight className="h-4 w-4 ml-2" />
                 </Link>
             </Button>
           </CardContent>
