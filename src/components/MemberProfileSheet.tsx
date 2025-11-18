@@ -17,6 +17,7 @@ import { membershipPlans } from '@/data/membership-plans';
 import { showSuccess } from '@/utils/toast';
 import { updateMember } from '@/utils/member-utils';
 import MembershipRenewalDialog from './MembershipRenewalDialog';
+import MembershipActionDialog from './MembershipActionDialog';
 
 interface MemberProfileSheetProps {
   open: boolean;
@@ -39,6 +40,7 @@ type MemberFormValues = z.infer<typeof memberSchema>;
 const MemberProfileSheet: React.FC<MemberProfileSheetProps> = ({ open, onOpenChange, selectedMember }) => {
   const [localMember, setLocalMember] = useState<Member | null>(selectedMember);
   const [isRenewalDialogOpen, setIsRenewalDialogOpen] = useState(false);
+  const [isActionDialogOpen, setIsActionDialogOpen] = useState(false);
     
   const form = useForm<MemberFormValues>({
     resolver: zodResolver(memberSchema),
@@ -89,6 +91,16 @@ const MemberProfileSheet: React.FC<MemberProfileSheetProps> = ({ open, onOpenCha
         ...form.getValues(),
         plan: renewedMember.plan,
         status: renewedMember.status as MemberFormValues['status'],
+      });
+  };
+  
+  const handleActionSuccess = (updatedMember: Member) => {
+      setLocalMember(updatedMember);
+      setIsActionDialogOpen(false);
+      // Update form state to reflect new status
+      form.reset({
+        ...form.getValues(),
+        status: updatedMember.status as MemberFormValues['status'],
       });
   };
 
@@ -266,12 +278,16 @@ const MemberProfileSheet: React.FC<MemberProfileSheetProps> = ({ open, onOpenCha
         </ScrollArea>
         
         <div className="mt-auto pt-4 border-t space-y-2">
-            {isExpired && (
+            {localMember.status !== 'Active' && (
                 <Button variant="default" className="w-full" onClick={() => setIsRenewalDialogOpen(true)}>
                     Renew Membership
                 </Button>
             )}
-            <Button variant="outline" className="w-full text-red-500">
+            <Button 
+                variant="outline" 
+                className="w-full text-red-500"
+                onClick={() => setIsActionDialogOpen(true)}
+            >
                 Freeze/Cancel Membership
             </Button>
         </div>
@@ -283,6 +299,16 @@ const MemberProfileSheet: React.FC<MemberProfileSheetProps> = ({ open, onOpenCha
                 onOpenChange={setIsRenewalDialogOpen}
                 member={localMember}
                 onRenewalSuccess={handleRenewalSuccess}
+            />
+        )}
+        
+        {/* Action Dialog */}
+        {localMember && isActionDialogOpen && (
+            <MembershipActionDialog
+                open={isActionDialogOpen}
+                onOpenChange={setIsActionDialogOpen}
+                member={localMember}
+                onActionSuccess={handleActionSuccess}
             />
         )}
       </SheetContent>

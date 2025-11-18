@@ -80,3 +80,41 @@ export const getExpiringMembers = (daysThreshold: number = 30): Member[] => {
         })
         .sort((a, b) => parseISO(a.expirationDate).getTime() - parseISO(b.expirationDate).getTime());
 };
+
+// Utility to simulate freezing a member's plan
+export const freezeMemberPlan = (memberId: string) => {
+  const member = mockMembers.find(m => m.id === memberId);
+
+  if (!member) {
+    console.error("Member not found for freezing.");
+    return null;
+  }
+
+  const updatedMember: Member = {
+    ...member,
+    status: 'Pending', // Using 'Pending' to represent a frozen state
+    // In a real system, we would calculate the freeze duration and adjust expiration date
+  };
+
+  updateMember(updatedMember);
+  return updatedMember;
+};
+
+// Utility to simulate canceling a member's plan
+export const cancelMemberPlan = (memberId: string) => {
+  const member = mockMembers.find(m => m.id === memberId);
+
+  if (!member) {
+    console.error("Member not found for cancellation.");
+    return null;
+  }
+
+  const updatedMember: Member = {
+    ...member,
+    status: 'Expired', // Using 'Expired' immediately upon cancellation
+    expirationDate: format(new Date(), 'yyyy-MM-dd'), // Set expiration to today
+  };
+
+  updateMember(updatedMember);
+  return updatedMember;
+};
