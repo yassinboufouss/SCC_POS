@@ -149,6 +149,7 @@ export const fr = {
     "no_members_found": "Aucun membre trouvé.",
     "clear_selected_member": "Effacer le Membre Sélectionné",
     "member_customer": "Membre/Client",
+    "guest_customer": "Client Invité",
     "item_name": "Nom de l'Article",
     "category": "Catégorie",
     "last_restock": "Dernier Réapprovisionnement",

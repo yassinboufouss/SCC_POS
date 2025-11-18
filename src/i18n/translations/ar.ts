@@ -149,6 +149,7 @@ export const ar = {
     "no_members_found": "لم يتم العثور على أعضاء.",
     "clear_selected_member": "مسح العضو المحدد",
     "member_customer": "عضو/عميل",
+    "guest_customer": "عميل زائر",
     "item_name": "اسم العنصر",
     "category": "الفئة",
     "last_restock": "آخر إعادة تخزين",

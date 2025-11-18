@@ -8,10 +8,12 @@ import { membershipPlans, MembershipPlan } from '@/data/membership-plans';
 import POSProductSelection from '@/components/pos/POSProductSelection';
 import POSCartAndCheckout from '@/components/pos/POSCartAndCheckout';
 import POSCheckIn from '@/components/pos/POSCheckIn';
+import POSMemberSelector from '@/components/pos/POSMemberSelector';
 import { CartItem, PaymentMethod } from '@/types/pos';
 import { useTranslation } from 'react-i18next';
 import Layout from '@/components/Layout';
 import { formatCurrency } from '@/utils/currency-utils';
+import { Member } from '@/data/members';
 
 const POSPage = () => {
   const { t } = useTranslation();
@@ -19,6 +21,7 @@ const POSPage = () => {
   const [inventorySearchTerm, setInventorySearchTerm] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('Card');
   const [discountPercent, setDiscountPercent] = useState(0);
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
 
   // --- Cart Manipulation Functions ---
 
@@ -100,6 +103,7 @@ const POSPage = () => {
   const handleClearCart = () => {
     setCart([]);
     setDiscountPercent(0);
+    setSelectedMember(null);
   };
 
   // --- Calculations ---
@@ -169,9 +173,13 @@ const POSPage = () => {
     
     const itemDescription = cart.map(item => `${item.name} x${item.quantity}`).join(', ');
     
+    // Use selected member details or default to Guest
+    const memberId = selectedMember?.id || 'GUEST';
+    const memberName = selectedMember?.name || t('guest_customer');
+    
     const newTransaction = {
-        memberId: 'GUEST', // Always GUEST now
-        memberName: 'Guest Customer', // Always Guest now
+        memberId: memberId,
+        memberName: memberName,
         type: transactionType,
         item: itemDescription,
         amount: total,
@@ -194,6 +202,7 @@ const POSPage = () => {
     setInventorySearchTerm('');
     setPaymentMethod('Card');
     setDiscountPercent(0);
+    setSelectedMember(null);
   };
 
   return (
@@ -214,8 +223,16 @@ const POSPage = () => {
           {/* Cart & Checkout (1/3 width) */}
           <div className="lg:col-span-1 flex flex-col space-y-6">
               <POSCheckIn />
+              
+              <POSMemberSelector 
+                selectedMember={selectedMember}
+                onSelectMember={setSelectedMember}
+                onClearMember={() => setSelectedMember(null)}
+              />
+              
               <POSCartAndCheckout
                   cart={cart}
+                  selectedMember={selectedMember}
                   paymentMethod={paymentMethod}
                   setPaymentMethod={setPaymentMethod}
                   discountPercent={discountPercent}

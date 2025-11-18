@@ -149,6 +149,7 @@ export const en = {
     "no_members_found": "No members found.",
     "clear_selected_member": "Clear Selected Member",
     "member_customer": "Member/Customer",
+    "guest_customer": "Guest Customer",
     "item_name": "Item Name",
     "category": "Category",
     "last_restock": "Last Restock",

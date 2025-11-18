@@ -11,10 +11,11 @@ import POSCartItem from './POSCartItem.tsx';
 import { CartItem, PaymentMethod } from '@/types/pos.ts';
 import { useTranslation } from 'react-i18next';
 import { formatCurrency } from '@/utils/currency-utils';
+import { Member } from '@/data/members';
 
 interface POSCartAndCheckoutProps {
   cart: CartItem[];
-  // Removed selectedMember and setSelectedMember props
+  selectedMember: Member | null;
   paymentMethod: PaymentMethod;
   setPaymentMethod: (method: PaymentMethod) => void;
   discountPercent: number;
@@ -31,7 +32,7 @@ interface POSCartAndCheckoutProps {
 
 const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
   cart,
-  // Removed selectedMember, setSelectedMember,
+  selectedMember,
   paymentMethod,
   setPaymentMethod,
   discountPercent,
@@ -67,9 +68,12 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
       </CardHeader>
       <CardContent className="flex flex-col flex-1">
         
-        {/* Member Selection removed */}
+        {/* Member Selection Display */}
         <div className="mb-4 text-sm text-muted-foreground p-2 border rounded-md">
-            {t("member_customer")}: Guest Customer
+            {t("member_customer")}: 
+            <span className="font-medium text-foreground ml-1">
+                {selectedMember ? `${selectedMember.name} (${selectedMember.id})` : t("guest_customer")}
+            </span>
         </div>
 
         {/* Cart Items List */}
