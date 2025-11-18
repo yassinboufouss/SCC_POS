@@ -195,11 +195,19 @@ const POSPage = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">{t("point_of_sale")}</h1>
-      
+    <div className="min-h-screen p-4 lg:p-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
+        {/* Product Selection (2/3 width) */}
+        <div className="lg:col-span-2">
+          <POSProductSelection
+            inventorySearchTerm={inventorySearchTerm}
+            setInventorySearchTerm={setInventorySearchTerm}
+            addInventoryToCart={addInventoryToCart}
+            addMembershipToCart={addMembershipToCart}
+          />
+        </div>
+
         {/* Cart & Checkout (1/3 width) */}
         <div className="lg:col-span-1 flex flex-col space-y-6">
             <POSCheckIn />
@@ -218,16 +226,6 @@ const POSPage = () => {
                 tax={tax}
                 total={total}
             />
-        </div>
-
-        {/* Product Selection (2/3 width) */}
-        <div className="lg:col-span-2 order-first lg:order-last">
-          <POSProductSelection
-            inventorySearchTerm={inventorySearchTerm}
-            setInventorySearchTerm={setInventorySearchTerm}
-            addInventoryToCart={addInventoryToCart}
-            addMembershipToCart={addMembershipToCart}
-          />
         </div>
       </div>
     </div>
