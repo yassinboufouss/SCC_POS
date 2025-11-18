@@ -226,5 +226,14 @@ export const en = {
     "pos_register_tab": "New Member Registration",
     "registration_and_cart_success": "Registration complete. {{name}} selected and plan added to cart.",
     "plan_not_found_after_registration": "Plan details not found after registration, please check cart manually.",
+    
+    // New Transaction Details Keys
+    "view_details": "View Details",
+    "transaction_details": "Transaction Details",
+    "transaction_id": "Transaction ID",
+    "sale_type": "Sale Type",
+    "items_purchased": "Items Purchased",
+    "transaction_date_time": "Date & Time",
+    "total_amount": "Total Amount",
   }
 };

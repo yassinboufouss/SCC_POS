@@ -226,5 +226,14 @@ export const ar = {
     "pos_register_tab": "تسجيل عضو جديد",
     "registration_and_cart_success": "اكتمل التسجيل. تم اختيار {{name}} وإضافة الخطة إلى العربة.",
     "plan_not_found_after_registration": "لم يتم العثور على تفاصيل الخطة بعد التسجيل، يرجى التحقق من العربة يدويًا.",
+    
+    // New Transaction Details Keys
+    "view_details": "عرض التفاصيل",
+    "transaction_details": "تفاصيل المعاملة",
+    "transaction_id": "معرف المعاملة",
+    "sale_type": "نوع البيع",
+    "items_purchased": "العناصر المشتراة",
+    "transaction_date_time": "التاريخ والوقت",
+    "total_amount": "المبلغ الإجمالي",
   }
 };

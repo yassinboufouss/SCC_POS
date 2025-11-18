@@ -226,5 +226,14 @@ export const fr = {
     "pos_register_tab": "Inscription Nouveau Membre",
     "registration_and_cart_success": "Inscription terminée. تم اختيار {{name}} وإضافة الخطة إلى العربة.",
     "plan_not_found_after_registration": "Détails du plan introuvables après l'inscription, veuillez vérifier le panier manuellement.",
+    
+    // New Transaction Details Keys
+    "view_details": "Voir les Détails",
+    "transaction_details": "Détails de la Transaction",
+    "transaction_id": "ID de la Transaction",
+    "sale_type": "Type de Vente",
+    "items_purchased": "Articles Achetés",
+    "transaction_date_time": "Date et Heure",
+    "total_amount": "Montant Total",
   }
 };

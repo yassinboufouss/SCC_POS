@@ -6,6 +6,7 @@ import { DollarSign } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { formatCurrency } from '@/utils/currency-utils';
 import { format } from 'date-fns';
+import TransactionDetailsDialog from './TransactionDetailsDialog';
 
 interface TransactionsTableProps {
     transactions: Transaction[];
@@ -31,6 +32,7 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({ transactions }) =
               <TableHead className="text-right">{t("amount")}</TableHead>
               <TableHead className="text-right">{t("payment")}</TableHead>
               <TableHead className="w-[100px] text-right">{t("date")}</TableHead>
+              <TableHead className="w-[50px] text-right">{t("actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -53,11 +55,14 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({ transactions }) =
                   <TableCell className="text-right text-xs text-muted-foreground">
                     {tx.transaction_date ? format(new Date(tx.transaction_date), 'yyyy-MM-dd') : 'N/A'}
                   </TableCell>
+                  <TableCell className="text-right">
+                    <TransactionDetailsDialog transaction={tx} />
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                  <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
+                  <TableCell colSpan={8} className="h-24 text-center text-muted-foreground">
                       {t("no_recent_transactions")}
                   </TableCell>
               </TableRow>
