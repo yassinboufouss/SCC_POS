@@ -271,5 +271,9 @@ export const ar = {
     // New keys for ProtectedRoute error handling
     "please_refresh_or_contact_support": "تعذر تحميل بيانات ملفك الشخصي. يرجى تحديث الصفحة أو الاتصال بالدعم.",
     "refresh": "تحديث",
+    
+    // Theme Toggle Keys
+    "light_mode": "الوضع الفاتح",
+    "dark_mode": "الوضع الداكن",
   }
 };

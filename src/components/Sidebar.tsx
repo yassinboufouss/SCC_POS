@@ -4,9 +4,10 @@ import { Users, ShoppingCart, LogOut, Package, Ticket, QrCode, LayoutDashboard, 
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
+import ThemeToggle from './ThemeToggle'; // Import ThemeToggle
 import { supabase } from '@/integrations/supabase/client';
 import { showError } from '@/utils/toast';
-import { useUserRole } from '@/hooks/use-user-role'; // Import role hook
+import { useUserRole } from '@/hooks/use-user-role';
 
 const navItems = [
   { nameKey: 'dashboard', href: '/dashboard', icon: LayoutDashboard, roles: ['owner', 'manager', 'cashier'] },
@@ -16,14 +17,14 @@ const navItems = [
   { nameKey: 'inventory', href: '/inventory', icon: Package, roles: ['owner', 'manager'] },
   { nameKey: 'membership_plans', href: '/plans', icon: Ticket, roles: ['owner', 'manager'] },
   { nameKey: 'transactions', href: '/transactions', icon: History, roles: ['owner', 'manager', 'cashier'] },
-  { nameKey: 'role_management', href: '/roles', icon: Shield, roles: ['owner'] }, // New role management link
+  { nameKey: 'role_management', href: '/roles', icon: Shield, roles: ['owner'] },
 ];
 
 const Sidebar: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
-  const { role, isOwner } = useUserRole(); // Use role hook
+  const { role, isOwner } = useUserRole();
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -71,7 +72,8 @@ const Sidebar: React.FC = () => {
         })}
       </nav>
       
-      <div className="mt-auto pt-4 border-t border-sidebar-border">
+      <div className="mt-auto pt-4 border-t border-sidebar-border space-y-2">
+        <ThemeToggle /> {/* Added Theme Toggle */}
         <LanguageSwitcher />
         <button
           onClick={handleLogout}

@@ -271,5 +271,9 @@ export const en = {
     // New keys for ProtectedRoute error handling
     "please_refresh_or_contact_support": "Your profile data could not be loaded. Please refresh the page or contact support.",
     "refresh": "Refresh",
+    
+    // Theme Toggle Keys
+    "light_mode": "Light Mode",
+    "dark_mode": "Dark Mode",
   }
 };

@@ -237,8 +237,8 @@ export const fr = {
     "transaction_id": "ID de la Transaction",
     "sale_type": "Type de Vente",
     "items_purchased": "Articles Achetés",
-    "transaction_date_time": "التاريخ والوقت",
-    "total_amount": "المبلغ الإجمالي",
+    "transaction_date_time": "Date et Heure",
+    "total_amount": "Montant Total",
     "lookup_failed": "Échec de la recherche de membre. Veuillez réessayer.",
     "free_giveaway_item": "Article Cadeau Gratuit",
     "select_optional_item": "Sélectionner un article optionnel",
@@ -271,5 +271,9 @@ export const fr = {
     // New keys for ProtectedRoute error handling
     "please_refresh_or_contact_support": "Vos données de profil n'ont pas pu être chargées. Veuillez rafraîchir la page ou contacter le support.",
     "refresh": "Rafraîchir",
+    
+    // Theme Toggle Keys
+    "light_mode": "Mode Clair",
+    "dark_mode": "Mode Sombre",
   }
 };
