@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { format, isToday, isThisWeek, isThisMonth } from "date-fns";
 
 // Utility to simulate adding a new transaction
-export const addTransaction = async (newTransaction: Omit<Transaction, 'id' | 'created_at'>): Promise<Transaction | null> => {
+export const addTransaction = async (newTransaction: Omit<Transaction, 'id' | 'created_at' | 'transaction_date'>): Promise<Transaction | null> => {
     const transactionData = {
         ...newTransaction,
         transaction_date: format(new Date(), 'yyyy-MM-dd'), // Ensure date is current

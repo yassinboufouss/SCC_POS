@@ -55,7 +55,7 @@ export const useMemberTransactions = (memberId: string) => {
 export const useAddTransaction = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (newTransaction: Omit<Transaction, 'id' | 'created_at'>) => addTransaction(newTransaction),
+    mutationFn: (newTransaction: Omit<Transaction, 'id' | 'created_at' | 'transaction_date'>) => addTransaction(newTransaction),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.metrics });

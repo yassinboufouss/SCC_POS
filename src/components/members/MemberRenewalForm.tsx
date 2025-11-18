@@ -9,12 +9,14 @@ import { Separator } from '@/components/ui/separator';
 import { Profile } from '@/types/supabase';
 import { usePlans } from '@/integrations/supabase/data/use-plans.ts';
 import { useRenewMemberPlan } from '@/integrations/supabase/data/use-members.ts';
+import { useAddTransaction } from '@/integrations/supabase/data/use-transactions.ts'; // Import transaction hook
 import { showSuccess, showError } from '@/utils/toast';
 import { useTranslation } from 'react-i18next';
 import { format, addDays } from 'date-fns';
 import { CreditCard, Ticket } from 'lucide-react';
 import { formatCurrency } from '@/utils/currency-utils';
 import { Skeleton } from '@/components/ui/skeleton';
+import { PaymentMethod } from '@/types/pos';
 
 interface MemberRenewalFormProps {
   member: Profile;
@@ -30,8 +32,11 @@ type RenewalFormValues = z.infer<typeof formSchema>;
 const MemberRenewalForm: React.FC<MemberRenewalFormProps> = ({ member }) => {
   const { t } = useTranslation();
   const { data: membershipPlans, isLoading: isLoadingPlans } = usePlans();
-  const { mutateAsync: renewPlan, isPending } = useRenewMemberPlan();
+  const { mutateAsync: renewPlan, isPending: isRenewing } = useRenewMemberPlan();
+  const { mutateAsync: recordTransaction, isPending: isRecording } = useAddTransaction();
   
+  const isPending = isRenewing || isRecording;
+
   const form = useForm<RenewalFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -69,11 +74,22 @@ const MemberRenewalForm: React.FC<MemberRenewalFormProps> = ({ member }) => {
 
 
   const onSubmit = async (values: RenewalFormValues) => {
+    if (!selectedPlan) return;
+    
     try {
         const updatedMember = await renewPlan({ profileId: member.id, planId: values.planId });
 
         if (updatedMember) {
-            // In a real app, we would also record a transaction here using values.paymentMethod
+            // 1. Record Transaction
+            await recordTransaction({
+                member_id: updatedMember.member_code || updatedMember.id,
+                member_name: `${updatedMember.first_name} ${updatedMember.last_name}`,
+                type: 'Membership',
+                item_description: `${selectedPlan.name} Renewal (${selectedPlan.duration_days} days)`,
+                amount: selectedPlan.price,
+                payment_method: values.paymentMethod as PaymentMethod,
+            });
+            
             showSuccess(t("renewal_success", { name: `${updatedMember.first_name} ${updatedMember.last_name}`, date: updatedMember.expiration_date }));
             // Invalidation handled by hook
         } else {

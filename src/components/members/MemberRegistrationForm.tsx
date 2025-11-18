@@ -12,13 +12,14 @@ import { useAddMember, NewMemberInput } from '@/integrations/supabase/data/use-m
 import { showSuccess, showError } from '@/utils/toast';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
-import { CalendarIcon, UserPlus } from 'lucide-react';
+import { CalendarIcon, UserPlus, CreditCard } from 'lucide-react';
 import { formatCurrency } from '@/utils/currency-utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Profile } from '@/types/supabase'; // Import Profile type
+import { PaymentMethod } from '@/types/pos'; // Import PaymentMethod type
 
 interface MemberRegistrationFormProps {
-  onSuccess: (member: Profile, planId: string) => void;
+  onSuccess: (member: Profile, planId: string, paymentMethod: PaymentMethod) => void;
 }
 
 const formSchema = z.object({
@@ -28,6 +29,7 @@ const formSchema = z.object({
   phone: z.string().min(10, { message: "Phone number must be at least 10 digits." }),
   dob: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, { message: "Date of Birth must be in YYYY-MM-DD format." }),
   planId: z.string().min(1, { message: "Please select a membership plan." }),
+  paymentMethod: z.enum(['Card', 'Cash', 'Transfer'], { required_error: "Please select a payment method." }),
 });
 
 type RegistrationFormValues = z.infer<typeof formSchema>;
@@ -46,6 +48,7 @@ const MemberRegistrationForm: React.FC<MemberRegistrationFormProps> = ({ onSucce
       phone: "",
       dob: format(new Date(2000, 0, 1), 'yyyy-MM-dd'), // Default to 2000-01-01
       planId: "",
+      paymentMethod: 'Cash',
     },
   });
 
@@ -57,6 +60,7 @@ const MemberRegistrationForm: React.FC<MemberRegistrationFormProps> = ({ onSucce
       phone: values.phone,
       dob: values.dob,
       planId: values.planId,
+      paymentMethod: values.paymentMethod, // Pass payment method
     };
 
     try {
@@ -64,7 +68,20 @@ const MemberRegistrationForm: React.FC<MemberRegistrationFormProps> = ({ onSucce
 
         if (newMember) {
             showSuccess(t("registration_success", { name: `${newMember.first_name} ${newMember.last_name}`, date: newMember.expiration_date }));
-            onSuccess(newMember, values.planId);
+            
+            // Call onSuccess with payment method
+            onSuccess(newMember, values.planId, values.paymentMethod); 
+            
+            // Reset form fields except for planId and paymentMethod if desired, but for simplicity, reset all.
+            form.reset({
+                first_name: "",
+                last_name: "",
+                email: "",
+                phone: "",
+                dob: format(new Date(2000, 0, 1), 'yyyy-MM-dd'),
+                planId: values.planId, // Keep selected plan for quick re-registration
+                paymentMethod: values.paymentMethod,
+            });
         } else {
             showError(t("registration_failed"));
         }
@@ -202,6 +219,31 @@ const MemberRegistrationForm: React.FC<MemberRegistrationFormProps> = ({ onSucce
                 <p className="text-muted-foreground mt-1">{selectedPlan.description}</p>
               </div>
             )}
+            
+            {/* Payment Method Selection */}
+            <FormField
+              control={form.control}
+              name="paymentMethod"
+              render={({ field }) => (
+                <FormItem className="mt-4">
+                  <FormLabel className="flex items-center gap-1"><CreditCard className="h-4 w-4" /> {t("select_payment_method")}</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder={t("select_payment_method")} />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Card">{t("card")}</SelectItem>
+                      <SelectItem value="Cash">{t("cash")}</SelectItem>
+                      <SelectItem value="Transfer">{t("transfer")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
           </CardContent>
         </Card>
 

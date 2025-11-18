@@ -1,6 +1,8 @@
 import { Profile } from "@/types/supabase";
 import { supabase } from "@/integrations/supabase/client";
 import { addDays, format } from "date-fns";
+import { addTransaction } from "./transaction-utils"; // Import transaction utility
+import { PaymentMethod } from "@/types/pos"; // Import PaymentMethod type
 
 // Define the expected input structure from the registration form
 export type NewMemberInput = {
@@ -10,6 +12,7 @@ export type NewMemberInput = {
   phone: string;
   dob: string;
   planId: string;
+  paymentMethod: PaymentMethod; // Added payment method
 };
 
 // Utility to update member data (used internally by other utils)
@@ -33,13 +36,15 @@ export const updateMemberStatus = async (profileId: string, newStatus: Profile['
   return updateProfile({ id: profileId, status: newStatus, updated_at: new Date().toISOString() });
 };
 
-// Utility to simulate adding a new member (This should ideally be handled by Supabase Auth trigger, but we simulate the profile creation here for the mock flow)
+// Utility to simulate adding a new member (Used by standalone registration and POS registration tab)
 export const addMember = async (newMemberData: NewMemberInput): Promise<Profile | null> => {
-  // Fetch plan details (assuming we have a way to get plan data, which we will implement via React Query later, but for now, we use a direct fetch)
+  const { planId, paymentMethod, ...memberDetails } = newMemberData;
+  
+  // 1. Fetch plan details
   const { data: planData, error: planError } = await supabase
     .from('membership_plans')
-    .select('name, duration_days')
-    .eq('id', newMemberData.planId)
+    .select('id, name, duration_days, price')
+    .eq('id', planId)
     .single();
 
   if (planError || !planData) {
@@ -47,14 +52,14 @@ export const addMember = async (newMemberData: NewMemberInput): Promise<Profile 
     throw new Error("Plan not found.");
   }
   
-  // 1. Sign up the user via Auth
+  // 2. Sign up the user via Auth
   const { data: authData, error: authError } = await supabase.auth.signUp({
-      email: newMemberData.email,
+      email: memberDetails.email,
       password: 'password123', // Mock password for registration flow
       options: {
           data: {
-              first_name: newMemberData.first_name,
-              last_name: newMemberData.last_name,
+              first_name: memberDetails.first_name,
+              last_name: memberDetails.last_name,
           }
       }
   });
@@ -69,19 +74,19 @@ export const addMember = async (newMemberData: NewMemberInput): Promise<Profile 
   const startDate = new Date();
   const expirationDate = addDays(startDate, planData.duration_days);
   
-  // 2. Update the profile created by the trigger (handle_new_user) with membership details.
+  // 3. Update the profile created by the trigger (handle_new_user) with membership details.
   const newProfileData = {
     id: userId,
-    first_name: newMemberData.first_name,
-    last_name: newMemberData.last_name,
-    phone: newMemberData.phone,
-    dob: newMemberData.dob,
+    first_name: memberDetails.first_name,
+    last_name: memberDetails.last_name,
+    phone: memberDetails.phone,
+    dob: memberDetails.dob,
     plan_name: planData.name,
     status: "Active" as const,
     start_date: format(startDate, 'yyyy-MM-dd'),
     expiration_date: format(expirationDate, 'yyyy-MM-dd'),
     updated_at: new Date().toISOString(),
-    email: newMemberData.email, // Include email for consistency with the new type
+    email: memberDetails.email,
   };
 
   const { data: profile, error: profileError } = await supabase
@@ -91,22 +96,37 @@ export const addMember = async (newMemberData: NewMemberInput): Promise<Profile 
     .select()
     .single();
 
-  if (profileError) {
+  if (profileError || !profile) {
     console.error("Supabase Profile Update Error:", profileError);
-    // If profile update fails, we should ideally delete the auth user, but for simplicity, we throw the error.
     throw new Error("Failed to finalize member registration: Profile update failed.");
   }
   
+  // 4. Record the initial transaction
+  try {
+      await addTransaction({
+          member_id: profile.member_code || profile.id,
+          member_name: `${profile.first_name} ${profile.last_name}`,
+          type: 'Membership',
+          item_description: `${planData.name} (${planData.duration_days} days)`,
+          amount: planData.price,
+          payment_method: paymentMethod,
+      });
+  } catch (txError) {
+      console.error("Failed to record initial registration transaction:", txError);
+      // Proceed anyway
+  }
+
   return profile;
 };
 
 
-// Utility to simulate renewing a member's plan
+// Utility to simulate renewing a member's plan (Used by POS checkout and Member Profile Renewal Form)
+// NOTE: This utility only updates the profile (plan, dates, status). Transaction recording must be handled by the caller.
 export const renewMemberPlan = async (profileId: string, planId: string): Promise<Profile | null> => {
   // 1. Fetch current profile and plan details
   const [{ data: profile, error: profileError }, { data: planData, error: planError }] = await Promise.all([
-    supabase.from('profiles').select('expiration_date').eq('id', profileId).single(),
-    supabase.from('membership_plans').select('name, duration_days').eq('id', planId).single(),
+    supabase.from('profiles').select('expiration_date, first_name, last_name, member_code').eq('id', profileId).single(),
+    supabase.from('membership_plans').select('name, duration_days, price').eq('id', planId).single(),
   ]);
 
   if (profileError || !profile) {
@@ -141,7 +161,11 @@ export const renewMemberPlan = async (profileId: string, planId: string): Promis
     updated_at: new Date().toISOString(),
   };
 
-  return updateProfile({ id: profileId, ...updatedProfileData });
+  const updatedProfile = await updateProfile({ id: profileId, ...updatedProfileData });
+  
+  // NOTE: Transaction recording is handled by the caller (MemberRenewalForm or POSPage)
+  
+  return updatedProfile;
 };
 
 // Utility to simulate a member check-in

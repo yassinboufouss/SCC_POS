@@ -75,6 +75,8 @@ const POSPage = () => {
   
   const addMembershipToCart = (plan: MembershipPlan) => {
     setCart(prevCart => {
+        // Check if a membership item is already in the cart. We generally only sell one plan at a time in POS.
+        // However, if we allow stacking, we allow multiple. Let's allow multiple for flexibility.
         const existingItem = prevCart.find(i => i.sourceId === plan.id && i.type === 'membership');
 
         if (existingItem) {
@@ -136,24 +138,22 @@ const POSPage = () => {
   // Handler for member lookup via check-in scanner
   const handleMemberFound = (member: Profile) => {
       setSelectedMember(member);
-      // If the member is not active, prompt for renewal by adding a generic membership item to the cart
-      // NOTE: We won't automatically add an item, but selecting the member is enough to proceed with renewal in the POS flow.
   };
   
-  const handleRegistrationSuccess = (member: Profile, planId: string) => {
+  // Handler for successful registration via POS tab
+  const handleRegistrationSuccess = (member: Profile, planId: string, paymentMethod: PaymentMethod) => {
     // 1. Select the new member
     setSelectedMember(member);
     
-    // 2. Add the purchased plan to the cart
-    const plan = membershipPlans?.find(p => p.id === planId);
-    if (plan) {
-        addMembershipToCart(plan);
-        showSuccess(t("registration_and_cart_success", { name: `${member.first_name} ${member.last_name}` }));
-    } else {
-        showError(t("plan_not_found_after_registration"));
-    }
+    // 2. Set the payment method used for registration (if the user proceeds to buy inventory items)
+    setPaymentMethod(paymentMethod);
     
-    // 3. Switch back to the products tab
+    // 3. The plan is already activated and transaction recorded by addMember utility. 
+    // We do NOT add the plan to the cart here to avoid double activation/transaction.
+    
+    showSuccess(t("registration_success", { name: `${member.first_name} ${member.last_name}`, date: member.expiration_date }));
+    
+    // 4. Switch back to the products tab
     setActiveTab('products');
   };
 
@@ -202,7 +202,7 @@ const POSPage = () => {
             await reduceInventoryStock(item.sourceId, item.quantity);
         }));
         
-        // 2. Process Membership Renewals (if a member is selected)
+        // 2. Process Membership Renewals (if a member is selected AND membership items are in the cart)
         const membershipItemsSold = cart.filter(item => item.type === 'membership');
         
         if (selectedMember && membershipItemsSold.length > 0) {
@@ -239,17 +239,20 @@ const POSPage = () => {
         const memberId = selectedMember?.id || 'GUEST';
         const memberName = selectedMember ? `${selectedMember.first_name} ${selectedMember.last_name}` : t('guest_customer');
         
-        const newTransaction = {
-            member_id: memberId,
-            member_name: memberName,
-            type: transactionType,
-            item_description: itemDescription,
-            amount: total,
-            payment_method: paymentMethod,
-            transaction_date: format(new Date(), 'yyyy-MM-dd'),
-        };
+        // Only record a transaction if the total is greater than zero (i.e., if there are items in the cart)
+        if (total > 0) {
+            const newTransaction = {
+                member_id: memberId,
+                member_name: memberName,
+                type: transactionType,
+                item_description: itemDescription,
+                amount: total,
+                payment_method: paymentMethod,
+            };
 
-        await addTransaction(newTransaction);
+            await addTransaction(newTransaction);
+        }
+
 
         showSuccess(t("sale_processed_success", { 
             type: transactionType, 
@@ -261,6 +264,8 @@ const POSPage = () => {
         queryClient.invalidateQueries({ queryKey: ['inventory'] });
         queryClient.invalidateQueries({ queryKey: ['dashboard'] });
         queryClient.invalidateQueries({ queryKey: ['transactions'] });
+        queryClient.invalidateQueries({ queryKey: ['profiles'] }); // Invalidate profiles to reflect renewal status
+
         
         // Reset state
         setCart([]);
