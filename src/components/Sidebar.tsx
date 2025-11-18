@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Users, ShoppingCart, LogOut, Package, Ticket, QrCode } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from './LanguageSwitcher';
 
 const navItems = [
   { nameKey: 'pos', href: '/pos', icon: ShoppingCart },
@@ -44,6 +45,7 @@ const Sidebar: React.FC = () => {
       </nav>
       
       <div className="mt-auto pt-4 border-t border-sidebar-border">
+        <LanguageSwitcher />
         <Link
           to="/"
           className="flex items-center gap-3 rounded-lg px-3 py-2 text-red-400 transition-all hover:bg-red-900/20"
