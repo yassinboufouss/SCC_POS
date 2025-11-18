@@ -11,7 +11,7 @@ import {
   ShoppingCart,
   Ticket,
 } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 const navItems = [
@@ -82,12 +82,19 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ className }: SidebarProps) => {
+  const navigate = useNavigate();
   // Placeholder for current user role (assuming Admin for full view initially)
   const currentUserRole = "Admin"; 
 
   const filteredNavItems = navItems.filter(item => 
     item.roles.includes(currentUserRole)
   );
+  
+  const handleLogout = () => {
+    // In a real app, this would clear auth tokens/session state
+    console.log("User logged out.");
+    navigate("/");
+  };
 
   return (
     <div
@@ -118,7 +125,11 @@ const Sidebar = ({ className }: SidebarProps) => {
       </nav>
       <div className="mt-auto pt-4 border-t border-sidebar-border">
         {/* Placeholder for User Profile/Logout */}
-        <Button variant="ghost" className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent">
+        <Button 
+          variant="ghost" 
+          className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent"
+          onClick={handleLogout}
+        >
           Logout
         </Button>
       </div>
