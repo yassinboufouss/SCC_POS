@@ -22,3 +22,23 @@ export const restockInventoryItem = (itemId: string, quantity: number) => {
   }
   return null;
 };
+
+// Utility to simulate adding a new inventory item
+export const addInventoryItem = (newItemData: Omit<InventoryItem, 'id' | 'lastRestock'> & { initialStock: number }): InventoryItem => {
+  const id = `INV${(inventoryItems.length + 1).toString().padStart(3, '0')}`; // Mock ID generation
+  const now = format(new Date(), 'yyyy-MM-dd');
+
+  const newItem: InventoryItem = {
+    id,
+    name: newItemData.name,
+    category: newItemData.category,
+    stock: newItemData.initialStock,
+    price: newItemData.price,
+    lastRestock: now,
+    imageUrl: newItemData.imageUrl || undefined,
+  };
+
+  inventoryItems.push(newItem);
+  console.log("Added Inventory Item:", newItem);
+  return newItem;
+};
