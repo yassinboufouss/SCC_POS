@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import POSPage from "./pages/POSPage";
+import MembersPage from "./pages/MembersPage";
 
 const queryClient = new QueryClient();
 
@@ -14,8 +15,14 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          {/* Public Route */}
           <Route path="/" element={<Index />} />
+          
+          {/* Protected Routes (Wrapped in Layout in their respective files) */}
           <Route path="/pos" element={<POSPage />} />
+          <Route path="/members" element={<MembersPage />} />
+          
+          {/* Fallback */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
