@@ -42,10 +42,12 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
           
           // Merge email from the User object into the profile object
           if (userProfile) {
-              setProfile({ ...userProfile, email: currentUser.email || null });
+              const completeProfile = { ...userProfile, email: currentUser.email || null };
+              setProfile(completeProfile);
+              console.log("Profile fetched successfully:", completeProfile.role);
           } else {
               // If profile doesn't exist yet, create a minimal profile object with email
-              setProfile({
+              const minimalProfile = {
                   id: currentUser.id,
                   email: currentUser.email || null,
                   role: 'staff', // Default role if profile fetch fails (shouldn't happen if trigger works)
@@ -62,7 +64,9 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
                   expiration_date: null,
                   last_check_in: null,
                   total_check_ins: 0,
-              } as Profile);
+              } as Profile;
+              setProfile(minimalProfile);
+              console.log("Minimal profile created:", minimalProfile.role);
           }
       } catch (e) {
           console.error("Failed to fetch profile after sign in:", e);
