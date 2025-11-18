@@ -280,5 +280,21 @@ export const fr = {
     "filter_by_payment": "Filtrer par Paiement",
     "pick_a_date_range": "Choisir une plage de dates",
     "clear_filters": "Effacer les Filtres",
+    
+    // Delete Keys
+    "delete_item": "Supprimer l'Article",
+    "delete_plan": "Supprimer le Plan",
+    "confirm_deletion": "Confirmer la Suppression",
+    "delete_item_confirmation": "Êtes-vous sûr de vouloir supprimer définitivement l'article d'inventaire '{{name}}' ? Cette action est irréversible.",
+    "delete_plan_confirmation": "Êtes-vous sûr de vouloir supprimer définitivement le plan d'adhésion '{{name}}' ? Cette action est irréversible et pourrait affecter les membres existants.",
+    "confirm_delete": "Oui, Supprimer",
+    "deleting": "Suppression en cours...",
+    "item_deleted_success": "Article d'inventaire '{{name}}' supprimé avec succès.",
+    "plan_deleted_success": "Plan d'adhésion '{{name}}' supprimé avec succès.",
+    "cancel": "Annuler",
+    
+    // Chart Keys
+    "monthly_revenue_trend": "Tendance des Revenus Mensuels (6 Derniers Mois)",
+    "revenue": "Revenu",
   }
 };

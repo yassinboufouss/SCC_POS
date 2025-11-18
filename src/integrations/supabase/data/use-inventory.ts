@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { InventoryItem } from '@/types/supabase';
 import { queryKeys } from './query-keys.ts';
-import { addInventoryItem, updateInventoryItem, restockInventoryItem } from '@/utils/inventory-utils';
+import { addInventoryItem, updateInventoryItem, restockInventoryItem, deleteInventoryItem } from '@/utils/inventory-utils';
 import { NewInventoryItemInput } from '@/types/pos';
 
 // --- Fetch Hooks ---
@@ -61,6 +61,17 @@ export const useRestockInventoryItem = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ itemId, quantity, currentStock }: { itemId: string, quantity: number, currentStock: number }) => restockInventoryItem(itemId, quantity, currentStock),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.inventory.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.metrics });
+    },
+  });
+};
+
+export const useDeleteInventoryItem = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (itemId: string) => deleteInventoryItem(itemId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.inventory.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.metrics });

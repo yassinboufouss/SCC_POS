@@ -79,3 +79,16 @@ export const reduceInventoryStock = async (itemId: string, quantity: number): Pr
         throw new Error("Failed to reduce inventory stock.");
     }
 };
+
+// Utility to delete an inventory item
+export const deleteInventoryItem = async (itemId: string): Promise<void> => {
+    const { error } = await supabase
+        .from('inventory_items')
+        .delete()
+        .eq('id', itemId);
+
+    if (error) {
+        console.error("Supabase deleteInventoryItem error:", error);
+        throw new Error("Failed to delete inventory item.");
+    }
+};

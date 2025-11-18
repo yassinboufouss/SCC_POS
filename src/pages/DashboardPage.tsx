@@ -6,9 +6,11 @@ import DashboardMetricCard from '@/components/dashboard/DashboardMetricCard';
 import ExpiringMemberships from '@/components/dashboard/ExpiringMemberships';
 import LowStockAlerts from '@/components/dashboard/LowStockAlerts';
 import RecentTransactionsTable from '@/components/dashboard/RecentTransactionsTable';
+import MonthlySalesChart from '@/components/dashboard/MonthlySalesChart';
 import { useDashboardMetrics } from '@/integrations/supabase/data/use-dashboard-metrics.ts';
 import { formatCurrency } from '@/utils/currency-utils';
 import { Skeleton } from '@/components/ui/skeleton';
+import { aggregateMonthlySales } from '@/utils/transaction-utils';
 
 const DashboardPage: React.FC = () => {
   const { t } = useTranslation();
@@ -33,9 +35,14 @@ const DashboardPage: React.FC = () => {
     expiringMemberships: [],
     lowStockItems: [],
     recentTransactions: [],
+    allTransactions: [], // Default for safety
   };
   
   const currentMetrics = metrics || defaultMetrics;
+  
+  // Calculate chart data using the full transaction list
+  const monthlySalesData = currentMetrics.allTransactions ? aggregateMonthlySales(currentMetrics.allTransactions) : [];
+
 
   const renderMetricCard = (titleKey: string, value: React.ReactNode, icon: LucideIcon, descriptionKey: string, isAlert = false) => (
     <DashboardMetricCard
@@ -81,20 +88,21 @@ const DashboardPage: React.FC = () => {
           )}
         </div>
         
-        {/* Alerts and Transactions */}
+        {/* Chart and Alerts */}
         <div className="grid gap-6 lg:grid-cols-3">
-          
-          {/* Alerts Column (1/3 width) */}
-          <div className="lg:col-span-1 space-y-6">
-            <ExpiringMemberships members={currentMetrics.expiringMemberships} isLoading={isLoading} />
-            <LowStockAlerts items={currentMetrics.lowStockItems} isLoading={isLoading} />
-          </div>
-          
-          {/* Recent Transactions (2/3 width) */}
-          <div className="lg:col-span-2">
-            <RecentTransactionsTable transactions={currentMetrics.recentTransactions} isLoading={isLoading} />
-          </div>
+            
+            {/* Chart Column (2/3 width) */}
+            <MonthlySalesChart data={monthlySalesData} isLoading={isLoading} />
+            
+            {/* Alerts Column (1/3 width) */}
+            <div className="lg:col-span-1 space-y-6">
+                <ExpiringMemberships members={currentMetrics.expiringMemberships} isLoading={isLoading} />
+                <LowStockAlerts items={currentMetrics.lowStockItems} isLoading={isLoading} />
+            </div>
         </div>
+        
+        {/* Recent Transactions (Full width below alerts) */}
+        <RecentTransactionsTable transactions={currentMetrics.recentTransactions} isLoading={isLoading} />
       </div>
     </Layout>
   );

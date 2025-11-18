@@ -16,6 +16,7 @@ export interface DashboardMetrics {
   expiringMemberships: Profile[];
   lowStockItems: InventoryItem[];
   recentTransactions: Transaction[];
+  allTransactions: Transaction[]; // NEW: Expose all transactions for charting
 }
 
 const fetchDashboardData = async (): Promise<{ profiles: Profile[], inventory: InventoryItem[], transactions: Transaction[] }> => {
@@ -26,7 +27,7 @@ const fetchDashboardData = async (): Promise<{ profiles: Profile[], inventory: I
     ] = await Promise.all([
         supabase.from('profiles').select('*'),
         supabase.from('inventory_items').select('*'),
-        // Fetch all transactions for local calculation of MTD/Daily/Recent
+        // Fetch all transactions for local calculation of MTD/Daily/Recent/Chart
         supabase.from('transactions').select('*'), 
     ]);
 
@@ -93,6 +94,7 @@ const calculateMetrics = (profiles: Profile[], inventory: InventoryItem[], trans
         expiringMemberships,
         lowStockItems,
         recentTransactions,
+        allTransactions: transactions, // Return the full list
     };
 };
 

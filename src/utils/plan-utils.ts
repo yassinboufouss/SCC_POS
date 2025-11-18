@@ -36,3 +36,18 @@ export const updateMembershipPlan = async (updatedPlan: Partial<MembershipPlan> 
     }
     return data;
 };
+
+/**
+ * Utility to delete a membership plan
+ */
+export const deleteMembershipPlan = async (planId: string): Promise<void> => {
+    const { error } = await supabase
+        .from('membership_plans')
+        .delete()
+        .eq('id', planId);
+
+    if (error) {
+        console.error("Supabase deleteMembershipPlan error:", error);
+        throw new Error("Failed to delete membership plan.");
+    }
+};

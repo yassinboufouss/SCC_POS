@@ -280,5 +280,21 @@ export const en = {
     "filter_by_payment": "Filter by Payment",
     "pick_a_date_range": "Pick a date range",
     "clear_filters": "Clear Filters",
+    
+    // Delete Keys
+    "delete_item": "Delete Item",
+    "delete_plan": "Delete Plan",
+    "confirm_deletion": "Confirm Deletion",
+    "delete_item_confirmation": "Are you sure you want to permanently delete the inventory item '{{name}}'? This action cannot be undone.",
+    "delete_plan_confirmation": "Are you sure you want to permanently delete the membership plan '{{name}}'? This action cannot be undone and may affect existing members.",
+    "confirm_delete": "Yes, Delete",
+    "deleting": "Deleting...",
+    "item_deleted_success": "Inventory item '{{name}}' deleted successfully.",
+    "plan_deleted_success": "Membership plan '{{name}}' deleted successfully.",
+    "cancel": "Cancel",
+    
+    // Chart Keys
+    "monthly_revenue_trend": "Monthly Revenue Trend (Last 6 Months)",
+    "revenue": "Revenue",
   }
 };

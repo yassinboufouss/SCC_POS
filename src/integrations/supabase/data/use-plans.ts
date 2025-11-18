@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { MembershipPlan } from '@/types/supabase';
 import { queryKeys } from './query-keys.ts';
-import { addMembershipPlan, updateMembershipPlan } from '@/utils/plan-utils';
+import { addMembershipPlan, updateMembershipPlan, deleteMembershipPlan } from '@/utils/plan-utils';
 import { NewPlanInput } from '@/types/pos';
 
 // --- Fetch Hooks ---
@@ -49,6 +49,16 @@ export const useUpdatePlan = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (updatedPlan: Partial<MembershipPlan> & { id: string }) => updateMembershipPlan(updatedPlan),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.plans.all });
+    },
+  });
+};
+
+export const useDeletePlan = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (planId: string) => deleteMembershipPlan(planId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.plans.all });
     },

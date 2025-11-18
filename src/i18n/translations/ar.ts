@@ -280,5 +280,21 @@ export const ar = {
     "filter_by_payment": "تصفية حسب الدفع",
     "pick_a_date_range": "اختر نطاقًا زمنيًا",
     "clear_filters": "مسح المرشحات",
+    
+    // Delete Keys
+    "delete_item": "حذف العنصر",
+    "delete_plan": "حذف الخطة",
+    "confirm_deletion": "تأكيد الحذف",
+    "delete_item_confirmation": "هل أنت متأكد أنك تريد حذف عنصر المخزون '{{name}}' نهائيًا؟ لا يمكن التراجع عن هذا الإجراء.",
+    "delete_plan_confirmation": "هل أنت متأكد أنك تريد حذف خطة العضوية '{{name}}' نهائيًا؟ لا يمكن التراجع عن هذا الإجراء وقد يؤثر على الأعضاء الحاليين.",
+    "confirm_delete": "نعم، احذف",
+    "deleting": "جاري الحذف...",
+    "item_deleted_success": "تم حذف عنصر المخزون '{{name}}' بنجاح.",
+    "plan_deleted_success": "تم حذف خطة العضوية '{{name}}' بنجاح.",
+    "cancel": "إلغاء",
+    
+    // Chart Keys
+    "monthly_revenue_trend": "اتجاه الإيرادات الشهرية (آخر 6 أشهر)",
+    "revenue": "الإيرادات",
   }
 };

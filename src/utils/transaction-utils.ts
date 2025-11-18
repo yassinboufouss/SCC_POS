@@ -1,6 +1,6 @@
 import { Transaction } from "@/types/supabase";
 import { supabase } from "@/integrations/supabase/client";
-import { format, isToday, isThisWeek, isThisMonth } from "date-fns";
+import { format, isToday, isThisWeek, isThisMonth, parseISO, startOfMonth, subMonths } from "date-fns";
 
 // Utility to simulate adding a new transaction
 export const addTransaction = async (newTransaction: Omit<Transaction, 'id' | 'created_at' | 'transaction_date'>): Promise<Transaction | null> => {
@@ -59,4 +59,49 @@ export const calculateSalesSummary = (transactions: Transaction[]): SalesSummary
         weeklyTotal,
         monthlyTotal,
     };
+};
+
+export interface MonthlySalesData {
+    month: string; // e.g., "Jan 24"
+    revenue: number;
+}
+
+/**
+ * Aggregates transactions into monthly revenue data for the last 6 months.
+ */
+export const aggregateMonthlySales = (transactions: Transaction[]): MonthlySalesData[] => {
+    const monthlyData: { [key: string]: number } = {};
+    const now = new Date();
+    
+    // Initialize data points for the last 6 months
+    for (let i = 0; i < 6; i++) {
+        const monthStart = startOfMonth(subMonths(now, i));
+        const monthKey = format(monthStart, 'MMM yy');
+        monthlyData[monthKey] = 0;
+    }
+
+    // Aggregate transactions
+    transactions.forEach(tx => {
+        if (tx.transaction_date) {
+            const txDate = parseISO(tx.transaction_date);
+            const monthKey = format(startOfMonth(txDate), 'MMM yy');
+            
+            if (monthlyData.hasOwnProperty(monthKey)) {
+                monthlyData[monthKey] += tx.amount;
+            }
+        }
+    });
+
+    // Convert to array and sort chronologically
+    const result = Object.keys(monthlyData).map(month => ({
+        month,
+        revenue: parseFloat(monthlyData[month].toFixed(2)),
+    })).sort((a, b) => {
+        // Simple sorting based on month string (e.g., Jan 24 < Feb 24)
+        const dateA = parseISO(a.month.replace(' ', ' 1, 20'));
+        const dateB = parseISO(b.month.replace(' ', ' 1, 20'));
+        return dateA.getTime() - dateB.getTime();
+    });
+    
+    return result;
 };
