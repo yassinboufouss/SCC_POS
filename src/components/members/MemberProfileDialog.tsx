@@ -10,7 +10,7 @@ import { User, Mail, Phone, Calendar, Clock, DollarSign, Edit, RefreshCw, Histor
 import { useTranslation } from 'react-i18next';
 import MemberRenewalForm from './MemberRenewalForm';
 import MemberStatusActions from './MemberStatusActions';
-import { useUpdateProfile } from '@/integrations/supabase/data/use-members.ts';
+import { useUpdateProfile, useMember } from '@/integrations/supabase/data/use-members.ts';
 import { useMemberTransactions } from '@/integrations/supabase/data/use-transactions.ts';
 import { showSuccess, showError } from '@/utils/toast';
 import { Input } from '@/components/ui/input';
@@ -20,47 +20,53 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 
 interface MemberProfileDialogProps {
-  member: Profile;
+  member: Profile; // Initial member data from the list
 }
 
 const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member }) => {
   const { t } = useTranslation();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('profile'); // State for active tab
+  const [activeTab, setActiveTab] = useState('profile'); 
   const [isEditing, setIsEditing] = useState(false);
   
-  // Local state for editing basic info
-  const [editFirstName, setEditFirstName] = useState(member.first_name || '');
-  const [editLastName, setEditLastName] = useState(member.last_name || '');
-  const [editEmail, setEditEmail] = useState(member.email || '');
-  const [editPhone, setEditPhone] = useState(member.phone || '');
-  const [editDob, setEditDob] = useState(member.dob || '');
+  // Fetch the freshest member data when the dialog is open
+  const { data: currentMember, isLoading: isLoadingMember } = useMember(member.id);
+  
+  // Use the freshest data available, fall back to prop if loading or not fetched yet
+  const displayMember = currentMember || member;
+
+  // Local state for editing basic info, initialized from displayMember
+  const [editFirstName, setEditFirstName] = useState(displayMember.first_name || '');
+  const [editLastName, setEditLastName] = useState(displayMember.last_name || '');
+  const [editEmail, setEditEmail] = useState(displayMember.email || '');
+  const [editPhone, setEditPhone] = useState(displayMember.phone || '');
+  const [editDob, setEditDob] = useState(displayMember.dob || '');
   
   const { mutateAsync: updateProfile, isPending: isSaving } = useUpdateProfile();
-  const { data: transactions, isLoading: isLoadingTransactions } = useMemberTransactions(member.id);
+  const { data: transactions, isLoading: isLoadingTransactions } = useMemberTransactions(displayMember.id);
 
-  // Reset local state when member changes
+  // Reset local state when the member data changes (either prop or fetched data)
   React.useEffect(() => {
-    setEditFirstName(member.first_name || '');
-    setEditLastName(member.last_name || '');
-    // Note: Email is managed by Auth, but we keep it here for display/mock editing
-    setEditEmail(member.email || ''); 
-    setEditPhone(member.phone || '');
-    setEditDob(member.dob || '');
+    setEditFirstName(displayMember.first_name || '');
+    setEditLastName(displayMember.last_name || '');
+    setEditEmail(displayMember.email || ''); 
+    setEditPhone(displayMember.phone || '');
+    setEditDob(displayMember.dob || '');
     setIsEditing(false);
-    // Reset tab to profile whenever the member prop changes
-    setActiveTab('profile');
-  }, [member]);
+  }, [displayMember]);
   
   const handleOpenChange = (open: boolean) => {
       setIsDialogOpen(open);
       if (open) {
           // If membership is inactive, default to the renewal tab
-          if (member.status !== 'Active') {
+          if (displayMember.status !== 'Active') {
               setActiveTab('renewal');
           } else {
               setActiveTab('profile');
           }
+      } else {
+          // Reset tab when closing
+          setActiveTab('profile');
       }
   };
 
@@ -84,7 +90,7 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member }) => 
     }
     
     const updatedData: Partial<Profile> & { id: string } = {
-        id: member.id,
+        id: displayMember.id,
         first_name: editFirstName,
         last_name: editLastName,
         phone: editPhone,
@@ -99,6 +105,25 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member }) => 
         showError(t("update_failed"));
     }
   };
+  
+  if (isLoadingMember && isDialogOpen) {
+      return (
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                  <Button variant="outline" size="sm">
+                      <Edit className="h-4 w-4" />
+                  </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[800px]">
+                  <Skeleton className="h-6 w-1/2 mb-4" />
+                  <div className="space-y-4">
+                      <Skeleton className="h-10 w-full" />
+                      <Skeleton className="h-40 w-full" />
+                  </div>
+              </DialogContent>
+          </Dialog>
+      );
+  }
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={handleOpenChange}>
@@ -110,7 +135,7 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member }) => 
       <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <User className="h-5 w-5" /> {member.first_name} {member.last_name} ({member.member_code || member.id.substring(0, 8)}...)
+            <User className="h-5 w-5" /> {displayMember.first_name} {displayMember.last_name} ({displayMember.member_code || displayMember.id.substring(0, 8)}...)
           </DialogTitle>
         </DialogHeader>
         
@@ -161,10 +186,10 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member }) => 
                     </div>
                 ) : (
                     <div className="grid grid-cols-2 gap-4 text-sm">
-                        <p className="flex items-center gap-2"><User className="h-4 w-4 text-muted-foreground" /> {member.first_name} {member.last_name}</p>
-                        <p className="flex items-center gap-2"><Mail className="h-4 w-4 text-muted-foreground" /> {member.email || 'N/A'}</p>
-                        <p className="flex items-center gap-2"><Phone className="h-4 w-4 text-muted-foreground" /> {member.phone || 'N/A'}</p>
-                        <p className="flex items-center gap-2"><Calendar className="h-4 w-4 text-muted-foreground" /> {member.dob || 'N/A'}</p>
+                        <p className="flex items-center gap-2"><User className="h-4 w-4 text-muted-foreground" /> {displayMember.first_name} {displayMember.last_name}</p>
+                        <p className="flex items-center gap-2"><Mail className="h-4 w-4 text-muted-foreground" /> {displayMember.email || 'N/A'}</p>
+                        <p className="flex items-center gap-2"><Phone className="h-4 w-4 text-muted-foreground" /> {displayMember.phone || 'N/A'}</p>
+                        <p className="flex items-center gap-2"><Calendar className="h-4 w-4 text-muted-foreground" /> {displayMember.dob || 'N/A'}</p>
                     </div>
                 )}
               </CardContent>
@@ -177,23 +202,23 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member }) => 
               <CardContent className="space-y-2 text-sm">
                 <div className="flex justify-between">
                     <span className="text-muted-foreground">{t("plan")}:</span>
-                    <span className="font-medium">{member.plan_name || 'N/A'}</span>
+                    <span className="font-medium">{displayMember.plan_name || 'N/A'}</span>
                 </div>
                 <div className="flex justify-between">
                     <span className="text-muted-foreground">{t("start_date")}:</span>
-                    <span className="font-medium">{member.start_date || 'N/A'}</span>
+                    <span className="font-medium">{displayMember.start_date || 'N/A'}</span>
                 </div>
                 <div className="flex justify-between">
                     <span className="text-muted-foreground">{t("expiration")}:</span>
-                    <span className="font-medium">{member.expiration_date || 'N/A'}</span>
+                    <span className="font-medium">{displayMember.expiration_date || 'N/A'}</span>
                 </div>
                 <Separator className="my-2" />
                 <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">{t("current_status")}:</span>
-                    <Badge variant={getStatusVariant(member.status)}>{t(member.status || 'Pending')}</Badge>
+                    <Badge variant={getStatusVariant(displayMember.status)}>{t(displayMember.status || 'Pending')}</Badge>
                 </div>
                 
-                {member.status !== 'Active' && (
+                {displayMember.status !== 'Active' && (
                     <Button 
                         variant="outline" 
                         className="w-full mt-4 text-green-600 border-green-200 hover:bg-green-50"
@@ -205,17 +230,17 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member }) => 
               </CardContent>
             </Card>
             
-            <MemberStatusActions member={member} />
+            <MemberStatusActions member={displayMember} />
           </TabsContent>
           
           {/* Renewal Tab */}
           <TabsContent value="renewal" className="mt-4">
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">{t("renew_membership_for", { name: `${member.first_name} ${member.last_name}` })}</CardTitle>
+                <CardTitle className="text-lg">{t("renew_membership_for", { name: `${displayMember.first_name} ${displayMember.last_name}` })}</CardTitle>
               </CardHeader>
               <CardContent>
-                <MemberRenewalForm member={member} />
+                <MemberRenewalForm member={displayMember} />
               </CardContent>
             </Card>
           </TabsContent>
@@ -233,12 +258,12 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member }) => 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <Card className="p-3 text-center">
                             <p className="text-xs text-muted-foreground">{t("total_check_ins")}</p>
-                            <p className="text-2xl font-bold text-primary">{member.total_check_ins || 0}</p>
+                            <p className="text-2xl font-bold text-primary">{displayMember.total_check_ins || 0}</p>
                         </Card>
                         <Card className="p-3 text-center md:col-span-3">
                             <p className="text-xs text-muted-foreground">{t("last_check_in")}</p>
                             <p className="text-lg font-bold text-primary mt-1">
-                                {member.last_check_in ? format(new Date(member.last_check_in), 'yyyy-MM-dd hh:mm a') : 'N/A'}
+                                {displayMember.last_check_in ? format(new Date(displayMember.last_check_in), 'yyyy-MM-dd hh:mm a') : 'N/A'}
                             </p>
                         </Card>
                     </div>
