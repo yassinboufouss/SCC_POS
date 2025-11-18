@@ -1,26 +1,40 @@
-import { Transaction, mockTransactions } from "@/data/transactions";
+import { Transaction } from "@/types/supabase";
+import { supabase } from "@/integrations/supabase/client";
 import { format, isToday, isThisWeek, isThisMonth } from "date-fns";
-import { simulateApiCall } from "./api-simulation";
 
 // Utility to simulate adding a new transaction
-export const addTransaction = async (newTransaction: Omit<Transaction, 'id'>): Promise<Transaction> => {
-    const id = `T${(mockTransactions.length + 1).toString().padStart(3, '0')}`; // Mock ID generation
-    const transaction: Transaction = {
+export const addTransaction = async (newTransaction: Omit<Transaction, 'id' | 'created_at'>): Promise<Transaction | null> => {
+    const transactionData = {
         ...newTransaction,
-        id,
-        date: format(new Date(), 'yyyy-MM-dd'), // Ensure date is current
+        transaction_date: format(new Date(), 'yyyy-MM-dd'), // Ensure date is current
     };
-    mockTransactions.unshift(transaction); // Add to the beginning for "recent" view
-    console.log("Transaction recorded:", transaction);
-    return simulateApiCall(transaction);
+    
+    const { data, error } = await supabase
+        .from('transactions')
+        .insert(transactionData)
+        .select()
+        .single();
+
+    if (error) {
+        console.error("Supabase addTransaction error:", error);
+        throw new Error("Failed to record transaction.");
+    }
+    return data;
 };
 
-// Utility to retrieve transactions for a specific member
-export const getTransactionsByMemberId = (memberId: string): Transaction[] => {
-    // This is a synchronous read operation, no need to simulate API call here unless we fetch all data async
-    return mockTransactions
-        .filter(tx => tx.memberId === memberId)
-        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+// Utility to retrieve transactions for a specific member (synchronous read from cache/query)
+export const getTransactionsByMemberId = async (memberId: string): Promise<Transaction[]> => {
+    const { data, error } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('member_id', memberId)
+        .order('transaction_date', { ascending: false });
+
+    if (error) {
+        console.error("Supabase getTransactionsByMemberId error:", error);
+        throw new Error("Failed to fetch member transactions.");
+    }
+    return data || [];
 };
 
 export interface SalesSummary {
@@ -29,13 +43,12 @@ export interface SalesSummary {
     monthlyTotal: number;
 }
 
-export const getSalesSummary = (): SalesSummary => {
-    // This is a synchronous read operation, no need to simulate API call here unless we fetch all data async
-    
-    const dailyTransactions = mockTransactions.filter(tx => isToday(new Date(tx.date)));
+// Utility to calculate sales summary from a list of transactions
+export const calculateSalesSummary = (transactions: Transaction[]): SalesSummary => {
+    const dailyTransactions = transactions.filter(tx => tx.transaction_date && isToday(new Date(tx.transaction_date)));
     // Assuming week starts on Monday (weekStartsOn: 1)
-    const weeklyTransactions = mockTransactions.filter(tx => isThisWeek(new Date(tx.date), { weekStartsOn: 1 })); 
-    const monthlyTransactions = mockTransactions.filter(tx => isThisMonth(new Date(tx.date)));
+    const weeklyTransactions = transactions.filter(tx => tx.transaction_date && isThisWeek(new Date(tx.transaction_date), { weekStartsOn: 1 })); 
+    const monthlyTransactions = transactions.filter(tx => tx.transaction_date && isThisMonth(new Date(tx.transaction_date)));
 
     const dailyTotal = dailyTransactions.reduce((sum, tx) => sum + tx.amount, 0);
     const weeklyTotal = weeklyTransactions.reduce((sum, tx) => sum + tx.amount, 0);

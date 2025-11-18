@@ -4,11 +4,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from '@/components/ui/input';
 import { Search, User, X, Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { mockMembers, Member } from '@/data/members';
+import { useMembers } from '@/integrations/supabase/data/use-members.ts';
+import { Profile } from '@/types/supabase';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface POSMemberSelectorProps {
-  selectedMember: Member | null;
-  onSelectMember: (member: Member) => void;
+  selectedMember: Profile | null;
+  onSelectMember: (member: Profile) => void;
   onClearMember: () => void;
 }
 
@@ -16,17 +18,11 @@ const POSMemberSelector: React.FC<POSMemberSelectorProps> = ({ selectedMember, o
   const { t } = useTranslation();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // Fetch members based on search term
+  const { data: members, isLoading } = useMembers(searchTerm);
 
-  const filteredMembers = useMemo(() => {
-    if (!searchTerm) return mockMembers;
-    const lowerCaseSearch = searchTerm.toLowerCase();
-    return mockMembers.filter(member =>
-      member.name.toLowerCase().includes(lowerCaseSearch) ||
-      member.id.toLowerCase().includes(lowerCaseSearch)
-    );
-  }, [searchTerm]);
-
-  const handleSelect = (member: Member) => {
+  const handleSelect = (member: Profile) => {
     onSelectMember(member);
     setIsDialogOpen(false);
     setSearchTerm('');
@@ -44,7 +40,7 @@ const POSMemberSelector: React.FC<POSMemberSelectorProps> = ({ selectedMember, o
         <div className="flex items-center justify-between p-3 border rounded-md bg-secondary/50">
           <div className="flex items-center gap-2">
             <User className="h-4 w-4 text-primary" />
-            <span className="font-medium">{selectedMember.name} ({selectedMember.id})</span>
+            <span className="font-medium">{selectedMember.first_name} {selectedMember.last_name} ({selectedMember.member_code || selectedMember.id.substring(0, 8)}...)</span>
           </div>
           <Button variant="ghost" size="icon" className="h-6 w-6 text-red-500" onClick={handleClear}>
             <X className="h-4 w-4" />
@@ -72,16 +68,20 @@ const POSMemberSelector: React.FC<POSMemberSelectorProps> = ({ selectedMember, o
               />
               
               <div className="max-h-60 overflow-y-auto border rounded-md">
-                {filteredMembers.length > 0 ? (
-                  filteredMembers.map((member) => (
+                {isLoading ? (
+                    <div className="p-4 space-y-2">
+                        {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}
+                    </div>
+                ) : members && members.length > 0 ? (
+                  members.map((member) => (
                     <div 
                       key={member.id} 
                       className="flex items-center justify-between p-3 cursor-pointer hover:bg-secondary transition-colors"
                       onClick={() => handleSelect(member)}
                     >
                       <div className="min-w-0">
-                        <p className="font-medium truncate">{member.name}</p>
-                        <p className="text-xs text-muted-foreground">{member.id} | {member.plan}</p>
+                        <p className="font-medium truncate">{member.first_name} {member.last_name}</p>
+                        <p className="text-xs text-muted-foreground">{member.member_code} | {member.plan_name}</p>
                       </div>
                       {selectedMember?.id === member.id && <Check className="h-4 w-4 text-green-500" />}
                     </div>

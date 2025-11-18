@@ -1,10 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { showSuccess, showError } from '@/utils/toast';
-import { updateInventoryItem } from '@/utils/inventory-utils';
+import { reduceInventoryStock } from '@/utils/inventory-utils';
 import { format } from 'date-fns';
-import { addTransaction } from '@/utils/transaction-utils';
-import { inventoryItems, InventoryItem } from '@/data/inventory';
-import { membershipPlans, MembershipPlan } from '@/data/membership-plans';
+import { useAddTransaction } from '@/integrations/supabase/data/use-transactions.ts';
+import { useInventory } from '@/integrations/supabase/data/use-inventory.ts';
+import { useRenewMemberPlan } from '@/integrations/supabase/data/use-members.ts';
 import POSProductSelection from '@/components/pos/POSProductSelection';
 import POSCartAndCheckout from '@/components/pos/POSCartAndCheckout';
 import POSCheckIn from '@/components/pos/POSCheckIn';
@@ -14,17 +14,22 @@ import { CartItem, PaymentMethod } from '@/types/pos';
 import { useTranslation } from 'react-i18next';
 import Layout from '@/components/Layout';
 import { formatCurrency } from '@/utils/currency-utils';
-import { Member } from '@/data/members';
-import { renewMemberPlan } from '@/utils/member-utils';
+import { Profile, InventoryItem, MembershipPlan } from '@/types/supabase';
+import { useQueryClient } from '@tanstack/react-query';
 
 const POSPage = () => {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [inventorySearchTerm, setInventorySearchTerm] = useState('');
-  // Use state for payment method selection
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('Cash'); 
   const [discountPercent, setDiscountPercent] = useState(0);
-  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+  const [selectedMember, setSelectedMember] = useState<Profile | null>(null);
+  
+  // Fetch live inventory data to check stock limits
+  const { data: liveInventoryItems } = useInventory();
+  const { mutateAsync: addTransaction, isPending: isProcessingSale } = useAddTransaction();
+  const { mutateAsync: renewMember } = useRenewMemberPlan();
 
   // --- Cart Manipulation Functions ---
 
@@ -32,14 +37,22 @@ const POSPage = () => {
     setCart(prevCart => {
       const existingItem = prevCart.find(i => i.sourceId === item.id && i.type === 'inventory');
       
+      // Use live stock data for check
+      const currentStock = liveInventoryItems?.find(i => i.id === item.id)?.stock || item.stock;
+      
       if (existingItem) {
-        if (existingItem.quantity + 1 > item.stock) {
-            showSuccess(t("cannot_add_more_stock_limit", { defaultValue: `Cannot add more ${item.name}. Stock limit reached.` }));
+        if (existingItem.quantity + 1 > currentStock) {
+            showError(t("cannot_add_more_stock_limit", { name: item.name }));
             return prevCart;
         }
         return prevCart.map(i =>
           i.sourceId === item.id && i.type === 'inventory' ? { ...i, quantity: i.quantity + 1 } : i
         );
+      }
+      
+      if (currentStock === 0) {
+          showError(t("out_of_stock_cannot_add", { name: item.name }));
+          return prevCart;
       }
       
       return [...prevCart, { 
@@ -48,8 +61,8 @@ const POSPage = () => {
           price: item.price, 
           quantity: 1, 
           type: 'inventory', 
-          stock: item.stock,
-          imageUrl: item.imageUrl
+          stock: currentStock,
+          imageUrl: item.image_url || undefined
       }];
     });
   };
@@ -66,7 +79,7 @@ const POSPage = () => {
 
         return [...prevCart, { 
             sourceId: plan.id, 
-            name: `${plan.name} (${plan.durationDays} ${t("days")})`, 
+            name: `${plan.name} (${plan.duration_days} ${t("days")})`, 
             price: plan.price, 
             quantity: 1, 
             type: 'membership' 
@@ -86,9 +99,9 @@ const POSPage = () => {
       }
       
       if (item.type === 'inventory') {
-        const inventoryStock = inventoryItems.find(i => i.id === sourceId)?.stock || 0;
+        const inventoryStock = liveInventoryItems?.find(i => i.id === sourceId)?.stock || item.stock || 0;
         if (newQuantity > inventoryStock) {
-          showError(t("cannot_add_more_stock_limit", { defaultValue: `Cannot add more ${item.name}. Stock limit reached.` }));
+          showError(t("cannot_add_more_stock_limit", { name: item.name }));
           return prevCart;
         }
       }
@@ -118,7 +131,6 @@ const POSPage = () => {
     // 1. Apply Discount to Subtotal
     const discountFactor = discountPercent / 100;
     const discountAmount = rawSubtotal * discountFactor;
-    const discountedSubtotal = rawSubtotal - discountAmount;
     
     const TAX_RATE = 0.08; // 8% sales tax
     
@@ -131,6 +143,7 @@ const POSPage = () => {
     const discountedTaxableSubtotal = rawTaxableSubtotal * (1 - discountFactor);
         
     const calculatedTax = discountedTaxableSubtotal * TAX_RATE;
+    const discountedSubtotal = rawSubtotal - discountAmount;
     const finalTotal = discountedSubtotal + calculatedTax;
     
     return { 
@@ -146,85 +159,85 @@ const POSPage = () => {
   const handleCheckout = async () => {
     if (cart.length === 0) return;
     
-    // 1. Process inventory stock reduction (mock)
-    const inventoryItemsSold = cart.filter(item => item.type === 'inventory');
-    
-    // Use Promise.all to wait for all inventory updates
-    await Promise.all(inventoryItemsSold.map(async item => {
-        const inventoryItem = inventoryItems.find(i => i.id === item.sourceId);
-        if (inventoryItem) {
-            const updatedItem = {
-                ...inventoryItem,
-                stock: inventoryItem.stock - item.quantity,
-            };
-            await updateInventoryItem(updatedItem); 
-        }
-    }));
-    
-    // 2. Process Membership Renewals (if a member is selected)
-    const membershipItemsSold = cart.filter(item => item.type === 'membership');
-    
-    if (selectedMember && membershipItemsSold.length > 0) {
-        // Renew the selected member's plan for each membership item in the cart
-        for (const item of membershipItemsSold) {
-            const planId = item.sourceId;
-            for (let i = 0; i < item.quantity; i++) {
-                // renewMemberPlan updates mockMembers array and returns the updated member object
-                const updatedMember = await renewMemberPlan(selectedMember.id, planId);
-                if (updatedMember) {
-                    // Crucially, update the local state to ensure subsequent renewals (if quantity > 1) stack correctly
-                    setSelectedMember(updatedMember); 
+    try {
+        // 1. Process inventory stock reduction (using RPC for atomic update)
+        const inventoryItemsSold = cart.filter(item => item.type === 'inventory');
+        
+        await Promise.all(inventoryItemsSold.map(async item => {
+            await reduceInventoryStock(item.sourceId, item.quantity);
+        }));
+        
+        // 2. Process Membership Renewals (if a member is selected)
+        const membershipItemsSold = cart.filter(item => item.type === 'membership');
+        
+        if (selectedMember && membershipItemsSold.length > 0) {
+            // Renew the selected member's plan for each membership item in the cart
+            for (const item of membershipItemsSold) {
+                const planId = item.sourceId;
+                for (let i = 0; i < item.quantity; i++) {
+                    const updatedMember = await renewMember({ profileId: selectedMember.id, planId });
+                    if (updatedMember) {
+                        // Update local state to reflect the latest expiration date for stacking
+                        setSelectedMember(updatedMember); 
+                    }
                 }
             }
+            showSuccess(t("membership_renewal_pos_success", { name: `${selectedMember.first_name} ${selectedMember.last_name}` }));
         }
-        showSuccess(t("membership_renewal_pos_success", { name: selectedMember.name }));
-    }
-    
-    // 3. Determine transaction type and description
-    const hasMembership = membershipItemsSold.length > 0;
-    const hasInventory = inventoryItemsSold.length > 0;
-    
-    let transactionType: 'Membership' | 'POS Sale' | 'Mixed Sale';
-    if (hasMembership && hasInventory) {
-        transactionType = 'Mixed Sale';
-    } else if (hasMembership) {
-        transactionType = 'Membership';
-    } else {
-        transactionType = 'POS Sale';
-    }
-    
-    const itemDescription = cart.map(item => `${item.name} x${item.quantity}`).join(', ');
-    
-    // Use selected member details or default to Guest
-    const memberId = selectedMember?.id || 'GUEST';
-    const memberName = selectedMember?.name || t('guest_customer');
-    
-    const newTransaction = {
-        memberId: memberId,
-        memberName: memberName,
-        type: transactionType,
-        item: itemDescription,
-        amount: total,
-        date: format(new Date(), 'yyyy-MM-dd'),
-        paymentMethod: paymentMethod, // Use state value
-    };
+        
+        // 3. Determine transaction type and description
+        const hasMembership = membershipItemsSold.length > 0;
+        const hasInventory = inventoryItemsSold.length > 0;
+        
+        let transactionType: 'Membership' | 'POS Sale' | 'Mixed Sale';
+        if (hasMembership && hasInventory) {
+            transactionType = 'Mixed Sale';
+        } else if (hasMembership) {
+            transactionType = 'Membership';
+        } else {
+            transactionType = 'POS Sale';
+        }
+        
+        const itemDescription = cart.map(item => `${item.name} x${item.quantity}`).join(', ');
+        
+        // Use selected member details or default to Guest
+        const memberId = selectedMember?.id || 'GUEST';
+        const memberName = selectedMember ? `${selectedMember.first_name} ${selectedMember.last_name}` : t('guest_customer');
+        
+        const newTransaction = {
+            member_id: memberId,
+            member_name: memberName,
+            type: transactionType,
+            item_description: itemDescription,
+            amount: total,
+            payment_method: paymentMethod,
+            transaction_date: format(new Date(), 'yyyy-MM-dd'),
+        };
 
-    await addTransaction(newTransaction);
+        await addTransaction(newTransaction);
 
-    console.log("Processing sale:", newTransaction);
-    showSuccess(t("sale_processed_success", { 
-        type: transactionType, 
-        method: t(paymentMethod.toLowerCase()), 
-        total: formatCurrency(total),
-        defaultValue: `${transactionType} processed successfully via ${paymentMethod}! Total: ${formatCurrency(total)}`
-    }));
-    
-    // Reset state
-    setCart([]);
-    setInventorySearchTerm('');
-    setDiscountPercent(0);
-    setSelectedMember(null);
-    setPaymentMethod('Cash'); // Reset payment method
+        showSuccess(t("sale_processed_success", { 
+            type: transactionType, 
+            method: t(paymentMethod.toLowerCase()), 
+            total: formatCurrency(total),
+        }));
+        
+        // Invalidate relevant queries
+        queryClient.invalidateQueries({ queryKey: ['inventory'] });
+        queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+        queryClient.invalidateQueries({ queryKey: ['transactions'] });
+        
+        // Reset state
+        setCart([]);
+        setInventorySearchTerm('');
+        setDiscountPercent(0);
+        setSelectedMember(null);
+        setPaymentMethod('Cash');
+        
+    } catch (error) {
+        console.error("Checkout failed:", error);
+        showError(t("checkout_failed"));
+    }
   };
 
   return (
@@ -268,6 +281,7 @@ const POSPage = () => {
                   discountAmount={discountAmount}
                   tax={tax}
                   total={total}
+                  isProcessingSale={isProcessingSale}
               />
           </div>
         </div>

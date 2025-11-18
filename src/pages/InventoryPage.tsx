@@ -7,17 +7,20 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import InventoryTable from '@/components/inventory/InventoryTable';
 import AddItemForm from '@/components/inventory/AddItemForm';
-import { inventoryItems } from '@/data/inventory';
+import { useInventory } from '@/integrations/supabase/data/use-inventory.ts';
+import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const InventoryPage: React.FC = () => {
   const { t } = useTranslation();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  // State key to force re-render of InventoryTable when a new item is added
-  const [inventoryKey, setInventoryKey] = useState(0); 
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  const { data: inventoryItems, isLoading } = useInventory(searchTerm);
 
   const handleAddSuccess = () => {
     setIsAddDialogOpen(false);
-    setInventoryKey(prev => prev + 1); // Force re-render of the table
+    // React Query handles invalidation, no need for inventoryKey state
   };
 
   return (
@@ -45,11 +48,26 @@ const InventoryPage: React.FC = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-                <Package className="h-5 w-5" /> {t("inventory")} ({inventoryItems.length})
+                <Package className="h-5 w-5" /> {t("inventory")} ({inventoryItems?.length || 0})
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <InventoryTable key={inventoryKey} />
+            <div className="mb-4 flex items-center gap-2">
+                <Input
+                    placeholder={t("search_items_by_name")}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="max-w-sm"
+                />
+            </div>
+            {isLoading ? (
+                <div className="space-y-4">
+                    <Skeleton className="h-10 w-full" />
+                    {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}
+                </div>
+            ) : (
+                <InventoryTable items={inventoryItems || []} />
+            )}
           </CardContent>
         </Card>
       </div>

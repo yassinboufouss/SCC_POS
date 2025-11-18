@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -6,18 +6,18 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { Member } from '@/data/members';
-import { membershipPlans } from '@/data/membership-plans';
-import { renewMemberPlan } from '@/utils/member-utils';
+import { Profile } from '@/types/supabase';
+import { usePlans } from '@/integrations/supabase/data/use-plans.ts';
+import { useRenewMemberPlan } from '@/integrations/supabase/data/use-members.ts';
 import { showSuccess, showError } from '@/utils/toast';
 import { useTranslation } from 'react-i18next';
 import { format, addDays } from 'date-fns';
 import { CreditCard, Ticket } from 'lucide-react';
 import { formatCurrency } from '@/utils/currency-utils';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface MemberRenewalFormProps {
-  member: Member;
-  onRenewalSuccess: (updatedMember: Member) => void;
+  member: Profile;
 }
 
 const formSchema = z.object({
@@ -27,8 +27,10 @@ const formSchema = z.object({
 
 type RenewalFormValues = z.infer<typeof formSchema>;
 
-const MemberRenewalForm: React.FC<MemberRenewalFormProps> = ({ member, onRenewalSuccess }) => {
+const MemberRenewalForm: React.FC<MemberRenewalFormProps> = ({ member }) => {
   const { t } = useTranslation();
+  const { data: membershipPlans, isLoading: isLoadingPlans } = usePlans();
+  const { mutateAsync: renewPlan, isPending } = useRenewMemberPlan();
   
   const form = useForm<RenewalFormValues>({
     resolver: zodResolver(formSchema),
@@ -39,7 +41,7 @@ const MemberRenewalForm: React.FC<MemberRenewalFormProps> = ({ member, onRenewal
   });
   
   const selectedPlanId = form.watch('planId');
-  const selectedPlan = membershipPlans.find(p => p.id === selectedPlanId);
+  const selectedPlan = membershipPlans?.find(p => p.id === selectedPlanId);
 
   const renewalSummary = useMemo(() => {
     if (!selectedPlan) {
@@ -47,7 +49,7 @@ const MemberRenewalForm: React.FC<MemberRenewalFormProps> = ({ member, onRenewal
     }
 
     const today = new Date();
-    const currentExpiration = new Date(member.expirationDate);
+    const currentExpiration = member.expiration_date ? new Date(member.expiration_date) : today;
     
     let newStartDate = today;
     
@@ -56,25 +58,29 @@ const MemberRenewalForm: React.FC<MemberRenewalFormProps> = ({ member, onRenewal
         newStartDate = addDays(currentExpiration, 1);
     }
     
-    const newExpirationDate = addDays(newStartDate, selectedPlan.durationDays);
+    const newExpirationDate = addDays(newStartDate, selectedPlan.duration_days);
 
     return {
       newStartDate: format(newStartDate, 'MMM dd, yyyy'),
       newExpiration: format(newExpirationDate, 'MMM dd, yyyy'),
       totalDue: selectedPlan.price,
     };
-  }, [selectedPlan, member.expirationDate]);
+  }, [selectedPlan, member.expiration_date]);
 
 
   const onSubmit = async (values: RenewalFormValues) => {
-    const updatedMember = await renewMemberPlan(member.id, values.planId);
+    try {
+        const updatedMember = await renewPlan({ profileId: member.id, planId: values.planId });
 
-    if (updatedMember) {
-      // In a real app, we would also record a transaction here using values.paymentMethod
-      showSuccess(t("renewal_success", { name: updatedMember.name, date: updatedMember.expirationDate }));
-      onRenewalSuccess(updatedMember);
-    } else {
-      showError(t("renewal_failed"));
+        if (updatedMember) {
+            // In a real app, we would also record a transaction here using values.paymentMethod
+            showSuccess(t("renewal_success", { name: `${updatedMember.first_name} ${updatedMember.last_name}`, date: updatedMember.expiration_date }));
+            // Invalidation handled by hook
+        } else {
+            showError(t("renewal_failed"));
+        }
+    } catch (error) {
+        showError(t("renewal_failed"));
     }
   };
 
@@ -84,35 +90,39 @@ const MemberRenewalForm: React.FC<MemberRenewalFormProps> = ({ member, onRenewal
         
         {/* Current Status */}
         <div className="p-3 border rounded-md bg-secondary/50 text-sm">
-            <p className="font-semibold">{t("current_status_colon")} <span className="font-bold text-primary">{t(member.status)}</span></p>
-            <p className="text-xs text-muted-foreground">{t("previous_expiration")}: {member.expirationDate}</p>
+            <p className="font-semibold">{t("current_status_colon")} <span className="font-bold text-primary">{t(member.status || 'Pending')}</span></p>
+            <p className="text-xs text-muted-foreground">{t("previous_expiration")}: {member.expiration_date || 'N/A'}</p>
         </div>
 
         {/* Plan Selection */}
-        <FormField
-          control={form.control}
-          name="planId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="flex items-center gap-1"><Ticket className="h-4 w-4" /> {t("select_new_plan")}</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder={t("choose_a_membership_plan")} />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {membershipPlans.map(plan => (
-                    <SelectItem key={plan.id} value={plan.id}>
-                      {plan.name} ({formatCurrency(plan.price)}) - {plan.durationDays} {t("days")}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {isLoadingPlans ? (
+            <Skeleton className="h-24 w-full" />
+        ) : (
+            <FormField
+              control={form.control}
+              name="planId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-1"><Ticket className="h-4 w-4" /> {t("select_new_plan")}</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder={t("choose_a_membership_plan")} />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {membershipPlans?.map(plan => (
+                        <SelectItem key={plan.id} value={plan.id}>
+                          {plan.name} ({formatCurrency(plan.price)}) - {plan.duration_days} {t("days")}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+        )}
         
         {/* Renewal Summary */}
         {selectedPlan && (
@@ -159,7 +169,7 @@ const MemberRenewalForm: React.FC<MemberRenewalFormProps> = ({ member, onRenewal
           )}
         />
 
-        <Button type="submit" className="w-full" disabled={!selectedPlan || form.formState.isSubmitting}>
+        <Button type="submit" className="w-full" disabled={!selectedPlan || isPending}>
           {t("process_renewal_payment")}
         </Button>
       </form>

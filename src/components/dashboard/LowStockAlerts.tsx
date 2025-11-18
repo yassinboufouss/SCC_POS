@@ -2,15 +2,17 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Package, AlertTriangle, RefreshCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { InventoryItem } from '@/data/inventory';
+import { InventoryItem } from '@/types/supabase';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface LowStockAlertsProps {
   items: InventoryItem[];
+  isLoading: boolean;
 }
 
-const LowStockAlerts: React.FC<LowStockAlertsProps> = ({ items }) => {
+const LowStockAlerts: React.FC<LowStockAlertsProps> = ({ items, isLoading }) => {
   const { t } = useTranslation();
 
   return (
@@ -21,7 +23,13 @@ const LowStockAlerts: React.FC<LowStockAlertsProps> = ({ items }) => {
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto">
-        {items.length === 0 ? (
+        {isLoading ? (
+            <div className="space-y-3">
+                {[...Array(3)].map((_, i) => (
+                    <Skeleton key={i} className="h-12 w-full" />
+                ))}
+            </div>
+        ) : items.length === 0 ? (
           <div className="text-center text-muted-foreground py-8">
             {t("all_inventory_healthy")}
           </div>

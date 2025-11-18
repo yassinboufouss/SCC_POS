@@ -2,16 +2,18 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertTriangle, User, Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Member } from '@/data/members';
+import { Profile } from '@/types/supabase';
 import { differenceInDays } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface ExpiringMembershipsProps {
-  members: Member[];
+  members: Profile[];
+  isLoading: boolean;
 }
 
-const ExpiringMemberships: React.FC<ExpiringMembershipsProps> = ({ members }) => {
+const ExpiringMemberships: React.FC<ExpiringMembershipsProps> = ({ members, isLoading }) => {
   const { t } = useTranslation();
   const now = new Date();
 
@@ -23,14 +25,21 @@ const ExpiringMemberships: React.FC<ExpiringMembershipsProps> = ({ members }) =>
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto">
-        {members.length === 0 ? (
+        {isLoading ? (
+            <div className="space-y-3">
+                {[...Array(3)].map((_, i) => (
+                    <Skeleton key={i} className="h-12 w-full" />
+                ))}
+            </div>
+        ) : members.length === 0 ? (
           <div className="text-center text-muted-foreground py-8">
             {t("no_expiring_members")}
           </div>
         ) : (
           <div className="space-y-3">
             {members.map((member) => {
-              const daysLeft = differenceInDays(new Date(member.expirationDate), now);
+              const expirationDate = member.expiration_date ? new Date(member.expiration_date) : now;
+              const daysLeft = differenceInDays(expirationDate, now);
               const daysText = t(daysLeft === 1 ? "days_left" : "days_left_plural", { count: daysLeft });
               
               return (
@@ -38,8 +47,8 @@ const ExpiringMemberships: React.FC<ExpiringMembershipsProps> = ({ members }) =>
                   <div className="flex items-center gap-3 min-w-0">
                     <User className="h-5 w-5 text-primary/70 shrink-0" />
                     <div className="min-w-0">
-                      <p className="font-medium truncate">{member.name}</p>
-                      <p className="text-xs text-muted-foreground truncate">{member.plan}</p>
+                      <p className="font-medium truncate">{member.first_name} {member.last_name}</p>
+                      <p className="text-xs text-muted-foreground truncate">{member.plan_name}</p>
                     </div>
                   </div>
                   <div className="text-right shrink-0 space-y-1">

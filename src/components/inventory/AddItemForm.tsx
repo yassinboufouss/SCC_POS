@@ -6,11 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { addInventoryItem } from '@/utils/inventory-utils';
+import { useAddInventoryItem } from '@/integrations/supabase/data/use-inventory.ts';
 import { showSuccess, showError } from '@/utils/toast';
 import { useTranslation } from 'react-i18next';
 import { PackagePlus } from 'lucide-react';
-import { InventoryItem } from '@/data/inventory';
+import { NewInventoryItemInput } from '@/types/pos';
 
 interface AddItemFormProps {
   onSuccess: () => void;
@@ -23,14 +23,15 @@ const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   category: z.enum(categories),
   price: z.coerce.number().min(0.01, { message: "Price must be greater than zero." }),
-  initialStock: z.coerce.number().int().min(0, { message: "Stock cannot be negative." }),
-  imageUrl: z.string().url({ message: "Must be a valid URL." }).optional().or(z.literal('')),
+  initial_stock: z.coerce.number().int().min(0, { message: "Stock cannot be negative." }),
+  image_url: z.string().url({ message: "Must be a valid URL." }).optional().or(z.literal('')),
 });
 
 type AddItemFormValues = z.infer<typeof formSchema>;
 
 const AddItemForm: React.FC<AddItemFormProps> = ({ onSuccess }) => {
   const { t } = useTranslation();
+  const { mutateAsync: addItem, isPending } = useAddInventoryItem();
   
   const form = useForm<AddItemFormValues>({
     resolver: zodResolver(formSchema),
@@ -38,25 +39,31 @@ const AddItemForm: React.FC<AddItemFormProps> = ({ onSuccess }) => {
       name: "",
       category: 'Apparel',
       price: 0,
-      initialStock: 0,
-      imageUrl: "",
+      initial_stock: 0,
+      image_url: "",
     },
   });
 
   const onSubmit = async (values: AddItemFormValues) => {
-    const newItem = await addInventoryItem({
+    const newItemData: NewInventoryItemInput & { image_url?: string } = {
       name: values.name,
       category: values.category as CategoryType,
       price: values.price,
-      initialStock: values.initialStock,
-      imageUrl: values.imageUrl || undefined,
-    });
+      initial_stock: values.initial_stock,
+      image_url: values.image_url || undefined,
+    };
+    
+    try {
+        const newItem = await addItem(newItemData);
 
-    if (newItem) {
-      showSuccess(t("item_added_success", { name: newItem.name }));
-      onSuccess();
-    } else {
-      showError(t("restock_failed")); // Reusing a generic error key
+        if (newItem) {
+            showSuccess(t("item_added_success", { name: newItem.name }));
+            onSuccess();
+        } else {
+            showError(t("restock_failed")); // Reusing a generic error key
+        }
+    } catch (error) {
+        showError(t("restock_failed"));
     }
   };
 
@@ -124,7 +131,7 @@ const AddItemForm: React.FC<AddItemFormProps> = ({ onSuccess }) => {
           {/* Initial Stock */}
           <FormField
             control={form.control}
-            name="initialStock"
+            name="initial_stock"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>{t("initial_stock")}</FormLabel>
@@ -140,7 +147,7 @@ const AddItemForm: React.FC<AddItemFormProps> = ({ onSuccess }) => {
         {/* Image URL */}
         <FormField
           control={form.control}
-          name="imageUrl"
+          name="image_url"
           render={({ field }) => (
             <FormItem>
               <FormLabel>{t("product_image_url")}</FormLabel>
@@ -152,7 +159,7 @@ const AddItemForm: React.FC<AddItemFormProps> = ({ onSuccess }) => {
           )}
         />
 
-        <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+        <Button type="submit" className="w-full" disabled={isPending}>
           <PackagePlus className="h-4 w-4 mr-2" />
           {t("save_item")}
         </Button>

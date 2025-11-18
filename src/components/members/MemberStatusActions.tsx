@@ -1,39 +1,42 @@
 import React, { useState } from 'react';
-import { Member } from '@/data/members';
+import { Profile } from '@/types/supabase';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertTriangle, Pause, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { updateMemberStatus } from '@/utils/member-utils';
+import { useUpdateMemberStatus } from '@/integrations/supabase/data/use-members.ts';
 import { showSuccess, showError } from '@/utils/toast';
 
 interface MemberStatusActionsProps {
-  member: Member;
-  onStatusUpdate: (updatedMember: Member) => void;
+  member: Profile;
 }
 
-const MemberStatusActions: React.FC<MemberStatusActionsProps> = ({ member, onStatusUpdate }) => {
+const MemberStatusActions: React.FC<MemberStatusActionsProps> = ({ member }) => {
   const { t } = useTranslation();
   const [isFreezeOpen, setIsFreezeOpen] = useState(false);
   const [isCancelOpen, setIsCancelOpen] = useState(false);
+  const { mutateAsync: updateStatus, isPending } = useUpdateMemberStatus();
 
   const handleStatusChange = async (newStatus: 'Pending' | 'Expired', actionKey: 'freeze' | 'cancel') => {
-    const updatedMember = await updateMemberStatus(member.id, newStatus);
+    try {
+        const updatedMember = await updateStatus({ profileId: member.id, newStatus });
 
-    if (updatedMember) {
-      showSuccess(t(`${actionKey}_success`, { name: updatedMember.name }));
-      onStatusUpdate(updatedMember);
-      setIsFreezeOpen(false);
-      setIsCancelOpen(false);
-    } else {
-      showError(t(`${actionKey}_failed`, { name: member.name }));
+        if (updatedMember) {
+            showSuccess(t(`${actionKey}_success`, { name: `${updatedMember.first_name} ${updatedMember.last_name}` }));
+            setIsFreezeOpen(false);
+            setIsCancelOpen(false);
+        } else {
+            showError(t(`${actionKey}_failed`, { name: `${member.first_name} ${member.last_name}` }));
+        }
+    } catch (error) {
+        showError(t(`${actionKey}_failed`, { name: `${member.first_name} ${member.last_name}` }));
     }
   };
 
   return (
     <div className="space-y-4">
       <h4 className="font-semibold text-lg">{t("membership_action")}</h4>
-      <p className="text-sm text-muted-foreground">{t("select_action_for", { name: member.name, plan: member.plan })}</p>
+      <p className="text-sm text-muted-foreground">{t("select_action_for", { name: `${member.first_name} ${member.last_name}`, plan: member.plan_name })}</p>
 
       {/* Freeze Membership */}
       <Dialog open={isFreezeOpen} onOpenChange={setIsFreezeOpen}>
@@ -57,6 +60,7 @@ const MemberStatusActions: React.FC<MemberStatusActionsProps> = ({ member, onSta
             <Button 
               variant="destructive" 
               onClick={() => handleStatusChange('Pending', 'freeze')}
+              disabled={isPending}
             >
               {t("freeze_membership")}
             </Button>
@@ -86,6 +90,7 @@ const MemberStatusActions: React.FC<MemberStatusActionsProps> = ({ member, onSta
             <Button 
               variant="destructive" 
               onClick={() => handleStatusChange('Expired', 'cancel')}
+              disabled={isPending}
             >
               {t("cancel_membership")}
             </Button>

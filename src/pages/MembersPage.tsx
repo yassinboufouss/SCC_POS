@@ -1,9 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { mockMembers, Member } from '@/data/members';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Edit, UserPlus, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Layout from '@/components/Layout';
@@ -11,35 +9,19 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import MemberRegistrationForm from '@/components/members/MemberRegistrationForm';
 import MemberProfileDialog from '@/components/members/MemberProfileDialog';
+import { useMembers } from '@/integrations/supabase/data/use-members.ts';
+import { Profile } from '@/types/supabase';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
 
 const MembersPage: React.FC = () => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
-  // State to force re-render of the member list when a member is updated
-  const [memberUpdateKey, setMemberUpdateKey] = useState(0); 
+  
+  const { data: members, isLoading } = useMembers(searchTerm);
 
-  const membersList = useMemo(() => {
-    // We use a key to force re-evaluation of mockMembers when an update occurs
-    // In a real app, this would be handled by a state management library or query invalidation.
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const _key = memberUpdateKey; 
-    return mockMembers;
-  }, [memberUpdateKey]);
-
-  const filteredMembers = useMemo(() => {
-    if (!searchTerm) {
-      return membersList;
-    }
-    const lowerCaseSearch = searchTerm.toLowerCase();
-    return membersList.filter(member =>
-      member.name.toLowerCase().includes(lowerCaseSearch) ||
-      member.id.toLowerCase().includes(lowerCaseSearch) ||
-      member.email.toLowerCase().includes(lowerCaseSearch)
-    );
-  }, [searchTerm, membersList]);
-
-  const getStatusVariant = (status: Member['status']) => {
+  const getStatusVariant = (status: Profile['status']) => {
     switch (status) {
       case 'Active':
         return 'default';
@@ -54,12 +36,9 @@ const MembersPage: React.FC = () => {
 
   const handleRegistrationSuccess = () => {
     setIsRegistrationOpen(false);
-    setMemberUpdateKey(prev => prev + 1);
   };
   
-  const handleMemberUpdate = () => {
-    setMemberUpdateKey(prev => prev + 1);
-  };
+  // No need for handleMemberUpdate or memberUpdateKey as React Query handles invalidation
 
   return (
     <Layout>
@@ -85,7 +64,7 @@ const MembersPage: React.FC = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>{t("member_directory", { count: filteredMembers.length })}</CardTitle>
+            <CardTitle>{t("member_directory", { count: members?.length || 0 })}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="mb-4 flex items-center gap-2">
@@ -111,20 +90,31 @@ const MembersPage: React.FC = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredMembers.length > 0 ? (
-                    filteredMembers.map((member) => (
+                  {isLoading ? (
+                    [...Array(5)].map((_, i) => (
+                        <TableRow key={i}>
+                            <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                            <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                            <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                            <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+                            <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                            <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto" /></TableCell>
+                        </TableRow>
+                    ))
+                  ) : members && members.length > 0 ? (
+                    members.map((member) => (
                       <TableRow key={member.id}>
-                        <TableCell className="font-medium">{member.id}</TableCell>
-                        <TableCell>{member.name}</TableCell>
-                        <TableCell>{member.plan}</TableCell>
-                        <TableCell>{member.expirationDate}</TableCell>
+                        <TableCell className="font-medium text-xs">{member.member_code || member.id.substring(0, 8)}...</TableCell>
+                        <TableCell>{member.first_name} {member.last_name}</TableCell>
+                        <TableCell>{member.plan_name}</TableCell>
+                        <TableCell>{member.expiration_date}</TableCell>
                         <TableCell>
                           <Badge variant={getStatusVariant(member.status)}>
-                            {t(member.status)}
+                            {t(member.status || 'Pending')}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
-                          <MemberProfileDialog member={member} onUpdate={handleMemberUpdate} />
+                          <MemberProfileDialog member={member} />
                         </TableCell>
                       </TableRow>
                     ))

@@ -6,16 +6,15 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { updateInventoryItem } from '@/utils/inventory-utils';
+import { useUpdateInventoryItem } from '@/integrations/supabase/data/use-inventory.ts';
 import { showSuccess, showError } from '@/utils/toast';
 import { useTranslation } from 'react-i18next';
 import { Save } from 'lucide-react';
-import { InventoryItem } from '@/data/inventory';
-import { formatCurrency } from '@/utils/currency-utils';
+import { InventoryItem } from '@/types/supabase';
 
 interface EditItemFormProps {
   item: InventoryItem;
-  onSuccess: (updatedItem: InventoryItem) => void;
+  onSuccess: () => void;
 }
 
 const categories = ['Apparel', 'Supplements', 'Equipment'] as const;
@@ -26,13 +25,14 @@ const formSchema = z.object({
   category: z.enum(categories),
   price: z.coerce.number().min(0.01, { message: "Price must be greater than zero." }),
   stock: z.coerce.number().int().min(0, { message: "Stock cannot be negative." }),
-  imageUrl: z.string().url({ message: "Must be a valid URL." }).optional().or(z.literal('')),
+  image_url: z.string().url({ message: "Must be a valid URL." }).optional().or(z.literal('')),
 });
 
 type EditItemFormValues = z.infer<typeof formSchema>;
 
 const EditItemForm: React.FC<EditItemFormProps> = ({ item, onSuccess }) => {
   const { t } = useTranslation();
+  const { mutateAsync: updateItem, isPending } = useUpdateInventoryItem();
   
   const form = useForm<EditItemFormValues>({
     resolver: zodResolver(formSchema),
@@ -41,23 +41,27 @@ const EditItemForm: React.FC<EditItemFormProps> = ({ item, onSuccess }) => {
       category: item.category,
       price: item.price,
       stock: item.stock,
-      imageUrl: item.imageUrl || '',
+      image_url: item.image_url || '',
     },
   });
 
   const onSubmit = async (values: EditItemFormValues) => {
-    const updatedItem: InventoryItem = {
-      ...item,
+    const updatedItem: Partial<InventoryItem> & { id: string } = {
+      id: item.id,
       name: values.name,
       category: values.category as CategoryType,
       price: values.price,
       stock: values.stock,
-      imageUrl: values.imageUrl || undefined,
+      image_url: values.image_url || null,
     };
     
-    await updateInventoryItem(updatedItem);
-    showSuccess(t("plan_updated_success", { name: updatedItem.name })); // Reusing translation key for success message
-    onSuccess(updatedItem);
+    try {
+        await updateItem(updatedItem);
+        showSuccess(t("plan_updated_success", { name: updatedItem.name })); // Reusing translation key for success message
+        onSuccess();
+    } catch (error) {
+        showError(t("update_failed"));
+    }
   };
 
   return (
@@ -140,7 +144,7 @@ const EditItemForm: React.FC<EditItemFormProps> = ({ item, onSuccess }) => {
         {/* Image URL */}
         <FormField
           control={form.control}
-          name="imageUrl"
+          name="image_url"
           render={({ field }) => (
             <FormItem>
               <FormLabel>{t("product_image_url")}</FormLabel>
@@ -152,7 +156,7 @@ const EditItemForm: React.FC<EditItemFormProps> = ({ item, onSuccess }) => {
           )}
         />
 
-        <Button type="submit" className="w-full mt-4">
+        <Button type="submit" className="w-full mt-4" disabled={isPending}>
           <Save className="h-4 w-4 mr-2" />
           {t("save_item_details")}
         </Button>

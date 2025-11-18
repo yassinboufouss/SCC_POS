@@ -1,127 +1,178 @@
-import { Member, mockMembers } from "@/data/members";
-import { membershipPlans } from "@/data/membership-plans";
+import { Profile } from "@/types/supabase";
+import { supabase } from "@/integrations/supabase/client";
 import { addDays, format } from "date-fns";
-import { simulateApiCall } from "./api-simulation";
 
 // Define the expected input structure from the registration form
 export type NewMemberInput = {
-  fullName: string;
+  first_name: string;
+  last_name: string;
   email: string;
   phone: string;
   dob: string;
   planId: string;
 };
 
-// Utility to simulate updating member data
-export const updateMember = async (updatedMember: Member): Promise<void> => {
-  const index = mockMembers.findIndex(member => member.id === updatedMember.id);
-  if (index !== -1) {
-    // Simulate updating the item in the mock array
-    mockMembers[index] = updatedMember;
-    console.log(`Mock Member Updated: ${updatedMember.name}`);
+// Utility to update member data (used internally by other utils)
+export const updateProfile = async (updatedProfile: Partial<Profile> & { id: string }): Promise<Profile | null> => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .update(updatedProfile)
+    .eq('id', updatedProfile.id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Supabase updateProfile error:", error);
+    throw new Error("Failed to update member profile.");
   }
-  await simulateApiCall(undefined);
+  return data;
 };
 
 // Utility to simulate updating member status
-export const updateMemberStatus = async (memberId: string, newStatus: Member['status']): Promise<Member | null> => {
-  const member = mockMembers.find(m => m.id === memberId);
-  if (!member) {
-    console.error("Member not found for status update.");
-    return simulateApiCall(null);
-  }
-  
-  const updatedMember: Member = {
-    ...member,
-    status: newStatus,
-  };
-
-  await updateMember(updatedMember);
-  return simulateApiCall(updatedMember);
+export const updateMemberStatus = async (profileId: string, newStatus: Profile['status']): Promise<Profile | null> => {
+  return updateProfile({ id: profileId, status: newStatus, updated_at: new Date().toISOString() });
 };
 
-// Utility to simulate adding a new member
-export const addMember = async (newMemberData: NewMemberInput): Promise<Member | null> => {
-  const plan = membershipPlans.find(p => p.id === newMemberData.planId);
-  if (!plan) {
-    console.error("Plan not found for new member registration.");
-    return simulateApiCall(null);
+// Utility to simulate adding a new member (This should ideally be handled by Supabase Auth trigger, but we simulate the profile creation here for the mock flow)
+export const addMember = async (newMemberData: NewMemberInput): Promise<Profile | null> => {
+  // Fetch plan details (assuming we have a way to get plan data, which we will implement via React Query later, but for now, we use a direct fetch)
+  const { data: planData, error: planError } = await supabase
+    .from('membership_plans')
+    .select('name, duration_days')
+    .eq('id', newMemberData.planId)
+    .single();
+
+  if (planError || !planData) {
+    console.error("Plan not found for new member registration:", planError);
+    throw new Error("Plan not found.");
   }
   
-  const id = `M${(mockMembers.length + 1).toString().padStart(3, '0')}`; // Mock ID generation
+  // NOTE: In a real app, the user must be created via Auth first, and the profile inserted via trigger.
+  // Since we are using mock data flow for registration, we will skip the Auth step and just insert the profile directly.
+  // We need a user ID (UUID) for the profile table. Since we don't have a real user ID from auth.users, we must rely on the database to generate the UUID for the profile ID.
+  // However, the profiles table references auth.users(id), so we must use a real user ID.
+  // For the purpose of this mock migration, we will assume the user is already created and we are updating their profile, or we use a placeholder UUID if we cannot create a user via the client here.
+  
+  // Since the profiles table references auth.users(id), we cannot insert a profile without a corresponding auth.user entry.
+  // We will simulate the registration by signing up the user first, then updating their profile.
+  
+  const { data: authData, error: authError } = await supabase.auth.signUp({
+      email: newMemberData.email,
+      password: 'password123', // Mock password for registration flow
+      options: {
+          data: {
+              first_name: newMemberData.first_name,
+              last_name: newMemberData.last_name,
+          }
+      }
+  });
+  
+  if (authError || !authData.user) {
+      console.error("Supabase Auth Signup Error:", authError);
+      throw new Error("Failed to create user account.");
+  }
+  
+  const userId = authData.user.id;
+  
   const startDate = new Date();
-  const expirationDate = addDays(startDate, plan.durationDays);
-
-  const newMember: Member = {
-    id,
-    name: newMemberData.fullName, // Use fullName from input, map to name in Member type
-    email: newMemberData.email,
+  const expirationDate = addDays(startDate, planData.duration_days);
+  
+  // The handle_new_user trigger should have created a basic profile. We now update it with membership details.
+  const newProfileData = {
+    id: userId,
+    first_name: newMemberData.first_name,
+    last_name: newMemberData.last_name,
     phone: newMemberData.phone,
     dob: newMemberData.dob,
-    plan: plan.name,
-    status: "Active",
-    startDate: format(startDate, 'yyyy-MM-dd'),
-    expirationDate: format(expirationDate, 'yyyy-MM-dd'),
-    lastCheckIn: null,
-    totalCheckIns: 0,
+    plan_name: planData.name,
+    status: "Active" as const,
+    start_date: format(startDate, 'yyyy-MM-dd'),
+    expiration_date: format(expirationDate, 'yyyy-MM-dd'),
+    updated_at: new Date().toISOString(),
+    email: newMemberData.email, // Include email for consistency with the new type
   };
 
-  mockMembers.push(newMember);
-  console.log("Registered Member:", newMember);
-  return simulateApiCall(newMember);
+  // Update the profile created by the trigger
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .update(newProfileData)
+    .eq('id', userId)
+    .select()
+    .single();
+
+  if (profileError) {
+    console.error("Supabase Profile Update Error:", profileError);
+    // Clean up the auth user if profile update fails? Too complex for simple migration. We throw.
+    throw new Error("Failed to finalize member registration.");
+  }
+  
+  return profile;
 };
 
 
 // Utility to simulate renewing a member's plan
-export const renewMemberPlan = async (memberId: string, planId: string): Promise<Member | null> => {
-  const member = mockMembers.find(m => m.id === memberId);
-  const plan = membershipPlans.find(p => p.id === planId);
+export const renewMemberPlan = async (profileId: string, planId: string): Promise<Profile | null> => {
+  // 1. Fetch current profile and plan details
+  const [{ data: profile, error: profileError }, { data: planData, error: planError }] = await Promise.all([
+    supabase.from('profiles').select('expiration_date').eq('id', profileId).single(),
+    supabase.from('membership_plans').select('name, duration_days').eq('id', planId).single(),
+  ]);
 
-  if (!member || !plan) {
-    console.error("Member or Plan not found for renewal.");
-    return simulateApiCall(null);
+  if (profileError || !profile) {
+    console.error("Member not found for renewal:", profileError);
+    throw new Error("Member not found.");
+  }
+  if (planError || !planData) {
+    console.error("Plan not found for renewal:", planError);
+    throw new Error("Plan not found.");
   }
 
-  // Determine the new start date: either today, or the day after the old expiration date if it's in the future (stacking plans).
+  // 2. Calculate new dates
   const today = new Date();
-  const currentExpiration = new Date(member.expirationDate);
+  const currentExpiration = profile.expiration_date ? new Date(profile.expiration_date) : today;
   
   let newStartDate = today;
   
   // If membership is still active (expiration date is in the future), start the new plan immediately after the current one ends.
   if (currentExpiration.getTime() > today.getTime()) {
+      // Add 1 day to the current expiration date to get the new start date
       newStartDate = addDays(currentExpiration, 1);
   }
   
-  const newExpirationDate = addDays(newStartDate, plan.durationDays);
+  const newExpirationDate = addDays(newStartDate, planData.duration_days);
 
-  const updatedMember: Member = {
-    ...member,
-    plan: plan.name,
-    status: 'Active',
-    startDate: format(newStartDate, 'yyyy-MM-dd'),
-    expirationDate: format(newExpirationDate, 'yyyy-MM-dd'),
+  // 3. Update profile
+  const updatedProfileData = {
+    plan_name: planData.name,
+    status: 'Active' as const,
+    start_date: format(newStartDate, 'yyyy-MM-dd'),
+    expiration_date: format(newExpirationDate, 'yyyy-MM-dd'),
+    updated_at: new Date().toISOString(),
   };
 
-  await updateMember(updatedMember);
-  return simulateApiCall(updatedMember);
+  return updateProfile({ id: profileId, ...updatedProfileData });
 };
 
 // Utility to simulate a member check-in
-export const processCheckIn = async (memberId: string): Promise<Member | null> => {
-  const member = mockMembers.find(m => m.id === memberId);
+export const processCheckIn = async (profileId: string, currentCheckIns: number): Promise<Profile | null> => {
+  const now = new Date();
+  
+  const { data, error } = await supabase
+    .from('profiles')
+    .update({
+      last_check_in: now.toISOString(),
+      total_check_ins: currentCheckIns + 1,
+      updated_at: now.toISOString(),
+    })
+    .eq('id', profileId)
+    .eq('status', 'Active') // Only allow check-in if status is Active
+    .select()
+    .single();
 
-  if (!member || member.status !== 'Active') {
-    return simulateApiCall(null);
+  if (error) {
+    console.error("Supabase CheckIn error:", error);
+    throw new Error("Failed to process check-in.");
   }
   
-  const now = new Date();
-  const updatedMember: Member = {
-    ...member,
-    lastCheckIn: format(now, 'yyyy-MM-dd hh:mm a'), // Update check-in time
-    totalCheckIns: member.totalCheckIns + 1, // Increment count
-  };
-
-  await updateMember(updatedMember);
-  return simulateApiCall(updatedMember);
+  return data;
 };

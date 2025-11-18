@@ -1,37 +1,21 @@
 import React, { useState, useMemo } from 'react';
-import { InventoryItem, inventoryItems } from '@/data/inventory';
+import { InventoryItem } from '@/types/supabase';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { Search, Image } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import InventoryItemActions from '@/components/inventory/InventoryItemActions';
 import { formatCurrency } from '@/utils/currency-utils';
 
-const InventoryTable: React.FC = () => {
-  const { t } = useTranslation();
-  const [searchTerm, setSearchTerm] = useState('');
-  // Use state to hold the list, so updates from forms trigger re-render
-  const [items, setItems] = useState<InventoryItem[]>(inventoryItems);
+interface InventoryTableProps {
+    items: InventoryItem[];
+}
 
-  const filteredItems = useMemo(() => {
-    const sortedItems = [...items].sort((a, b) => a.name.localeCompare(b.name));
-    
-    if (!searchTerm) {
-      return sortedItems;
-    }
-    const lowerCaseSearch = searchTerm.toLowerCase();
-    return sortedItems.filter(item =>
-      item.name.toLowerCase().includes(lowerCaseSearch) ||
-      item.category.toLowerCase().includes(lowerCaseSearch) ||
-      item.id.toLowerCase().includes(lowerCaseSearch)
-    );
-  }, [searchTerm, items]);
+const InventoryTable: React.FC<InventoryTableProps> = ({ items }) => {
+  const { t } = useTranslation();
   
-  const handleItemUpdate = (updatedItem: InventoryItem) => {
-    // Update the local state to reflect changes (restock or edit)
-    setItems(prevItems => prevItems.map(i => i.id === updatedItem.id ? updatedItem : i));
-  };
+  // The filtering and sorting logic is now handled by the useInventory hook in the parent page.
+  // This component just renders the provided list.
 
   const getStockVariant = (stock: number) => {
     if (stock === 0) return 'destructive';
@@ -41,15 +25,7 @@ const InventoryTable: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
-          <Search className="h-4 w-4 text-muted-foreground" />
-          <Input
-              placeholder={t("search_items_by_name")}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="max-w-sm"
-          />
-      </div>
+      {/* Search input is now in the parent page */}
       
       <div className="overflow-x-auto border rounded-lg">
         <Table>
@@ -66,14 +42,14 @@ const InventoryTable: React.FC = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredItems.length > 0 ? (
-              filteredItems.map((item) => (
+            {items.length > 0 ? (
+              items.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell>
                     <div className="w-8 h-8 rounded-sm overflow-hidden bg-muted flex items-center justify-center shrink-0">
-                        {item.imageUrl ? (
+                        {item.image_url ? (
                             <img 
-                                src={item.imageUrl} 
+                                src={item.image_url} 
                                 alt={item.name} 
                                 className="w-full h-full object-cover" 
                             />
@@ -82,7 +58,7 @@ const InventoryTable: React.FC = () => {
                         )}
                     </div>
                   </TableCell>
-                  <TableCell className="font-medium text-xs">{item.id}</TableCell>
+                  <TableCell className="font-medium text-xs">{item.id.substring(0, 8)}...</TableCell>
                   <TableCell>{item.name}</TableCell>
                   <TableCell>{item.category}</TableCell>
                   <TableCell className="text-right">{formatCurrency(item.price)}</TableCell>
@@ -91,16 +67,19 @@ const InventoryTable: React.FC = () => {
                       {item.stock} {item.stock === 0 ? t("out_of_stock") : t("in_stock")}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{item.lastRestock}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">
+                    {item.last_restock ? item.last_restock : 'N/A'}
+                  </TableCell>
                   <TableCell className="text-right">
-                    <InventoryItemActions item={item} onUpdate={handleItemUpdate} />
+                    {/* Pass the item directly. Actions component will handle mutations and invalidation */}
+                    <InventoryItemActions item={item} />
                   </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
                   <TableCell colSpan={8} className="h-24 text-center text-muted-foreground">
-                      {t("no_products_found", { term: searchTerm })}
+                      {t("no_products_found")}
                   </TableCell>
               </TableRow>
             )}

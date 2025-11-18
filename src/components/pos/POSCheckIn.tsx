@@ -4,40 +4,57 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { QrCode, UserCheck, UserX, Search } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
-import { mockMembers, Member } from '@/data/members';
-import { processCheckIn } from '@/utils/member-utils';
+import { useProcessCheckIn, useMembers } from '@/integrations/supabase/data/use-members.ts';
 import { useTranslation } from 'react-i18next';
+import { Profile } from '@/types/supabase';
+import { format } from 'date-fns';
 
 const POSCheckIn: React.FC = () => {
   const { t } = useTranslation();
   const [memberCode, setMemberCode] = useState('');
-  const [memberInfo, setMemberInfo] = useState<Member | null>(null);
-  const [isCheckingIn, setIsCheckingIn] = useState(false);
+  const [memberInfo, setMemberInfo] = useState<Profile | null>(null);
+  
+  // Fetch all members to look up by member_code (since Supabase RLS prevents direct lookup by non-indexed columns)
+  const { data: members, isLoading: isLoadingMembers } = useMembers();
+  const { mutateAsync: processCheckIn, isPending: isCheckingIn } = useProcessCheckIn();
 
   const handleCheckIn = async (code: string) => {
-    setIsCheckingIn(true);
     setMemberInfo(null);
     
-    const member = mockMembers.find(m => m.id === code.toUpperCase());
+    const member = members?.find(m => m.member_code?.toUpperCase() === code.toUpperCase());
     
+    if (isLoadingMembers) {
+        showError(t("loading_members_data"));
+        return;
+    }
+
     if (member) {
-      if (member.status === 'Active') {
-        const checkedInMember = await processCheckIn(member.id);
-        if (checkedInMember) {
-          setMemberInfo(checkedInMember);
-          showSuccess(`${checkedInMember.name} ${t("checked_in_successfully")} ${t("total_check_ins")}: ${checkedInMember.totalCheckIns}`);
-        } else {
-          setMemberInfo(member);
-          showError(t("checkin_failed", { name: member.name }));
+      if (member.status === 'Active' && member.id) {
+        try {
+            const checkedInMember = await processCheckIn({ 
+                profileId: member.id, 
+                currentCheckIns: member.total_check_ins || 0 
+            });
+            
+            if (checkedInMember) {
+              setMemberInfo(checkedInMember);
+              showSuccess(`${checkedInMember.first_name} ${checkedInMember.last_name} ${t("checked_in_successfully")} ${t("total_check_ins")}: ${checkedInMember.total_check_ins}`);
+            } else {
+              // Should not happen if mutation succeeds, but for safety
+              setMemberInfo(member);
+              showError(t("checkin_failed", { name: `${member.first_name} ${member.last_name}` }));
+            }
+        } catch (error) {
+            setMemberInfo(member);
+            showError(t("checkin_failed", { name: `${member.first_name} ${member.last_name}` }));
         }
       } else {
         setMemberInfo(member);
-        showError(`${member.name}: ${t("membership_is", { status: member.status })} ${t("cannot_check_in")}`);
+        showError(`${member.first_name} ${member.last_name}: ${t("membership_is", { status: member.status })} ${t("cannot_check_in")}`);
       }
     } else {
       showError(t("member_code_not_found", { code }));
     }
-    setIsCheckingIn(false);
     setMemberCode('');
   };
 
@@ -59,14 +76,14 @@ const POSCheckIn: React.FC = () => {
         <div className="flex items-center space-x-3">
           <Icon className={`h-6 w-6 ${statusClass}`} />
           <div>
-            <h3 className="text-lg font-semibold">{memberInfo.name} ({memberInfo.id})</h3>
-            <p className="text-xs text-muted-foreground">{memberInfo.plan} {t("plan")}</p>
+            <h3 className="text-lg font-semibold">{memberInfo.first_name} {memberInfo.last_name} ({memberInfo.member_code})</h3>
+            <p className="text-xs text-muted-foreground">{memberInfo.plan_name} {t("plan")}</p>
           </div>
         </div>
         <div className="mt-2 pt-2 border-t space-y-1 text-sm">
-          <p>{t("status")}: <span className={`font-bold ${statusClass}`}>{memberInfo.status}</span></p>
-          {memberInfo.lastCheckIn && (
-            <p className="text-xs text-muted-foreground">{t("last_check_in")}: {memberInfo.lastCheckIn}</p>
+          <p>{t("status")}: <span className={`font-bold ${statusClass}`}>{t(memberInfo.status || 'Pending')}</span></p>
+          {memberInfo.last_check_in && (
+            <p className="text-xs text-muted-foreground">{t("last_check_in")}: {format(new Date(memberInfo.last_check_in), 'yyyy-MM-dd hh:mm a')}</p>
           )}
         </div>
       </div>
@@ -87,9 +104,9 @@ const POSCheckIn: React.FC = () => {
             value={memberCode}
             onChange={(e) => setMemberCode(e.target.value)}
             className="flex-1 h-10"
-            disabled={isCheckingIn}
+            disabled={isCheckingIn || isLoadingMembers}
           />
-          <Button type="submit" size="sm" disabled={isCheckingIn}>
+          <Button type="submit" size="sm" disabled={isCheckingIn || isLoadingMembers}>
             <Search className="h-4 w-4" />
           </Button>
         </form>

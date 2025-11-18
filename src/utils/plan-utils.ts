@@ -1,33 +1,38 @@
-import { MembershipPlan, membershipPlans } from "@/data/membership-plans";
-import { simulateApiCall } from "./api-simulation";
-
-export type NewPlanInput = Omit<MembershipPlan, 'id'>;
+import { MembershipPlan } from "@/types/supabase";
+import { supabase } from "@/integrations/supabase/client";
+import { NewPlanInput } from "@/types/pos";
 
 /**
  * Utility to simulate adding a new plan
  */
-export const addMembershipPlan = async (newPlanData: NewPlanInput): Promise<MembershipPlan> => {
-    const id = `PLAN${(membershipPlans.length + 1).toString().padStart(3, '0')}`; // Mock ID generation
-    
-    const newPlan: MembershipPlan = {
-        ...newPlanData,
-        id,
-    };
+export const addMembershipPlan = async (newPlanData: NewPlanInput): Promise<MembershipPlan | null> => {
+    const { data, error } = await supabase
+        .from('membership_plans')
+        .insert(newPlanData)
+        .select()
+        .single();
 
-    membershipPlans.push(newPlan);
-    console.log("Added Membership Plan:", newPlan);
-    return simulateApiCall(newPlan);
+    if (error) {
+        console.error("Supabase addMembershipPlan error:", error);
+        throw new Error("Failed to add new membership plan.");
+    }
+    return data;
 };
 
 /**
  * Utility to simulate updating a plan
  */
-export const updateMembershipPlan = async (updatedPlan: MembershipPlan): Promise<void> => {
-    const index = membershipPlans.findIndex(plan => plan.id === updatedPlan.id);
-    if (index !== -1) {
-        // Simulate updating the item in the mock array
-        membershipPlans[index] = updatedPlan;
-        console.log(`Mock Plan Updated: ${updatedPlan.name}`);
+export const updateMembershipPlan = async (updatedPlan: Partial<MembershipPlan> & { id: string }): Promise<MembershipPlan | null> => {
+    const { data, error } = await supabase
+        .from('membership_plans')
+        .update(updatedPlan)
+        .eq('id', updatedPlan.id)
+        .select()
+        .single();
+
+    if (error) {
+        console.error("Supabase updateMembershipPlan error:", error);
+        throw new Error("Failed to update membership plan.");
     }
-    await simulateApiCall(undefined);
+    return data;
 };

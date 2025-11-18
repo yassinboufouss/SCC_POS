@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 
 interface DashboardMetricCardProps {
   title: string;
-  value: string | number;
+  value: React.ReactNode;
   icon: LucideIcon;
   description: string;
   className?: string;

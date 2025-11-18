@@ -1,44 +1,24 @@
-import React, { useState, useMemo } from 'react';
-import { mockTransactions, Transaction } from '@/data/transactions';
+import React from 'react';
+import { Transaction } from '@/types/supabase';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Search, DollarSign } from 'lucide-react';
+import { DollarSign } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { formatCurrency } from '@/utils/currency-utils';
+import { format } from 'date-fns';
 
-const TransactionsTable: React.FC = () => {
+interface TransactionsTableProps {
+    transactions: Transaction[];
+}
+
+const TransactionsTable: React.FC<TransactionsTableProps> = ({ transactions }) => {
   const { t } = useTranslation();
-  const [searchTerm, setSearchTerm] = useState('');
   
-  // Use a copy of mockTransactions and sort them by date descending
-  const allTransactions = useMemo(() => {
-    return [...mockTransactions].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  }, []);
-
-  const filteredTransactions = useMemo(() => {
-    if (!searchTerm) {
-      return allTransactions;
-    }
-    const lowerCaseSearch = searchTerm.toLowerCase();
-    return allTransactions.filter(tx =>
-      tx.memberName.toLowerCase().includes(lowerCaseSearch) ||
-      tx.item.toLowerCase().includes(lowerCaseSearch) ||
-      tx.id.toLowerCase().includes(lowerCaseSearch)
-    );
-  }, [searchTerm, allTransactions]);
+  // Filtering is handled by the useTransactions hook in the parent page.
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
-          <Search className="h-4 w-4 text-muted-foreground" />
-          <Input
-              placeholder={t("search_transactions_by_member")}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="max-w-lg"
-          />
-      </div>
+      {/* Search input is now in the parent page */}
       
       <div className="overflow-x-auto border rounded-lg">
         <Table>
@@ -54,23 +34,25 @@ const TransactionsTable: React.FC = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredTransactions.length > 0 ? (
-              filteredTransactions.map((tx) => (
+            {transactions.length > 0 ? (
+              transactions.map((tx) => (
                 <TableRow key={tx.id}>
-                  <TableCell className="font-medium text-xs">{tx.id}</TableCell>
-                  <TableCell>{tx.memberName}</TableCell>
+                  <TableCell className="font-medium text-xs">{tx.id.substring(0, 8)}...</TableCell>
+                  <TableCell>{tx.member_name}</TableCell>
                   <TableCell>
                       <Badge variant="secondary" className="text-xs">
                           {t(tx.type.replace(/\s/g, '_').toLowerCase())}
                       </Badge>
                   </TableCell>
-                  <TableCell className="text-sm text-muted-foreground max-w-xs truncate">{tx.item}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground max-w-xs truncate">{tx.item_description}</TableCell>
                   <TableCell className="text-right font-semibold text-green-600 flex items-center justify-end gap-1">
                     <DollarSign className="h-4 w-4" />
                     {formatCurrency(tx.amount)}
                   </TableCell>
-                  <TableCell className="text-right text-sm">{t(tx.paymentMethod.toLowerCase())}</TableCell>
-                  <TableCell className="text-right text-xs text-muted-foreground">{tx.date}</TableCell>
+                  <TableCell className="text-right text-sm">{t(tx.payment_method.toLowerCase())}</TableCell>
+                  <TableCell className="text-right text-xs text-muted-foreground">
+                    {tx.transaction_date ? format(new Date(tx.transaction_date), 'yyyy-MM-dd') : 'N/A'}
+                  </TableCell>
                 </TableRow>
               ))
             ) : (

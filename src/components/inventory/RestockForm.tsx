@@ -5,15 +5,15 @@ import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { restockInventoryItem } from '@/utils/inventory-utils';
 import { showSuccess, showError } from '@/utils/toast';
 import { useTranslation } from 'react-i18next';
 import { RefreshCw } from 'lucide-react';
-import { InventoryItem } from '@/data/inventory';
+import { InventoryItem } from '@/types/supabase';
+import { useRestockInventoryItem } from '@/integrations/supabase/data/use-inventory.ts';
 
 interface RestockFormProps {
   item: InventoryItem;
-  onSuccess: (updatedItem: InventoryItem) => void;
+  onSuccess: () => void;
 }
 
 const formSchema = z.object({
@@ -24,6 +24,7 @@ type RestockFormValues = z.infer<typeof formSchema>;
 
 const RestockForm: React.FC<RestockFormProps> = ({ item, onSuccess }) => {
   const { t } = useTranslation();
+  const { mutateAsync: restockItem, isPending } = useRestockInventoryItem();
   
   const form = useForm<RestockFormValues>({
     resolver: zodResolver(formSchema),
@@ -33,13 +34,21 @@ const RestockForm: React.FC<RestockFormProps> = ({ item, onSuccess }) => {
   });
 
   const onSubmit = async (values: RestockFormValues) => {
-    const updatedItem = await restockInventoryItem(item.id, values.quantity);
+    try {
+        const updatedItem = await restockItem({ 
+            itemId: item.id, 
+            quantity: values.quantity,
+            currentStock: item.stock,
+        });
 
-    if (updatedItem) {
-      showSuccess(t("restock_success", { quantity: values.quantity, name: updatedItem.name, stock: updatedItem.stock }));
-      onSuccess(updatedItem);
-    } else {
-      showError(t("restock_failed"));
+        if (updatedItem) {
+            showSuccess(t("restock_success", { quantity: values.quantity, name: updatedItem.name, stock: updatedItem.stock }));
+            onSuccess();
+        } else {
+            showError(t("restock_failed"));
+        }
+    } catch (error) {
+        showError(t("restock_failed"));
     }
   };
 
@@ -60,7 +69,7 @@ const RestockForm: React.FC<RestockFormProps> = ({ item, onSuccess }) => {
                 </FormItem>
                 )}
             />
-            <Button type="submit" disabled={form.formState.isSubmitting}>
+            <Button type="submit" disabled={isPending}>
                 <RefreshCw className="h-4 w-4 mr-2" />
                 {t("restock")}
             </Button>

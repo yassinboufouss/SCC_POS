@@ -7,17 +7,19 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import PlanTable from '@/components/plans/PlanTable.tsx';
 import AddPlanForm from '@/components/plans/AddPlanForm.tsx';
-import { membershipPlans } from '@/data/membership-plans';
+import { usePlans } from '@/integrations/supabase/data/use-plans.ts';
+import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const PlansPage: React.FC = () => {
   const { t } = useTranslation();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  // State key to force re-render of PlanTable when a new plan is added
-  const [planKey, setPlanKey] = useState(0); 
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  const { data: membershipPlans, isLoading } = usePlans(searchTerm);
 
   const handleAddSuccess = () => {
     setIsAddDialogOpen(false);
-    setPlanKey(prev => prev + 1); // Force re-render of the table
   };
 
   return (
@@ -45,11 +47,26 @@ const PlansPage: React.FC = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-                <Ticket className="h-5 w-5" /> {t("current_plans", { count: membershipPlans.length })}
+                <Ticket className="h-5 w-5" /> {t("current_plans", { count: membershipPlans?.length || 0 })}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <PlanTable key={planKey} />
+            <div className="mb-4 flex items-center gap-2">
+                <Input
+                    placeholder={t("search_plans_by_name")}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="max-w-sm"
+                />
+            </div>
+            {isLoading ? (
+                <div className="space-y-4">
+                    <Skeleton className="h-10 w-full" />
+                    {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}
+                </div>
+            ) : (
+                <PlanTable plans={membershipPlans || []} />
+            )}
           </CardContent>
         </Card>
       </div>

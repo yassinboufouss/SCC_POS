@@ -10,11 +10,11 @@ import POSCartItem from './POSCartItem.tsx';
 import { CartItem, PaymentMethod } from '@/types/pos.ts';
 import { useTranslation } from 'react-i18next';
 import { formatCurrency } from '@/utils/currency-utils';
-import { Member } from '@/data/members';
+import { Profile } from '@/types/supabase';
 
 interface POSCartAndCheckoutProps {
   cart: CartItem[];
-  selectedMember: Member | null;
+  selectedMember: Profile | null;
   paymentMethod: PaymentMethod; 
   setPaymentMethod: (method: PaymentMethod) => void;
   discountPercent: number;
@@ -27,6 +27,7 @@ interface POSCartAndCheckoutProps {
   discountAmount: number;
   tax: number;
   total: number;
+  isProcessingSale: boolean;
 }
 
 const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
@@ -44,6 +45,7 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
   discountAmount,
   tax,
   total,
+  isProcessingSale,
 }) => {
   const { t } = useTranslation();
   
@@ -71,7 +73,7 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
         <div className="mb-4 text-sm text-muted-foreground p-2 border rounded-md">
             {t("member_customer")}: 
             <span className="font-medium text-foreground ml-1">
-                {selectedMember ? `${selectedMember.name} (${selectedMember.id})` : t("guest_customer")}
+                {selectedMember ? `${selectedMember.first_name} ${selectedMember.last_name} (${selectedMember.member_code})` : t("guest_customer")}
             </span>
         </div>
 
@@ -115,6 +117,7 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
                   className="w-20 h-8 text-right"
                   min={0}
                   max={100}
+                  disabled={isProcessingSale}
               />
             </div>
             
@@ -145,7 +148,7 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
               <Select 
                 value={paymentMethod} 
                 onValueChange={(value: PaymentMethod) => setPaymentMethod(value)}
-                disabled={cart.length === 0}
+                disabled={cart.length === 0 || isProcessingSale}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder={t("select_payment_method")} />
@@ -161,15 +164,15 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
           <Button 
             className="w-full mt-4 h-12 text-lg" 
             onClick={handleCheckout}
-            disabled={cart.length === 0}
+            disabled={cart.length === 0 || isProcessingSale}
           >
-            {t("process_sale")}
+            {isProcessingSale ? t("processing_sale") : t("process_sale")}
           </Button>
           <Button 
             variant="outline" 
             className="w-full mt-2 text-red-500" 
             onClick={handleClearCart}
-            disabled={cart.length === 0}
+            disabled={cart.length === 0 || isProcessingSale}
           >
             <Trash2 className="h-4 w-4 mr-2" /> {t("clear_cart")}
           </Button>

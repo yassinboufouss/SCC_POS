@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { InventoryItem } from '@/data/inventory';
+import { InventoryItem } from '@/types/supabase';
 import { Button } from '@/components/ui/button';
 import { Edit, RefreshCw, Package } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -7,20 +7,24 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTranslation } from 'react-i18next';
 import RestockForm from '@/components/inventory/RestockForm';
 import EditItemForm from '@/components/inventory/EditItemForm';
+import { useInventory } from '@/integrations/supabase/data/use-inventory.ts'; // Import hook to get fresh data
 
 interface InventoryItemActionsProps {
   item: InventoryItem;
-  onUpdate: (updatedItem: InventoryItem) => void;
 }
 
-const InventoryItemActions: React.FC<InventoryItemActionsProps> = ({ item, onUpdate }) => {
+const InventoryItemActions: React.FC<InventoryItemActionsProps> = ({ item }) => {
   const { t } = useTranslation();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [currentItem, setCurrentItem] = useState(item);
+  
+  // We use the useInventory hook to ensure the item data displayed in the dialog is fresh 
+  // (though the mutation hooks handle invalidation, this ensures the dialog reflects the latest state if opened later)
+  const { data: freshInventoryItems } = useInventory();
+  const currentItem = freshInventoryItems?.find(i => i.id === item.id) || item;
 
-  const handleUpdate = (updatedItem: InventoryItem) => {
-    setCurrentItem(updatedItem);
-    onUpdate(updatedItem);
+  const handleUpdateSuccess = () => {
+    // Mutation hooks handle invalidation, we just close the dialog
+    setIsDialogOpen(false);
   };
 
   return (
@@ -43,7 +47,7 @@ const InventoryItemActions: React.FC<InventoryItemActionsProps> = ({ item, onUpd
                 <p className="mt-1">
                     {t("stock")}: <span className="font-bold text-lg">{currentItem.stock}</span> {t("in_stock")}
                 </p>
-                <p className="text-xs text-muted-foreground">{currentItem.lastRestock && `${t("last_restock")}: ${currentItem.lastRestock}`}</p>
+                <p className="text-xs text-muted-foreground">{currentItem.last_restock && `${t("last_restock")}: ${currentItem.last_restock}`}</p>
             </div>
             
             <Tabs defaultValue="edit">
@@ -57,11 +61,11 @@ const InventoryItemActions: React.FC<InventoryItemActionsProps> = ({ item, onUpd
                 </TabsList>
                 
                 <TabsContent value="edit" className="mt-4">
-                    <EditItemForm item={currentItem} onSuccess={handleUpdate} />
+                    <EditItemForm item={currentItem} onSuccess={handleUpdateSuccess} />
                 </TabsContent>
                 
                 <TabsContent value="restock" className="mt-4">
-                    <RestockForm item={currentItem} onSuccess={handleUpdate} />
+                    <RestockForm item={currentItem} onSuccess={handleUpdateSuccess} />
                 </TabsContent>
             </Tabs>
         </div>

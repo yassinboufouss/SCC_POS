@@ -6,10 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { addMembershipPlan, NewPlanInput } from '@/utils/plan-utils';
+import { useAddPlan } from '@/integrations/supabase/data/use-plans.ts';
 import { showSuccess, showError } from '@/utils/toast';
 import { useTranslation } from 'react-i18next';
 import { Ticket } from 'lucide-react';
+import { NewPlanInput } from '@/types/pos';
 
 interface AddPlanFormProps {
   onSuccess: () => void;
@@ -17,7 +18,7 @@ interface AddPlanFormProps {
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Plan name must be at least 2 characters." }),
-  durationDays: z.coerce.number().int().min(1, { message: "Duration must be at least 1 day." }),
+  duration_days: z.coerce.number().int().min(1, { message: "Duration must be at least 1 day." }),
   price: z.coerce.number().min(0.01, { message: "Price must be greater than zero." }),
   description: z.string().min(5, { message: "Description is required." }),
 });
@@ -26,12 +27,13 @@ type AddPlanFormValues = z.infer<typeof formSchema>;
 
 const AddPlanForm: React.FC<AddPlanFormProps> = ({ onSuccess }) => {
   const { t } = useTranslation();
+  const { mutateAsync: addPlan, isPending } = useAddPlan();
   
   const form = useForm<AddPlanFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      durationDays: 30,
+      duration_days: 30,
       price: 0,
       description: "",
     },
@@ -40,18 +42,22 @@ const AddPlanForm: React.FC<AddPlanFormProps> = ({ onSuccess }) => {
   const onSubmit = async (values: AddPlanFormValues) => {
     const newPlanData: NewPlanInput = {
         name: values.name,
-        durationDays: values.durationDays,
+        duration_days: values.duration_days,
         price: values.price,
         description: values.description,
     };
     
-    const newPlan = await addMembershipPlan(newPlanData);
+    try {
+        const newPlan = await addPlan(newPlanData);
 
-    if (newPlan) {
-      showSuccess(t("plan_created_success", { name: newPlan.name }));
-      onSuccess();
-    } else {
-      showError(t("registration_failed")); // Reusing generic error key
+        if (newPlan) {
+            showSuccess(t("plan_created_success", { name: newPlan.name }));
+            onSuccess();
+        } else {
+            showError(t("registration_failed")); // Reusing generic error key
+        }
+    } catch (error) {
+        showError(t("registration_failed"));
     }
   };
 
@@ -78,7 +84,7 @@ const AddPlanForm: React.FC<AddPlanFormProps> = ({ onSuccess }) => {
           {/* Duration Days */}
           <FormField
             control={form.control}
-            name="durationDays"
+            name="duration_days"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>{t("duration_days_label")}</FormLabel>
@@ -121,7 +127,7 @@ const AddPlanForm: React.FC<AddPlanFormProps> = ({ onSuccess }) => {
           )}
         />
 
-        <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+        <Button type="submit" className="w-full" disabled={isPending}>
           <Ticket className="h-4 w-4 mr-2" />
           {t("create_plan")}
         </Button>
