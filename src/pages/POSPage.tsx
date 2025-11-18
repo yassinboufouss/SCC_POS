@@ -5,7 +5,6 @@ import { format } from 'date-fns';
 import { addTransaction } from '@/utils/transaction-utils';
 import { inventoryItems, InventoryItem } from '@/data/inventory';
 import { membershipPlans, MembershipPlan } from '@/data/membership-plans';
-import { Member } from '@/data/members';
 import POSProductSelection from '@/components/pos/POSProductSelection';
 import POSCartAndCheckout from '@/components/pos/POSCartAndCheckout';
 import { CartItem, PaymentMethod } from '@/types/pos';
@@ -15,7 +14,7 @@ const POSPage = () => {
   const { t } = useTranslation();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [inventorySearchTerm, setInventorySearchTerm] = useState('');
-  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+  // Removed selectedMember state
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('Card');
   const [discountPercent, setDiscountPercent] = useState(0);
 
@@ -169,8 +168,8 @@ const POSPage = () => {
     const itemDescription = cart.map(item => `${item.name} x${item.quantity}`).join(', ');
     
     const newTransaction = {
-        memberId: selectedMember?.id || 'GUEST',
-        memberName: selectedMember?.name || 'Guest Customer',
+        memberId: 'GUEST', // Always GUEST now
+        memberName: 'Guest Customer', // Always Guest now
         type: transactionType,
         item: itemDescription,
         amount: total,
@@ -191,7 +190,6 @@ const POSPage = () => {
     // Reset state
     setCart([]);
     setInventorySearchTerm('');
-    setSelectedMember(null);
     setPaymentMethod('Card');
     setDiscountPercent(0);
   };
@@ -216,8 +214,6 @@ const POSPage = () => {
         <div className="lg:col-span-1">
           <POSCartAndCheckout
             cart={cart}
-            selectedMember={selectedMember}
-            setSelectedMember={setSelectedMember}
             paymentMethod={paymentMethod}
             setPaymentMethod={setPaymentMethod}
             discountPercent={discountPercent}

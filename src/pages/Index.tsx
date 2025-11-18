@@ -13,8 +13,8 @@ const Index = () => {
   const { t } = useTranslation();
 
   const handleLogin = () => {
-    // Simulate successful login and redirect to dashboard
-    navigate("/dashboard");
+    // Simulate successful login and redirect to POS
+    navigate("/pos");
   };
 
   return (

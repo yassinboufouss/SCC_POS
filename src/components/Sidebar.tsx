@@ -1,29 +1,13 @@
 import { cn } from "@/lib/utils";
 import {
-  Home,
-  Users,
-  Package,
   LogIn,
   ShoppingCart,
-  Ticket,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 
 const navItems = [
-  {
-    nameKey: "dashboard",
-    icon: Home,
-    path: "/dashboard",
-    roles: ["Admin", "Manager", "Receptionist", "Trainer"],
-  },
-  {
-    nameKey: "members",
-    icon: Users,
-    path: "/members",
-    roles: ["Admin", "Manager", "Receptionist"],
-  },
   {
     nameKey: "check_in",
     icon: LogIn,
@@ -35,18 +19,6 @@ const navItems = [
     icon: ShoppingCart,
     path: "/pos",
     roles: ["Admin", "Manager", "Receptionist"],
-  },
-  {
-    nameKey: "inventory",
-    icon: Package,
-    path: "/inventory",
-    roles: ["Admin", "Manager"],
-  },
-  {
-    nameKey: "membership_plans",
-    icon: Ticket,
-    path: "/plans",
-    roles: ["Admin", "Manager"],
   },
 ];
 

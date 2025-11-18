@@ -3,20 +3,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { ShoppingCart, Trash2, UserX, DollarSign, CreditCard, Receipt, Percent } from 'lucide-react';
+import { ShoppingCart, Trash2, DollarSign, CreditCard, Receipt, Percent } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import MemberSelectDialog from '@/components/MemberSelectDialog';
 import POSCartItem from './POSCartItem.tsx';
 import { CartItem, PaymentMethod } from '@/types/pos.ts';
-import { Member } from '@/data/members';
 import { useTranslation } from 'react-i18next';
 
 interface POSCartAndCheckoutProps {
   cart: CartItem[];
-  selectedMember: Member | null;
-  setSelectedMember: (member: Member | null) => void;
+  // Removed selectedMember and setSelectedMember props
   paymentMethod: PaymentMethod;
   setPaymentMethod: (method: PaymentMethod) => void;
   discountPercent: number;
@@ -33,8 +30,7 @@ interface POSCartAndCheckoutProps {
 
 const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
   cart,
-  selectedMember,
-  setSelectedMember,
+  // Removed selectedMember, setSelectedMember,
   paymentMethod,
   setPaymentMethod,
   discountPercent,
@@ -70,22 +66,9 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
       </CardHeader>
       <CardContent className="flex flex-col flex-1">
         
-        {/* Member Selection */}
-        <div className="mb-4">
-          <MemberSelectDialog 
-              onSelectMember={setSelectedMember} 
-              selectedMember={selectedMember} 
-          />
-          {selectedMember && (
-              <div className="flex items-center justify-between text-sm mt-2 p-2 bg-accent rounded-md">
-                  <p className="font-medium">
-                      {selectedMember.name}
-                  </p>
-                  <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setSelectedMember(null)}>
-                      <UserX className="h-4 w-4 text-red-500" />
-                  </Button>
-              </div>
-          )}
+        {/* Member Selection removed */}
+        <div className="mb-4 text-sm text-muted-foreground p-2 border rounded-md">
+            {t("member_customer")}: Guest Customer
         </div>
 
         {/* Cart Items List */}

@@ -1,6 +1,6 @@
 import { Member, mockMembers } from "@/data/members";
 import { membershipPlans } from "@/data/membership-plans";
-import { addDays, format, isBefore, parseISO } from "date-fns";
+import { addDays, format } from "date-fns";
 
 // Define the expected input structure from the registration form
 export type NewMemberInput = {
@@ -21,7 +21,7 @@ export const updateMember = (updatedMember: Member) => {
   }
 };
 
-// Utility to simulate adding a new member
+// Utility to simulate adding a new member (kept for POS/Check-in future expansion, though currently unused)
 export const addMember = (newMemberData: NewMemberInput): Member | null => {
   const plan = membershipPlans.find(p => p.id === newMemberData.planId);
   if (!plan) {
@@ -53,7 +53,7 @@ export const addMember = (newMemberData: NewMemberInput): Member | null => {
 };
 
 
-// Utility to simulate renewing a member's plan
+// Utility to simulate renewing a member's plan (kept for POS/Check-in future expansion)
 export const renewMemberPlan = (memberId: string, planId: string) => {
   const member = mockMembers.find(m => m.id === memberId);
   const plan = membershipPlans.find(p => p.id === planId);
@@ -101,59 +101,6 @@ export const processCheckIn = (memberId: string) => {
     ...member,
     lastCheckIn: format(now, 'yyyy-MM-dd hh:mm a'), // Update check-in time
     totalCheckIns: member.totalCheckIns + 1, // Increment count
-  };
-
-  updateMember(updatedMember);
-  return updatedMember;
-};
-
-// Utility to get members whose plans expire soon (e.g., within the next 30 days)
-export const getExpiringMembers = (daysThreshold: number = 30): Member[] => {
-    const today = new Date();
-    const thresholdDate = addDays(today, daysThreshold);
-    
-    return mockMembers
-        .filter(member => member.status === 'Active')
-        .filter(member => {
-            const expiration = parseISO(member.expirationDate);
-            // Check if expiration is in the future AND before the threshold date
-            return isBefore(expiration, thresholdDate) && isBefore(today, expiration);
-        })
-        .sort((a, b) => parseISO(a.expirationDate).getTime() - parseISO(b.expirationDate).getTime());
-};
-
-// Utility to simulate freezing a member's plan
-export const freezeMemberPlan = (memberId: string) => {
-  const member = mockMembers.find(m => m.id === memberId);
-
-  if (!member) {
-    console.error("Member not found for freezing.");
-    return null;
-  }
-
-  const updatedMember: Member = {
-    ...member,
-    status: 'Pending', // Using 'Pending' to represent a frozen state
-    // In a real system, we would calculate the freeze duration and adjust expiration date
-  };
-
-  updateMember(updatedMember);
-  return updatedMember;
-};
-
-// Utility to simulate canceling a member's plan
-export const cancelMemberPlan = (memberId: string) => {
-  const member = mockMembers.find(m => m.id === memberId);
-
-  if (!member) {
-    console.error("Member not found for cancellation.");
-    return null;
-  }
-
-  const updatedMember: Member = {
-    ...member,
-    status: 'Expired', // Using 'Expired' immediately upon cancellation
-    expirationDate: format(new Date(), 'yyyy-MM-dd'), // Set expiration to today
   };
 
   updateMember(updatedMember);

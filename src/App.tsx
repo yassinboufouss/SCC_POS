@@ -6,12 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import MainLayout from "@/layouts/MainLayout.tsx";
-import Dashboard from "./pages/Dashboard";
-import MembersPage from "@/pages/members/MembersPage.tsx";
 import CheckInPage from "./pages/CheckInPage";
-import InventoryPage from "./pages/InventoryPage";
 import POSPage from "./pages/POSPage";
-import MembershipPlansPage from "./pages/MembershipPlansPage";
 
 const queryClient = new QueryClient();
 
@@ -24,14 +20,10 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           
-          {/* Protected Routes using MainLayout */}
+          {/* Operational Routes using MainLayout */}
           <Route element={<MainLayout />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/members/*" element={<MembersPage />} />
             <Route path="/checkin" element={<CheckInPage />} />
             <Route path="/pos" element={<POSPage />} />
-            <Route path="/inventory" element={<InventoryPage />} />
-            <Route path="/plans" element={<MembershipPlansPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           </Route>
 
