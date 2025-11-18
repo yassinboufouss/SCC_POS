@@ -1,12 +1,14 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Users, ShoppingCart, LogOut } from 'lucide-react';
+import { Users, ShoppingCart, LogOut, Package, Ticket } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 
 const navItems = [
   { nameKey: 'pos', href: '/pos', icon: ShoppingCart },
   { nameKey: 'members', href: '/members', icon: Users },
+  { nameKey: 'inventory', href: '/inventory', icon: Package },
+  { nameKey: 'membership_plans', href: '/plans', icon: Ticket },
 ];
 
 const Sidebar: React.FC = () => {
@@ -22,7 +24,7 @@ const Sidebar: React.FC = () => {
       <nav className="flex-1 space-y-2">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = location.pathname === item.href;
+          const isActive = location.pathname.startsWith(item.href);
           
           return (
             <Link
