@@ -1,17 +1,18 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Users, ShoppingCart, LogOut, Package, Ticket, QrCode, LayoutDashboard } from 'lucide-react';
+import { Users, ShoppingCart, LogOut, Package, Ticket, QrCode, LayoutDashboard, History } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
 
 const navItems = [
-  { nameKey: 'dashboard', href: '/dashboard', icon: LayoutDashboard }, // Added Dashboard
+  { nameKey: 'dashboard', href: '/dashboard', icon: LayoutDashboard },
   { nameKey: 'pos', href: '/pos', icon: ShoppingCart },
   { nameKey: 'check_in', href: '/check-in', icon: QrCode },
   { nameKey: 'members', href: '/members', icon: Users },
   { nameKey: 'inventory', href: '/inventory', icon: Package },
   { nameKey: 'membership_plans', href: '/plans', icon: Ticket },
+  { nameKey: 'transactions', href: '/transactions', icon: History },
 ];
 
 const Sidebar: React.FC = () => {
