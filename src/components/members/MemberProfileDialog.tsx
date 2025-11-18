@@ -10,6 +10,7 @@ import { User, Mail, Phone, Calendar, Clock, DollarSign, Edit, RefreshCw, Histor
 import { useTranslation } from 'react-i18next';
 import MemberRenewalForm from './MemberRenewalForm';
 import MemberStatusActions from './MemberStatusActions';
+import MemberDetailsCard from './MemberDetailsCard';
 import { useUpdateProfile, useMember } from '@/integrations/supabase/data/use-members.ts';
 import { useMemberTransactions } from '@/integrations/supabase/data/use-transactions.ts';
 import { showSuccess, showError } from '@/utils/toast';
@@ -49,7 +50,7 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member }) => 
   React.useEffect(() => {
     setEditFirstName(displayMember.first_name || '');
     setEditLastName(displayMember.last_name || '');
-    setEditEmail(displayMember.email || ''); 
+    setEditEmail(displayMember.email || '');
     setEditPhone(displayMember.phone || '');
     setEditDob(displayMember.dob || '');
     setIsEditing(false);
@@ -70,19 +71,6 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member }) => 
       }
   };
 
-  const getStatusVariant = (status: Profile['status']) => {
-    switch (status) {
-      case 'Active':
-        return 'default';
-      case 'Expired':
-        return 'destructive';
-      case 'Pending':
-        return 'secondary';
-      default:
-        return 'secondary';
-    }
-  };
-  
   const handleSaveBasicDetails = async () => {
     if (!editFirstName || !editLastName || !editPhone || !editDob) {
         showError(t("all_fields_required"));
@@ -195,40 +183,10 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member }) => 
               </CardContent>
             </Card>
             
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">{t("membership_details")}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                    <span className="text-muted-foreground">{t("plan")}:</span>
-                    <span className="font-medium">{displayMember.plan_name || 'N/A'}</span>
-                </div>
-                <div className="flex justify-between">
-                    <span className="text-muted-foreground">{t("start_date")}:</span>
-                    <span className="font-medium">{displayMember.start_date || 'N/A'}</span>
-                </div>
-                <div className="flex justify-between">
-                    <span className="text-muted-foreground">{t("expiration")}:</span>
-                    <span className="font-medium">{displayMember.expiration_date || 'N/A'}</span>
-                </div>
-                <Separator className="my-2" />
-                <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">{t("current_status")}:</span>
-                    <Badge variant={getStatusVariant(displayMember.status)}>{t(displayMember.status || 'Pending')}</Badge>
-                </div>
-                
-                {displayMember.status !== 'Active' && (
-                    <Button 
-                        variant="outline" 
-                        className="w-full mt-4 text-green-600 border-green-200 hover:bg-green-50"
-                        onClick={() => setActiveTab('renewal')}
-                    >
-                        <RefreshCw className="h-4 w-4 mr-2" /> {t("renew_membership_now")}
-                    </Button>
-                )}
-              </CardContent>
-            </Card>
+            <MemberDetailsCard 
+                member={displayMember} 
+                onRenewClick={() => setActiveTab('renewal')} 
+            />
             
             <MemberStatusActions member={displayMember} />
           </TabsContent>
