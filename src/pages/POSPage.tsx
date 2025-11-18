@@ -19,7 +19,8 @@ const POSPage = () => {
   const { t } = useTranslation();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [inventorySearchTerm, setInventorySearchTerm] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('Card');
+  // Hardcode payment method to 'Cash'
+  const paymentMethod: PaymentMethod = 'Cash'; 
   const [discountPercent, setDiscountPercent] = useState(0);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
 
@@ -141,10 +142,7 @@ const POSPage = () => {
 
   const handleCheckout = () => {
     if (cart.length === 0) return;
-    if (!paymentMethod) {
-        showError(t("select_payment_method_error", { defaultValue: "Please select a payment method." }));
-        return;
-    }
+    // Payment method is always 'Cash' now
 
     // 1. Process inventory stock reduction (mock)
     const inventoryItemsSold = cart.filter(item => item.type === 'inventory');
@@ -184,7 +182,7 @@ const POSPage = () => {
         item: itemDescription,
         amount: total,
         date: format(new Date(), 'yyyy-MM-dd'),
-        paymentMethod: paymentMethod,
+        paymentMethod: paymentMethod, // Always 'Cash'
     };
 
     addTransaction(newTransaction);
@@ -200,7 +198,6 @@ const POSPage = () => {
     // Reset state
     setCart([]);
     setInventorySearchTerm('');
-    setPaymentMethod('Card');
     setDiscountPercent(0);
     setSelectedMember(null);
   };
@@ -233,8 +230,8 @@ const POSPage = () => {
               <POSCartAndCheckout
                   cart={cart}
                   selectedMember={selectedMember}
-                  paymentMethod={paymentMethod}
-                  setPaymentMethod={setPaymentMethod}
+                  paymentMethod={paymentMethod} // Passed as hardcoded value
+                  // setPaymentMethod removed
                   discountPercent={discountPercent}
                   setDiscountPercent={setDiscountPercent}
                   updateQuantity={updateQuantity}

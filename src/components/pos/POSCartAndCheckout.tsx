@@ -3,9 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { ShoppingCart, Trash2, DollarSign, CreditCard, Receipt, Percent } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { ShoppingCart, Trash2, DollarSign, Percent } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import POSCartItem from './POSCartItem.tsx';
 import { CartItem, PaymentMethod } from '@/types/pos.ts';
@@ -16,8 +14,9 @@ import { Member } from '@/data/members';
 interface POSCartAndCheckoutProps {
   cart: CartItem[];
   selectedMember: Member | null;
-  paymentMethod: PaymentMethod;
-  setPaymentMethod: (method: PaymentMethod) => void;
+  // paymentMethod is now always 'Cash'
+  paymentMethod: PaymentMethod; 
+  // setPaymentMethod removed
   discountPercent: number;
   setDiscountPercent: (percent: number) => void;
   updateQuantity: (sourceId: string, type: 'inventory' | 'membership', delta: number) => void;
@@ -33,8 +32,7 @@ interface POSCartAndCheckoutProps {
 const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
   cart,
   selectedMember,
-  paymentMethod,
-  setPaymentMethod,
+  paymentMethod, // Still received, but hardcoded to 'Cash'
   discountPercent,
   setDiscountPercent,
   updateQuantity,
@@ -140,49 +138,13 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
           
           <Separator className="my-4" />
       
-          {/* Payment Method Selection */}
+          {/* Payment Method Display (Hardcoded to Cash) */}
           <div className="space-y-2">
-              <h4 className="font-semibold text-sm mb-2">{t("select_payment_method")}</h4>
-              <RadioGroup 
-                  defaultValue="Card" 
-                  value={paymentMethod} 
-                  onValueChange={(value: PaymentMethod) => setPaymentMethod(value)}
-                  className="grid grid-cols-3 gap-2"
-              >
-                  <Label
-                      htmlFor="payment-card"
-                      className={cn(
-                          "flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-3 text-sm hover:bg-accent hover:text-accent-foreground cursor-pointer",
-                          paymentMethod === 'Card' && "border-primary"
-                      )}
-                  >
-                      <CreditCard className="mb-1 h-5 w-5" />
-                      {t("card")}
-                      <RadioGroupItem value="Card" id="payment-card" className="sr-only" />
-                  </Label>
-                  <Label
-                      htmlFor="payment-cash"
-                      className={cn(
-                          "flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-3 text-sm hover:bg-accent hover:text-accent-foreground cursor-pointer",
-                          paymentMethod === 'Cash' && "border-primary"
-                      )}
-                  >
-                      <DollarSign className="mb-1 h-5 w-5" />
-                      {t("cash")}
-                      <RadioGroupItem value="Cash" id="payment-cash" className="sr-only" />
-                  </Label>
-                  <Label
-                      htmlFor="payment-transfer"
-                      className={cn(
-                          "flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-3 text-sm hover:bg-accent hover:text-accent-foreground cursor-pointer",
-                          paymentMethod === 'Transfer' && "border-primary"
-                      )}
-                  >
-                      <Receipt className="mb-1 h-5 w-5" />
-                      {t("transfer")}
-                      <RadioGroupItem value="Transfer" id="payment-transfer" className="sr-only" />
-                  </Label>
-              </RadioGroup>
+              <h4 className="font-semibold text-sm mb-2">{t("payment_method")}</h4>
+              <div className="flex items-center justify-center rounded-md border-2 border-primary bg-popover p-3 text-sm">
+                  <DollarSign className="mb-1 h-5 w-5 mr-2" />
+                  {t("cash")}
+              </div>
           </div>
           
           <Button 
