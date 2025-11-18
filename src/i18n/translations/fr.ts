@@ -268,12 +268,17 @@ export const fr = {
     "manager": "Manager",
     "cashier": "Caissier",
     
-    // New keys for ProtectedRoute error handling
-    "please_refresh_or_contact_support": "Vos données de profil n'ont pas pu être chargées. Veuillez rafraîchir la page ou contacter le support.",
-    "refresh": "Rafraîchir",
-    
     // Theme Toggle Keys
     "light_mode": "Mode Clair",
     "dark_mode": "Mode Sombre",
+    
+    // Transaction Filters
+    "membership": "Adhésion",
+    "pos_sale": "Vente PDV",
+    "mixed_sale": "Vente Mixte",
+    "filter_by_type": "Filtrer par Type",
+    "filter_by_payment": "Filtrer par Paiement",
+    "pick_a_date_range": "Choisir une plage de dates",
+    "clear_filters": "Effacer les Filtres",
   }
 };

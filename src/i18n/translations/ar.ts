@@ -268,12 +268,17 @@ export const ar = {
     "manager": "المدير",
     "cashier": "أمين الصندوق",
     
-    // New keys for ProtectedRoute error handling
-    "please_refresh_or_contact_support": "تعذر تحميل بيانات ملفك الشخصي. يرجى تحديث الصفحة أو الاتصال بالدعم.",
-    "refresh": "تحديث",
-    
     // Theme Toggle Keys
     "light_mode": "الوضع الفاتح",
     "dark_mode": "الوضع الداكن",
+    
+    // Transaction Filters
+    "membership": "عضوية",
+    "pos_sale": "بيع نقطة البيع",
+    "mixed_sale": "بيع مختلط",
+    "filter_by_type": "تصفية حسب النوع",
+    "filter_by_payment": "تصفية حسب الدفع",
+    "pick_a_date_range": "اختر نطاقًا زمنيًا",
+    "clear_filters": "مسح المرشحات",
   }
 };

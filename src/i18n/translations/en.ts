@@ -268,12 +268,17 @@ export const en = {
     "manager": "Manager",
     "cashier": "Cashier",
     
-    // New keys for ProtectedRoute error handling
-    "please_refresh_or_contact_support": "Your profile data could not be loaded. Please refresh the page or contact support.",
-    "refresh": "Refresh",
-    
     // Theme Toggle Keys
     "light_mode": "Light Mode",
     "dark_mode": "Dark Mode",
+    
+    // Transaction Filters
+    "membership": "Membership",
+    "pos_sale": "POS Sale",
+    "mixed_sale": "Mixed Sale",
+    "filter_by_type": "Filter by Type",
+    "filter_by_payment": "Filter by Payment",
+    "pick_a_date_range": "Pick a date range",
+    "clear_filters": "Clear Filters",
   }
 };

@@ -1,3 +1,6 @@
+import { Transaction } from "@/types/supabase";
+import { PaymentMethod } from "@/types/pos";
+
 export const queryKeys = {
   profiles: {
     all: ['profiles'] as const,
@@ -17,7 +20,7 @@ export const queryKeys = {
   },
   transactions: {
     all: ['transactions'] as const,
-    list: (search?: string) => [...queryKeys.transactions.all, 'list', search] as const,
+    list: (search?: string, type?: Transaction['type'] | 'All', paymentMethod?: PaymentMethod | 'All', dateRange?: { from: Date | undefined, to: Date | undefined }) => [...queryKeys.transactions.all, 'list', search, type, paymentMethod, dateRange] as const,
     byMember: (memberId: string) => [...queryKeys.transactions.all, 'byMember', memberId] as const,
   },
   dashboard: {

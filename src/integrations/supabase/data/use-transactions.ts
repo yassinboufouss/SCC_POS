@@ -3,14 +3,27 @@ import { supabase } from '@/integrations/supabase/client';
 import { Transaction } from '@/types/supabase';
 import { queryKeys } from './query-keys.ts';
 import { addTransaction } from '@/utils/transaction-utils';
+import { PaymentMethod } from '@/types/pos';
+import { format } from 'date-fns';
 
 // --- Fetch Hooks ---
 
-export const useTransactions = (searchTerm: string = '') => {
+interface TransactionFilters {
+  searchTerm?: string;
+  typeFilter?: Transaction['type'] | 'All';
+  paymentMethodFilter?: PaymentMethod | 'All';
+  dateRange?: {
+    from: Date | undefined;
+    to: Date | undefined;
+  };
+}
+
+export const useTransactions = (filters: TransactionFilters = {}) => {
+  const { searchTerm = '', typeFilter = 'All', paymentMethodFilter = 'All', dateRange } = filters;
   const search = searchTerm.toLowerCase();
   
   return useQuery({
-    queryKey: queryKeys.transactions.list(search),
+    queryKey: queryKeys.transactions.list(search, typeFilter, paymentMethodFilter, dateRange),
     queryFn: async () => {
       let query = supabase
         .from('transactions')
@@ -19,6 +32,24 @@ export const useTransactions = (searchTerm: string = '') => {
 
       if (search) {
         query = query.or(`member_name.ilike.%${search}%,item_description.ilike.%${search}%`);
+      }
+      
+      if (typeFilter && typeFilter !== 'All') {
+        query = query.eq('type', typeFilter);
+      }
+      
+      if (paymentMethodFilter && paymentMethodFilter !== 'All') {
+        query = query.eq('payment_method', paymentMethodFilter);
+      }
+      
+      if (dateRange?.from) {
+        const fromDate = format(dateRange.from, 'yyyy-MM-dd');
+        query = query.gte('transaction_date', fromDate);
+      }
+      
+      if (dateRange?.to) {
+        const toDate = format(dateRange.to, 'yyyy-MM-dd');
+        query = query.lte('transaction_date', toDate);
       }
 
       const { data, error } = await query;
