@@ -26,6 +26,7 @@ interface MemberProfileDialogProps {
 const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member }) => {
   const { t } = useTranslation();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('profile'); // State for active tab
   const [isEditing, setIsEditing] = useState(false);
   
   // Local state for editing basic info
@@ -38,7 +39,7 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member }) => 
   const { mutateAsync: updateProfile, isPending: isSaving } = useUpdateProfile();
   const { data: transactions, isLoading: isLoadingTransactions } = useMemberTransactions(member.id);
 
-  // Reset local state when dialog opens/member changes
+  // Reset local state when member changes
   React.useEffect(() => {
     setEditFirstName(member.first_name || '');
     setEditLastName(member.last_name || '');
@@ -47,7 +48,21 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member }) => 
     setEditPhone(member.phone || '');
     setEditDob(member.dob || '');
     setIsEditing(false);
+    // Reset tab to profile whenever the member prop changes
+    setActiveTab('profile');
   }, [member]);
+  
+  const handleOpenChange = (open: boolean) => {
+      setIsDialogOpen(open);
+      if (open) {
+          // If membership is inactive, default to the renewal tab
+          if (member.status !== 'Active') {
+              setActiveTab('renewal');
+          } else {
+              setActiveTab('profile');
+          }
+      }
+  };
 
   const getStatusVariant = (status: Profile['status']) => {
     switch (status) {
@@ -71,7 +86,7 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member }) => 
     const updatedData: Partial<Profile> & { id: string } = {
         id: member.id,
         first_name: editFirstName,
-        last_name: editLastName, // Corrected: was editPhone
+        last_name: editLastName,
         phone: editPhone,
         dob: editDob,
     };
@@ -86,7 +101,7 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member }) => 
   };
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+    <Dialog open={isDialogOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <Edit className="h-4 w-4" />
@@ -99,7 +114,7 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member }) => 
           </DialogTitle>
         </DialogHeader>
         
-        <Tabs defaultValue="profile" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="profile">{t("member_details")}</TabsTrigger>
             <TabsTrigger value="renewal">{t("renew_membership")}</TabsTrigger>
@@ -182,7 +197,7 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member }) => 
                     <Button 
                         variant="outline" 
                         className="w-full mt-4 text-green-600 border-green-200 hover:bg-green-50"
-                        onClick={() => console.log("Switch to renewal tab logic needed")}
+                        onClick={() => setActiveTab('renewal')}
                     >
                         <RefreshCw className="h-4 w-4 mr-2" /> {t("renew_membership_now")}
                     </Button>
