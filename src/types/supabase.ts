@@ -14,6 +14,7 @@ export type Profile = {
   last_check_in: string | null; // TIMESTAMP WITH TIME ZONE
   total_check_ins: number | null;
   email: string | null; // Added email field
+  role: 'owner' | 'staff' | null; // NEW
 };
 
 export type MembershipPlan = {

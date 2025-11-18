@@ -180,7 +180,7 @@ export const processCheckIn = async (profileId: string, currentCheckIns: number)
   return data;
 };
 
-// NEW: Utility to fetch a profile by member code
+// Utility to fetch a profile by member code
 export const getProfileByMemberCode = async (memberCode: string): Promise<Profile | null> => {
     const { data, error } = await supabase
         .from('profiles')
@@ -206,4 +206,20 @@ export const getProfileByMemberCode = async (memberCode: string): Promise<Profil
     }
     
     return profile;
+};
+
+// NEW: Utility to fetch the full profile for the currently logged-in user
+export const fetchUserProfile = async (userId: string): Promise<Profile | null> => {
+    const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+    if (error && error.code !== 'PGRST116') {
+        console.error("Supabase fetchUserProfile error:", error);
+        throw new Error("Failed to fetch user profile.");
+    }
+    
+    return data as Profile | null;
 };
