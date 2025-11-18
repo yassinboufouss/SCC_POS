@@ -7,7 +7,7 @@ import { useInventory } from '@/integrations/supabase/data/use-inventory.ts';
 import { useRenewMemberPlan } from '@/integrations/supabase/data/use-members.ts';
 import POSProductSelection from '@/components/pos/POSProductSelection';
 import POSCartAndCheckout from '@/components/pos/POSCartAndCheckout';
-import POSCheckIn from '@/components/pos/POSCheckIn';
+import MemberCheckInScanner from '@/components/members/MemberCheckInScanner';
 import POSMemberSelector from '@/components/pos/POSMemberSelector';
 import POSTransactionSummary from '@/components/pos/POSTransactionSummary';
 import { CartItem, PaymentMethod } from '@/types/pos';
@@ -121,6 +121,13 @@ const POSPage = () => {
     setDiscountPercent(0);
     setSelectedMember(null);
     setPaymentMethod('Cash'); // Reset payment method
+  };
+  
+  // Handler for member lookup via check-in scanner
+  const handleMemberFound = (member: Profile) => {
+      setSelectedMember(member);
+      // If the member is not active, prompt for renewal by adding a generic membership item to the cart
+      // NOTE: We won't automatically add an item, but selecting the member is enough to proceed with renewal in the POS flow.
   };
 
   // --- Calculations ---
@@ -258,7 +265,9 @@ const POSPage = () => {
           {/* Cart & Checkout (1/3 width) */}
           <div className="lg:col-span-1 flex flex-col space-y-6">
               <POSTransactionSummary />
-              <POSCheckIn />
+              
+              {/* Updated Check-In Scanner */}
+              <MemberCheckInScanner onMemberFound={handleMemberFound} />
               
               <POSMemberSelector 
                 selectedMember={selectedMember}

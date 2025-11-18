@@ -5,7 +5,7 @@ import { queryKeys } from './query-keys.ts';
 import { addMember, updateProfile, updateMemberStatus, renewMemberPlan, NewMemberInput, processCheckIn } from '@/utils/member-utils';
 
 // Re-export NewMemberInput to allow components to import it
-export { NewMemberInput };
+export type { NewMemberInput };
 
 // --- Fetch Hooks ---
 

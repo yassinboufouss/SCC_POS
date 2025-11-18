@@ -2,19 +2,24 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { QrCode, UserCheck, UserX, Search } from 'lucide-react';
+import { QrCode, UserCheck, UserX, Search, RefreshCw } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 import { useProcessCheckIn, useMembers } from '@/integrations/supabase/data/use-members.ts';
 import { useTranslation } from 'react-i18next';
 import { Profile } from '@/types/supabase';
 import { format } from 'date-fns';
 
-const POSCheckIn: React.FC = () => {
+interface MemberCheckInScannerProps {
+  // Optional callback when a member is successfully looked up (regardless of status)
+  onMemberFound?: (member: Profile) => void;
+}
+
+const MemberCheckInScanner: React.FC<MemberCheckInScannerProps> = ({ onMemberFound }) => {
   const { t } = useTranslation();
   const [memberCode, setMemberCode] = useState('');
   const [memberInfo, setMemberInfo] = useState<Profile | null>(null);
   
-  // Fetch all members to look up by member_code (since Supabase RLS prevents direct lookup by non-indexed columns)
+  // Fetch all members to look up by member_code
   const { data: members, isLoading: isLoadingMembers } = useMembers();
   const { mutateAsync: processCheckIn, isPending: isCheckingIn } = useProcessCheckIn();
 
@@ -29,6 +34,9 @@ const POSCheckIn: React.FC = () => {
     }
 
     if (member) {
+      // Notify parent component immediately
+      onMemberFound?.(member);
+      
       if (member.status === 'Active' && member.id) {
         try {
             const checkedInMember = await processCheckIn({ 
@@ -40,7 +48,6 @@ const POSCheckIn: React.FC = () => {
               setMemberInfo(checkedInMember);
               showSuccess(`${checkedInMember.first_name} ${checkedInMember.last_name} ${t("checked_in_successfully")} ${t("total_check_ins")}: ${checkedInMember.total_check_ins}`);
             } else {
-              // Should not happen if mutation succeeds, but for safety
               setMemberInfo(member);
               showError(t("checkin_failed", { name: `${member.first_name} ${member.last_name}` }));
             }
@@ -50,7 +57,7 @@ const POSCheckIn: React.FC = () => {
         }
       } else {
         setMemberInfo(member);
-        showError(`${member.first_name} ${member.last_name}: ${t("membership_is", { status: member.status })} ${t("cannot_check_in")}`);
+        showError(`${member.first_name} ${member.last_name}: ${t("membership_is", { status: t(member.status || 'Pending') })} ${t("cannot_check_in")}`);
       }
     } else {
       showError(t("member_code_not_found", { code }));
@@ -68,13 +75,14 @@ const POSCheckIn: React.FC = () => {
   const renderMemberStatus = () => {
     if (!memberInfo) return null;
 
-    const statusClass = memberInfo.status === 'Active' ? 'text-green-600' : 'text-red-600';
-    const Icon = memberInfo.status === 'Active' ? UserCheck : UserX;
+    const isActive = memberInfo.status === 'Active';
+    const statusClass = isActive ? 'text-green-600' : 'text-red-600';
+    const Icon = isActive ? UserCheck : UserX;
 
     return (
       <div className="mt-4 p-3 border rounded-lg bg-background shadow-sm">
         <div className="flex items-center space-x-3">
-          <Icon className={`h-6 w-6 ${statusClass}`} />
+          <Icon className={`h-6 w-6 ${statusClass} shrink-0`} />
           <div>
             <h3 className="text-lg font-semibold">{memberInfo.first_name} {memberInfo.last_name} ({memberInfo.member_code})</h3>
             <p className="text-xs text-muted-foreground">{memberInfo.plan_name} {t("plan")}</p>
@@ -84,6 +92,17 @@ const POSCheckIn: React.FC = () => {
           <p>{t("status")}: <span className={`font-bold ${statusClass}`}>{t(memberInfo.status || 'Pending')}</span></p>
           {memberInfo.last_check_in && (
             <p className="text-xs text-muted-foreground">{t("last_check_in")}: {format(new Date(memberInfo.last_check_in), 'yyyy-MM-dd hh:mm a')}</p>
+          )}
+          
+          {!isActive && (
+            <Button 
+                variant="link" 
+                size="sm" 
+                className="p-0 h-auto text-blue-600 flex items-center"
+                onClick={() => onMemberFound?.(memberInfo)} // Re-trigger onMemberFound for POS context
+            >
+                <RefreshCw className="h-3 w-3 mr-1" /> {t("renew_membership_now")}
+            </Button>
           )}
         </div>
       </div>
@@ -118,4 +137,4 @@ const POSCheckIn: React.FC = () => {
   );
 };
 
-export default POSCheckIn;
+export default MemberCheckInScanner;
