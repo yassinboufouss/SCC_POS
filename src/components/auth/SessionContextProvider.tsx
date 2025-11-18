@@ -36,10 +36,34 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
   const [profile, setProfile] = useState<Profile | null>(null); // State for profile
   const [isLoading, setIsLoading] = useState(true);
 
-  const getProfile = async (userId: string) => {
+  const getProfile = async (currentUser: User) => {
       try {
-          const userProfile = await fetchUserProfile(userId);
-          setProfile(userProfile);
+          const userProfile = await fetchUserProfile(currentUser.id);
+          
+          // Merge email from the User object into the profile object
+          if (userProfile) {
+              setProfile({ ...userProfile, email: currentUser.email || null });
+          } else {
+              // If profile doesn't exist yet, create a minimal profile object with email
+              setProfile({
+                  id: currentUser.id,
+                  email: currentUser.email || null,
+                  role: 'staff', // Default role if profile fetch fails (shouldn't happen if trigger works)
+                  first_name: null,
+                  last_name: null,
+                  avatar_url: null,
+                  updated_at: null,
+                  member_code: null,
+                  phone: null,
+                  dob: null,
+                  plan_name: null,
+                  status: 'Pending',
+                  start_date: null,
+                  expiration_date: null,
+                  last_check_in: null,
+                  total_check_ins: 0,
+              } as Profile);
+          }
       } catch (e) {
           console.error("Failed to fetch profile after sign in:", e);
           setProfile(null);
@@ -52,7 +76,7 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
       setUser(currentUser);
       
       if (currentUser) {
-          await getProfile(currentUser.id);
+          await getProfile(currentUser);
       } else {
           setProfile(null);
       }
