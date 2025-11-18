@@ -10,9 +10,10 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { membershipPlans } from "@/data/membership-plans.ts";
 import { addDays, format } from "date-fns";
-import { showSuccess } from "@/utils/toast";
+import { showSuccess, showError } from "@/utils/toast";
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import { addMember } from '@/utils/member-utils'; // Import new utility
 
 const memberRegistrationSchema = z.object({
   fullName: z.string().min(2, { message: "Full name is required." }),
@@ -41,26 +42,22 @@ const RegistrationForm = () => {
   const selectedPlan = membershipPlans.find(p => p.id === selectedPlanId);
 
   const onSubmit = (values: MemberRegistrationFormValues) => {
-    if (!selectedPlan) return;
+    if (!selectedPlan) {
+        showError("Please select a valid membership plan.");
+        return;
+    }
 
-    const startDate = new Date();
-    const expirationDate = addDays(startDate, selectedPlan.durationDays);
+    const newMember = addMember(values);
 
-    const newMemberData = {
-      ...values,
-      plan: selectedPlan.name,
-      price: selectedPlan.price,
-      startDate: format(startDate, 'yyyy-MM-dd'),
-      expirationDate: format(expirationDate, 'yyyy-MM-dd'),
-      status: "Active",
-    };
-
-    console.log("Registering Member:", newMemberData);
-    showSuccess(`Member ${values.fullName} registered successfully! Expires: ${format(expirationDate, 'MMM dd, yyyy')}`);
-    
-    // Simulate successful registration and navigate back to the list
-    form.reset();
-    navigate('/members');
+    if (newMember) {
+        showSuccess(`Member ${newMember.name} registered successfully! Expires: ${format(new Date(newMember.expirationDate), 'MMM dd, yyyy')}`);
+        
+        // Simulate successful registration and navigate back to the list
+        form.reset();
+        navigate('/members');
+    } else {
+        showError("Registration failed. Please check plan selection.");
+    }
   };
 
   return (
