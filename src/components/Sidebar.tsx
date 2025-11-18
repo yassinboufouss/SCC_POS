@@ -1,9 +1,11 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Users, ShoppingCart, LogOut, Package, Ticket, QrCode, LayoutDashboard, History } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
+import { supabase } from '@/integrations/supabase/client';
+import { showError } from '@/utils/toast';
 
 const navItems = [
   { nameKey: 'dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -18,6 +20,18 @@ const navItems = [
 const Sidebar: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('Logout error:', error);
+      showError(t('logout_failed'));
+    } else {
+      // Redirection handled by SessionContextProvider/ProtectedRoute, but navigate just in case
+      navigate('/');
+    }
+  };
 
   return (
     <div className="flex flex-col h-screen border-r bg-sidebar text-sidebar-foreground p-4 w-64 sticky top-0">
@@ -49,13 +63,13 @@ const Sidebar: React.FC = () => {
       
       <div className="mt-auto pt-4 border-t border-sidebar-border">
         <LanguageSwitcher />
-        <Link
-          to="/"
-          className="flex items-center gap-3 rounded-lg px-3 py-2 text-red-400 transition-all hover:bg-red-900/20"
+        <button
+          onClick={handleLogout}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-red-400 transition-all hover:bg-red-900/20"
         >
           <LogOut className="h-5 w-5" />
           {t("logout")}
-        </Link>
+        </button>
       </div>
     </div>
   );

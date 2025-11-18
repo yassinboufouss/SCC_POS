@@ -201,5 +201,14 @@ export const fr = {
     "print": "Imprimer",
     "print_summary_success": "PDF du résumé des ventes généré avec succès.",
     "print_summary_failed": "Échec de la génération du PDF du résumé des ventes.",
+    "login_successful": "Connexion réussie !",
+    "logout_successful": "Déconnexion réussie.",
+    "logging_in": "Connexion en cours...",
+    "signing_up": "Inscription en cours...",
+    "already_have_an_account_sign_in": "Vous avez déjà un compte ? Connectez-vous",
+    "dont_have_an_account_sign_up": "Vous n'avez pas de compte ? Inscrivez-vous",
+    "forgot_your_password": "Mot de passe oublié ?",
+    "loading": "Chargement",
+    "logout_failed": "Échec de la déconnexion. Veuillez réessayer.",
   }
 };

@@ -201,5 +201,14 @@ export const ar = {
     "print": "طباعة",
     "print_summary_success": "تم إنشاء ملف PDF لملخص المبيعات بنجاح.",
     "print_summary_failed": "فشل إنشاء ملف PDF لملخص المبيعات.",
+    "login_successful": "تم تسجيل الدخول بنجاح!",
+    "logout_successful": "تم تسجيل الخروج بنجاح.",
+    "logging_in": "جاري تسجيل الدخول...",
+    "signing_up": "جاري التسجيل...",
+    "already_have_an_account_sign_in": "هل لديك حساب بالفعل؟ تسجيل الدخول",
+    "dont_have_an_account_sign_up": "ليس لديك حساب؟ سجل الآن",
+    "forgot_your_password": "هل نسيت كلمة المرور؟",
+    "loading": "جاري التحميل",
+    "logout_failed": "فشل تسجيل الخروج. الرجاء المحاولة مرة أخرى.",
   }
 };

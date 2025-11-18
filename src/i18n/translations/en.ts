@@ -201,5 +201,14 @@ export const en = {
     "print": "Print",
     "print_summary_success": "Sales summary PDF generated successfully.",
     "print_summary_failed": "Failed to generate sales summary PDF.",
+    "login_successful": "Login successful!",
+    "logout_successful": "Logged out successfully.",
+    "logging_in": "Logging in...",
+    "signing_up": "Signing up...",
+    "already_have_an_account_sign_in": "Already have an account? Sign In",
+    "dont_have_an_account_sign_up": "Don't have an account? Sign Up",
+    "forgot_your_password": "Forgot your password?",
+    "loading": "Loading",
+    "logout_failed": "Logout failed. Please try again.",
   }
 };
