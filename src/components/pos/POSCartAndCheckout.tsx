@@ -3,8 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { ShoppingCart, Trash2, DollarSign, Percent } from 'lucide-react';
+import { ShoppingCart, Trash2, DollarSign, Percent, CreditCard } from 'lucide-react';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import POSCartItem from './POSCartItem.tsx';
 import { CartItem, PaymentMethod } from '@/types/pos.ts';
 import { useTranslation } from 'react-i18next';
@@ -14,9 +15,8 @@ import { Member } from '@/data/members';
 interface POSCartAndCheckoutProps {
   cart: CartItem[];
   selectedMember: Member | null;
-  // paymentMethod is now always 'Cash'
   paymentMethod: PaymentMethod; 
-  // setPaymentMethod removed
+  setPaymentMethod: (method: PaymentMethod) => void;
   discountPercent: number;
   setDiscountPercent: (percent: number) => void;
   updateQuantity: (sourceId: string, type: 'inventory' | 'membership', delta: number) => void;
@@ -32,7 +32,8 @@ interface POSCartAndCheckoutProps {
 const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
   cart,
   selectedMember,
-  paymentMethod, // Still received, but hardcoded to 'Cash'
+  paymentMethod, 
+  setPaymentMethod,
   discountPercent,
   setDiscountPercent,
   updateQuantity,
@@ -138,13 +139,23 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
           
           <Separator className="my-4" />
       
-          {/* Payment Method Display (Hardcoded to Cash) */}
+          {/* Payment Method Selection */}
           <div className="space-y-2">
               <h4 className="font-semibold text-sm mb-2">{t("payment_method")}</h4>
-              <div className="flex items-center justify-center rounded-md border-2 border-primary bg-popover p-3 text-sm">
-                  <DollarSign className="mb-1 h-5 w-5 mr-2" />
-                  {t("cash")}
-              </div>
+              <Select 
+                value={paymentMethod} 
+                onValueChange={(value: PaymentMethod) => setPaymentMethod(value)}
+                disabled={cart.length === 0}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={t("select_payment_method")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Card">{t("card")}</SelectItem>
+                  <SelectItem value="Cash">{t("cash")}</SelectItem>
+                  <SelectItem value="Transfer">{t("transfer")}</SelectItem>
+                </SelectContent>
+              </Select>
           </div>
           
           <Button 

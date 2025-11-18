@@ -20,8 +20,8 @@ const POSPage = () => {
   const { t } = useTranslation();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [inventorySearchTerm, setInventorySearchTerm] = useState('');
-  // Hardcode payment method to 'Cash'
-  const paymentMethod: PaymentMethod = 'Cash'; 
+  // Use state for payment method selection
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('Cash'); 
   const [discountPercent, setDiscountPercent] = useState(0);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
 
@@ -106,6 +106,7 @@ const POSPage = () => {
     setCart([]);
     setDiscountPercent(0);
     setSelectedMember(null);
+    setPaymentMethod('Cash'); // Reset payment method
   };
 
   // --- Calculations ---
@@ -143,8 +144,7 @@ const POSPage = () => {
 
   const handleCheckout = async () => {
     if (cart.length === 0) return;
-    // Payment method is always 'Cash' now
-
+    
     // 1. Process inventory stock reduction (mock)
     const inventoryItemsSold = cart.filter(item => item.type === 'inventory');
     
@@ -185,7 +185,7 @@ const POSPage = () => {
         item: itemDescription,
         amount: total,
         date: format(new Date(), 'yyyy-MM-dd'),
-        paymentMethod: paymentMethod, // Always 'Cash'
+        paymentMethod: paymentMethod, // Use state value
     };
 
     await addTransaction(newTransaction);
@@ -203,6 +203,7 @@ const POSPage = () => {
     setInventorySearchTerm('');
     setDiscountPercent(0);
     setSelectedMember(null);
+    setPaymentMethod('Cash'); // Reset payment method
   };
 
   return (
@@ -234,7 +235,8 @@ const POSPage = () => {
               <POSCartAndCheckout
                   cart={cart}
                   selectedMember={selectedMember}
-                  paymentMethod={paymentMethod} // Passed as hardcoded value
+                  paymentMethod={paymentMethod}
+                  setPaymentMethod={setPaymentMethod}
                   discountPercent={discountPercent}
                   setDiscountPercent={setDiscountPercent}
                   updateQuantity={updateQuantity}
