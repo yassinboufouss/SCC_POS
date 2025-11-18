@@ -32,7 +32,7 @@ const POSPage = () => {
   const [activeTab, setActiveTab] = useState<'products' | 'register'>('products');
   const [justRegisteredMemberId, setJustRegisteredMemberId] = useState<string | null>(null); // Track newly registered member
   
-  // Fetch live inventory data to check stock limits
+  // Fetch live inventory data to check stock limits and get giveaway details
   const { data: liveInventoryItems } = useInventory();
   const { data: membershipPlans } = usePlans();
   const { mutateAsync: addTransaction, isPending: isProcessingSale } = useAddTransaction();
@@ -42,7 +42,7 @@ const POSPage = () => {
 
   const addInventoryToCart = (item: InventoryItem) => {
     setCart(prevCart => {
-      const existingItem = prevCart.find(i => i.sourceId === item.id && i.type === 'inventory');
+      const existingItem = prevCart.find(i => i.sourceId === item.id && i.type === 'inventory' && !i.isGiveaway);
       
       // Use live stock data for check
       const currentStock = liveInventoryItems?.find(i => i.id === item.id)?.stock || item.stock;
@@ -53,7 +53,7 @@ const POSPage = () => {
             return prevCart;
         }
         return prevCart.map(i =>
-          i.sourceId === item.id && i.type === 'inventory' ? { ...i, quantity: i.quantity + 1 } : i
+          i.sourceId === item.id && i.type === 'inventory' && !i.isGiveaway ? { ...i, quantity: i.quantity + 1 } : i
         );
       }
       
@@ -76,32 +76,85 @@ const POSPage = () => {
   
   const addMembershipToCart = (plan: MembershipPlan) => {
     setCart(prevCart => {
-        const existingItem = prevCart.find(i => i.sourceId === plan.id && i.type === 'membership');
+        const newCart: CartItem[] = [];
+        let planAdded = false;
 
-        if (existingItem) {
-            return prevCart.map(i =>
+        // 1. Add/Increment Membership Plan
+        const existingPlan = prevCart.find(i => i.sourceId === plan.id && i.type === 'membership');
+
+        if (existingPlan) {
+            newCart.push(...prevCart.map(i =>
                 i.sourceId === plan.id && i.type === 'membership' ? { ...i, quantity: i.quantity + 1 } : i
-            );
+            ));
+            planAdded = true;
+        } else {
+            newCart.push(...prevCart, { 
+                sourceId: plan.id, 
+                name: `${plan.name} (${plan.duration_days} ${t("days")})`, 
+                price: plan.price, 
+                quantity: 1, 
+                type: 'membership' 
+            });
+            planAdded = true;
         }
-
-        return [...prevCart, { 
-            sourceId: plan.id, 
-            name: `${plan.name} (${plan.duration_days} ${t("days")})`, 
-            price: plan.price, 
-            quantity: 1, 
-            type: 'membership' 
-        }];
+        
+        // 2. Add Giveaway Item (if applicable and not already added as a giveaway for this plan)
+        if (plan.giveaway_item_id) {
+            const giveawayItem = liveInventoryItems?.find(i => i.id === plan.giveaway_item_id);
+            
+            if (giveawayItem) {
+                // Check if the giveaway item is already in the cart as a FREE item for this plan
+                const existingGiveaway = newCart.find(i => i.sourceId === giveawayItem.id && i.type === 'inventory' && i.isGiveaway);
+                
+                if (existingGiveaway) {
+                    // If the plan quantity was incremented, increment the giveaway quantity too
+                    if (planAdded && existingPlan) {
+                        return newCart.map(i =>
+                            i.sourceId === giveawayItem.id && i.type === 'inventory' && i.isGiveaway ? { ...i, quantity: i.quantity + 1 } : i
+                        );
+                    }
+                } else {
+                    // Add new giveaway item
+                    newCart.push({
+                        sourceId: giveawayItem.id,
+                        name: `${giveawayItem.name} (${t("free_giveaway")})`,
+                        price: 0, // FREE
+                        quantity: 1,
+                        type: 'inventory',
+                        stock: giveawayItem.stock,
+                        imageUrl: giveawayItem.image_url || undefined,
+                        isGiveaway: true, // Mark as free item
+                    });
+                }
+            } else {
+                showError(t("giveaway_item_not_found"));
+            }
+        }
+        
+        // Filter out any old items if we modified the cart structure above (e.g., if we didn't use map correctly)
+        // Since we used map/push correctly, we just return the new cart.
+        return newCart;
     });
   };
 
   const updateQuantity = (sourceId: string, type: 'inventory' | 'membership', delta: number) => {
     setCart(prevCart => {
-      const item = prevCart.find(i => i.sourceId === sourceId && i.type === type);
-      if (!item) return prevCart;
+      const item = prevCart.find(i => i.sourceId === sourceId && i.type === type && !i.isGiveaway);
+      if (!item) return prevCart; // Only allow manual quantity update on non-giveaway items
 
       const newQuantity = item.quantity + delta;
       
       if (newQuantity <= 0) {
+        // If removing the last item, also remove any associated free giveaway items
+        const plan = membershipPlans?.find(p => p.id === sourceId && type === 'membership');
+        
+        if (plan?.giveaway_item_id) {
+            return prevCart.filter(i => 
+                !(i.sourceId === sourceId && i.type === type) && // Remove plan
+                !(i.sourceId === plan.giveaway_item_id && i.isGiveaway) // Remove associated giveaway
+            );
+        }
+        
         return prevCart.filter(i => !(i.sourceId === sourceId && i.type === type));
       }
       
@@ -112,6 +165,22 @@ const POSPage = () => {
           return prevCart;
         }
       }
+      
+      // If updating a membership quantity, update the associated giveaway quantity too
+      if (item.type === 'membership') {
+          const plan = membershipPlans?.find(p => p.id === sourceId);
+          if (plan?.giveaway_item_id) {
+              return prevCart.map(i => {
+                  if (i.sourceId === sourceId && i.type === 'membership') {
+                      return { ...i, quantity: newQuantity };
+                  }
+                  if (i.sourceId === plan.giveaway_item_id && i.isGiveaway) {
+                      return { ...i, quantity: newQuantity };
+                  }
+                  return i;
+              });
+          }
+      }
 
       return prevCart.map(i =>
         i.sourceId === sourceId && i.type === type ? { ...i, quantity: newQuantity } : i
@@ -120,7 +189,26 @@ const POSPage = () => {
   };
 
   const removeItem = (sourceId: string, type: 'inventory' | 'membership') => {
-    setCart(prevCart => prevCart.filter(i => !(i.sourceId === sourceId && i.type === type)));
+    setCart(prevCart => {
+        // If removing a membership plan, also remove its associated giveaway item
+        if (type === 'membership') {
+            const plan = membershipPlans?.find(p => p.id === sourceId);
+            if (plan?.giveaway_item_id) {
+                return prevCart.filter(i => 
+                    !(i.sourceId === sourceId && i.type === type) && // Remove plan
+                    !(i.sourceId === plan.giveaway_item_id && i.isGiveaway) // Remove associated giveaway
+                );
+            }
+        }
+        // Prevent removing giveaway items manually (they are tied to the plan)
+        const itemToRemove = prevCart.find(i => i.sourceId === sourceId && i.type === type);
+        if (itemToRemove?.isGiveaway) {
+            showError(t("cannot_remove_giveaway"));
+            return prevCart;
+        }
+        
+        return prevCart.filter(i => !(i.sourceId === sourceId && i.type === type));
+    });
   };
   
   const handleClearMember = () => {
@@ -143,7 +231,7 @@ const POSPage = () => {
   };
   
   // Handler for successful registration via POS tab (UPDATED)
-  const handleRegistrationSuccess = ({ member, plan, paymentMethod }: { member: Profile, plan: Pick<MembershipPlan, 'id' | 'name' | 'duration_days' | 'price'>, paymentMethod: PaymentMethod }) => {
+  const handleRegistrationSuccess = ({ member, plan, paymentMethod }: { member: Profile, plan: Pick<MembershipPlan, 'id' | 'name' | 'duration_days' | 'price' | 'giveaway_item_id'>, paymentMethod: PaymentMethod }) => {
     // 1. Select the new member
     setSelectedMember(member);
     
@@ -153,9 +241,8 @@ const POSPage = () => {
     // 3. Mark as just registered
     setJustRegisteredMemberId(member.id); 
     
-    // 4. Add the plan to the cart. The transaction will be recorded during checkout.
-    // We cast 'plan' to MembershipPlan because addMembershipToCart expects the full type, 
-    // even though it only uses the picked fields.
+    // 4. Add the plan (and potential giveaway) to the cart. 
+    // We cast 'plan' to MembershipPlan because addMembershipToCart expects the full type.
     addMembershipToCart(plan as MembershipPlan); 
     
     showSuccess(t("registration_and_cart_success", { name: `${member.first_name} ${member.last_name}` }));
@@ -168,7 +255,10 @@ const POSPage = () => {
   // --- Calculations ---
 
   const { subtotal, discountAmount, tax, total } = useMemo(() => {
-    const rawSubtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    // Only calculate price based on non-giveaway items
+    const payableCart = cart.filter(item => !item.isGiveaway);
+    
+    const rawSubtotal = payableCart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     
     // 1. Apply Discount to Subtotal
     const discountFactor = discountPercent / 100;
@@ -176,8 +266,8 @@ const POSPage = () => {
     
     const TAX_RATE = 0.08; // 8% sales tax
     
-    // 2. Calculate Taxable Base (only inventory items, after discount)
-    const rawTaxableSubtotal = cart
+    // 2. Calculate Taxable Base (only inventory items, after discount, excluding giveaways)
+    const rawTaxableSubtotal = payableCart
         .filter(item => item.type === 'inventory')
         .reduce((sum, item) => sum + item.price * item.quantity, 0);
         
@@ -203,10 +293,23 @@ const POSPage = () => {
     
     try {
         // 1. Process inventory stock reduction (using RPC for atomic update)
+        // This includes both paid inventory items AND free giveaway items
         const inventoryItemsSold = cart.filter(item => item.type === 'inventory');
         
         await Promise.all(inventoryItemsSold.map(async item => {
-            await reduceInventoryStock(item.sourceId, item.quantity);
+            // Only reduce stock if the item is actually in stock (prevents errors on 0 stock items)
+            const currentStock = liveInventoryItems?.find(i => i.id === item.sourceId)?.stock || item.stock || 0;
+            if (currentStock >= item.quantity) {
+                await reduceInventoryStock(item.sourceId, item.quantity);
+            } else {
+                // If a giveaway item is out of stock, we should still proceed with the sale, 
+                // but log a warning or notify staff (for now, we just log and proceed).
+                if (item.isGiveaway) {
+                    console.warn(`Giveaway item ${item.name} is out of stock but sale proceeded.`);
+                } else {
+                    throw new Error(t("checkout_failed_stock_issue", { name: item.name }));
+                }
+            }
         }));
         
         // 2. Process Membership Renewals/Activation

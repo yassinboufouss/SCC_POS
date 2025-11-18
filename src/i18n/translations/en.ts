@@ -213,7 +213,7 @@ export const en = {
     "logging_in": "Logging in...",
     "signing_up": "Signing up...",
     "already_have_an_account_sign_in": "Already have an account? Sign In",
-    "dont_have_an_account_sign_up": "Don't have an account? Sign Up",
+    "dont_have_an-account_sign_up": "Don't have an account? Sign Up",
     "forgot_your_password": "Forgot your password?",
     "loading": "Loading",
     "logout_failed": "Logout failed. Please try again.",
@@ -236,5 +236,15 @@ export const en = {
     "transaction_date_time": "Date & Time",
     "total_amount": "Total Amount",
     "lookup_failed": "Member lookup failed. Please try again.",
+    
+    // Giveaway Keys
+    "free_giveaway_item": "Free Giveaway Item",
+    "select_optional_item": "Select optional item",
+    "no_giveaway": "No Giveaway",
+    "free_giveaway": "FREE",
+    "free_item": "FREE Item",
+    "cannot_remove_giveaway": "Cannot remove giveaway item. Remove the associated plan instead.",
+    "giveaway_item_not_found": "Giveaway item not found in inventory.",
+    "checkout_failed_stock_issue": "Checkout failed: Insufficient stock for {{name}}.",
   }
 };

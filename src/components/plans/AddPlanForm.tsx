@@ -5,11 +5,13 @@ import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useAddPlan } from '@/integrations/supabase/data/use-plans.ts';
+import { useInventory } from '@/integrations/supabase/data/use-inventory.ts'; // Import inventory hook
 import { showSuccess, showError } from '@/utils/toast';
 import { useTranslation } from 'react-i18next';
-import { Ticket } from 'lucide-react';
+import { Ticket, Gift } from 'lucide-react';
 import { NewPlanInput } from '@/types/pos';
 
 interface AddPlanFormProps {
@@ -21,6 +23,7 @@ const formSchema = z.object({
   duration_days: z.coerce.number().int().min(1, { message: "Duration must be at least 1 day." }),
   price: z.coerce.number().min(0.01, { message: "Price must be greater than zero." }),
   description: z.string().min(5, { message: "Description is required." }),
+  giveaway_item_id: z.string().optional().nullable(), // New field
 });
 
 type AddPlanFormValues = z.infer<typeof formSchema>;
@@ -28,6 +31,7 @@ type AddPlanFormValues = z.infer<typeof formSchema>;
 const AddPlanForm: React.FC<AddPlanFormProps> = ({ onSuccess }) => {
   const { t } = useTranslation();
   const { mutateAsync: addPlan, isPending } = useAddPlan();
+  const { data: inventoryItems, isLoading: isLoadingInventory } = useInventory();
   
   const form = useForm<AddPlanFormValues>({
     resolver: zodResolver(formSchema),
@@ -36,6 +40,7 @@ const AddPlanForm: React.FC<AddPlanFormProps> = ({ onSuccess }) => {
       duration_days: 30,
       price: 0,
       description: "",
+      giveaway_item_id: null,
     },
   });
 
@@ -45,6 +50,7 @@ const AddPlanForm: React.FC<AddPlanFormProps> = ({ onSuccess }) => {
         duration_days: values.duration_days,
         price: values.price,
         description: values.description,
+        giveaway_item_id: values.giveaway_item_id || null,
     };
     
     try {
@@ -106,6 +112,33 @@ const AddPlanForm: React.FC<AddPlanFormProps> = ({ onSuccess }) => {
                 <FormControl>
                   <Input type="number" step="0.01" min="0.01" placeholder="99.99" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          {/* Giveaway Item */}
+          <FormField
+            control={form.control}
+            name="giveaway_item_id"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-1"><Gift className="h-4 w-4 text-green-600" /> {t("free_giveaway_item")}</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value || ''} disabled={isLoadingInventory}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t("select_optional_item")} />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="">{t("no_giveaway")}</SelectItem>
+                    {inventoryItems?.map(item => (
+                      <SelectItem key={item.id} value={item.id}>
+                        {item.name} ({item.stock} {t("in_stock")})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}

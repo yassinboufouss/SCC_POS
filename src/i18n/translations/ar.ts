@@ -236,5 +236,15 @@ export const ar = {
     "transaction_date_time": "التاريخ والوقت",
     "total_amount": "المبلغ الإجمالي",
     "lookup_failed": "فشل البحث عن العضو. الرجاء المحاولة مرة أخرى.",
+    
+    // Giveaway Keys
+    "free_giveaway_item": "عنصر هدية مجاني",
+    "select_optional_item": "اختر عنصرًا اختياريًا",
+    "no_giveaway": "لا توجد هدية",
+    "free_giveaway": "مجاني",
+    "free_item": "عنصر مجاني",
+    "cannot_remove_giveaway": "لا يمكن إزالة عنصر الهدية. قم بإزالة الخطة المرتبطة بدلاً من ذلك.",
+    "giveaway_item_not_found": "لم يتم العثور على عنصر الهدية في المخزون.",
+    "checkout_failed_stock_issue": "فشل الدفع: مخزون غير كافٍ لـ {{name}}.",
   }
 };

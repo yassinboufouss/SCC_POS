@@ -23,6 +23,7 @@ export type MembershipPlan = {
   price: number;
   description: string | null;
   created_at: string | null;
+  giveaway_item_id: string | null; // NEW: Optional ID of a free inventory item
 };
 
 export type InventoryItem = {

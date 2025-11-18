@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { MembershipPlan } from '@/types/supabase';
 import { Button } from '@/components/ui/button';
-import { Edit, Save, Ticket } from 'lucide-react';
+import { Edit, Save, Ticket, Gift } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
@@ -10,7 +10,9 @@ import * as z from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { useUpdatePlan } from '@/integrations/supabase/data/use-plans.ts';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useUpdatePlan, usePlans } from '@/integrations/supabase/data/use-plans.ts';
+import { useInventory } from '@/integrations/supabase/data/use-inventory.ts'; // Import inventory hook
 import { showSuccess, showError } from '@/utils/toast';
 import { Separator } from '@/components/ui/separator';
 
@@ -23,6 +25,7 @@ const formSchema = z.object({
   duration_days: z.coerce.number().int().min(1, { message: "Duration must be at least 1 day." }),
   price: z.coerce.number().min(0.01, { message: "Price must be greater than zero." }),
   description: z.string().min(5, { message: "Description is required." }),
+  giveaway_item_id: z.string().optional().nullable(), // New field
 });
 
 type EditPlanFormValues = z.infer<typeof formSchema>;
@@ -31,6 +34,7 @@ const PlanActions: React.FC<PlanActionsProps> = ({ plan }) => {
   const { t } = useTranslation();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { mutateAsync: updatePlan, isPending } = useUpdatePlan();
+  const { data: inventoryItems, isLoading: isLoadingInventory } = useInventory();
   
   const form = useForm<EditPlanFormValues>({
     resolver: zodResolver(formSchema),
@@ -39,6 +43,7 @@ const PlanActions: React.FC<PlanActionsProps> = ({ plan }) => {
       duration_days: plan.duration_days,
       price: plan.price,
       description: plan.description || "",
+      giveaway_item_id: plan.giveaway_item_id || null,
     },
   });
 
@@ -49,6 +54,7 @@ const PlanActions: React.FC<PlanActionsProps> = ({ plan }) => {
       duration_days: values.duration_days,
       price: values.price,
       description: values.description,
+      giveaway_item_id: values.giveaway_item_id || null,
     };
     
     try {
@@ -121,6 +127,33 @@ const PlanActions: React.FC<PlanActionsProps> = ({ plan }) => {
                     <FormControl>
                       <Input type="number" step="0.01" min="0.01" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              {/* Giveaway Item */}
+              <FormField
+                control={form.control}
+                name="giveaway_item_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-1"><Gift className="h-4 w-4 text-green-600" /> {t("free_giveaway_item")}</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value || ''} disabled={isLoadingInventory}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t("select_optional_item")} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="">{t("no_giveaway")}</SelectItem>
+                        {inventoryItems?.map(item => (
+                          <SelectItem key={item.id} value={item.id}>
+                            {item.name} ({item.stock} {t("in_stock")})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

@@ -224,7 +224,7 @@ export const fr = {
     "no_plans_found": "Aucun plan d'adhésion trouvé.",
     "pos_products_tab": "Produits et Plans",
     "pos_register_tab": "Inscription Nouveau Membre",
-    "registration_and_cart_success": "Inscription terminée. تم اختيار {{name}} وإضافة الخطة إلى العربة.",
+    "registration_and_cart_success": "Inscription terminée. {{name}} sélectionné et plan ajouté à la caisse.",
     "plan_not_found_after_registration": "Détails du plan introuvables après l'inscription, veuillez vérifier le panier manuellement.",
     
     // New Transaction Details Keys
@@ -236,5 +236,15 @@ export const fr = {
     "transaction_date_time": "Date et Heure",
     "total_amount": "Montant Total",
     "lookup_failed": "Échec de la recherche de membre. Veuillez réessayer.",
+    
+    // Giveaway Keys
+    "free_giveaway_item": "Article Cadeau Gratuit",
+    "select_optional_item": "Sélectionner un article optionnel",
+    "no_giveaway": "Pas de Cadeau",
+    "free_giveaway": "GRATUIT",
+    "free_item": "Article GRATUIT",
+    "cannot_remove_giveaway": "Impossible de supprimer l'article cadeau. Supprimez plutôt le plan associé.",
+    "giveaway_item_not_found": "Article cadeau introuvable dans l'inventaire.",
+    "checkout_failed_stock_issue": "Échec du paiement : Stock insuffisant pour {{name}}.",
   }
 };

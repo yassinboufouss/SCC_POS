@@ -8,6 +8,7 @@ export interface CartItem {
   type: 'inventory' | 'membership';
   stock?: number; 
   imageUrl?: string;
+  isGiveaway?: boolean; // NEW: Flag to mark free items
 }
 
 export type PaymentMethod = 'Card' | 'Cash' | 'Transfer';
