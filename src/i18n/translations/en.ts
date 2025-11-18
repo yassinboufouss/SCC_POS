@@ -190,5 +190,11 @@ export const en = {
     "plan_updated_success": "Membership plan '{{name}}' updated successfully.",
     "associated_members_placeholder": "List of associated members and usage statistics will appear here.",
     "currency_symbol": "MAD",
+    "daily_sales_total": "Daily Sales Total",
+    "weekly_sales_total": "Weekly Sales Total",
+    "monthly_sales_total": "Monthly Sales Total",
+    "sales_summary": "Sales Summary",
+    "print": "Print",
+    "print_summary_success": "Sales summary printed to console.",
   }
 };

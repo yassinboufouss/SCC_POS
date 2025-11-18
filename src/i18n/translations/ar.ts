@@ -190,5 +190,11 @@ export const ar = {
     "plan_updated_success": "تم تحديث خطة العضوية '{{name}}' بنجاح.",
     "associated_members_placeholder": "ستظهر هنا قائمة الأعضاء المرتبطين وإحصائيات الاستخدام.",
     "currency_symbol": "د.م.",
+    "daily_sales_total": "إجمالي المبيعات اليومية",
+    "weekly_sales_total": "إجمالي المبيعات الأسبوعية",
+    "monthly_sales_total": "إجمالي المبيعات الشهرية",
+    "sales_summary": "ملخص المبيعات",
+    "print": "طباعة",
+    "print_summary_success": "تمت طباعة ملخص المبيعات إلى وحدة التحكم.",
   }
 };

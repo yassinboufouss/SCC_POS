@@ -190,5 +190,11 @@ export const fr = {
     "plan_updated_success": "Plan d'adhésion '{{name}}' mis à jour avec succès.",
     "associated_members_placeholder": "La liste des membres associés et les statistiques d'utilisation apparaîtront ici.",
     "currency_symbol": "MAD",
+    "daily_sales_total": "Ventes Quotidiennes Totales",
+    "weekly_sales_total": "Ventes Hebdomadaires Totales",
+    "monthly_sales_total": "Ventes Mensuelles Totales",
+    "sales_summary": "Résumé des Ventes",
+    "print": "Imprimer",
+    "print_summary_success": "Résumé des ventes imprimé dans la console.",
   }
 };

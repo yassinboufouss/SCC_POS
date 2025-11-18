@@ -9,6 +9,7 @@ import POSProductSelection from '@/components/pos/POSProductSelection';
 import POSCartAndCheckout from '@/components/pos/POSCartAndCheckout';
 import POSCheckIn from '@/components/pos/POSCheckIn';
 import POSMemberSelector from '@/components/pos/POSMemberSelector';
+import POSTransactionSummary from '@/components/pos/POSTransactionSummary';
 import { CartItem, PaymentMethod } from '@/types/pos';
 import { useTranslation } from 'react-i18next';
 import Layout from '@/components/Layout';
@@ -219,6 +220,7 @@ const POSPage = () => {
 
           {/* Cart & Checkout (1/3 width) */}
           <div className="lg:col-span-1 flex flex-col space-y-6">
+              <POSTransactionSummary />
               <POSCheckIn />
               
               <POSMemberSelector 
@@ -231,7 +233,6 @@ const POSPage = () => {
                   cart={cart}
                   selectedMember={selectedMember}
                   paymentMethod={paymentMethod} // Passed as hardcoded value
-                  // setPaymentMethod removed
                   discountPercent={discountPercent}
                   setDiscountPercent={setDiscountPercent}
                   updateQuantity={updateQuantity}
