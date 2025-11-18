@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign } from 'lucide-react';
 import { DataTable } from '@/components/DataTable';
 import { mockTransactions } from '@/data/transactions';
-import { transactionColumns } from '@/pages/finance/transaction-columns.tsx';
+import { transactionColumns } from '@/pages/finance/transaction-columns';
 
 const TransactionsPage = () => {
   // Note: We use a copy of mockTransactions to ensure the DataTable receives a stable array for filtering/sorting
