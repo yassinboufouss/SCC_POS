@@ -11,6 +11,7 @@ import { showSuccess, showError } from '@/utils/toast';
 import { useTranslation } from 'react-i18next';
 import { Save } from 'lucide-react';
 import { InventoryItem } from '@/data/inventory';
+import { formatCurrency } from '@/utils/currency-utils';
 
 interface EditItemFormProps {
   item: InventoryItem;
@@ -111,7 +112,7 @@ const EditItemForm: React.FC<EditItemFormProps> = ({ item, onSuccess }) => {
             name="price"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("price")}</FormLabel>
+                <FormLabel>{t("price")} ({t("currency_symbol")})</FormLabel>
                 <FormControl>
                   <Input type="number" step="0.01" min="0.01" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
                 </FormControl>

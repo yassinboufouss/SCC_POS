@@ -4,7 +4,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Input } from '@/components/ui/input';
 import { Search, DollarSign, Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import PlanActions from './PlanActions.tsx';
+import PlanActions from './PlanActions';
+import { formatCurrency } from '@/utils/currency-utils';
 
 const PlanTable: React.FC = () => {
   const { t } = useTranslation();
@@ -68,7 +69,7 @@ const PlanTable: React.FC = () => {
                   </TableCell>
                   <TableCell className="text-right font-bold text-primary flex items-center justify-end gap-1">
                     <DollarSign className="h-4 w-4" />
-                    {plan.price.toFixed(2)}
+                    {formatCurrency(plan.price)}
                   </TableCell>
                   <TableCell className="text-sm text-muted-foreground max-w-xs truncate">{plan.description}</TableCell>
                   <TableCell className="text-right">

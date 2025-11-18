@@ -3,6 +3,7 @@ import { CartItem } from '@/types/pos';
 import { Button } from "@/components/ui/button";
 import { X, Plus, Minus, Ticket, Image } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { formatCurrency } from '@/utils/currency-utils';
 
 interface POSCartItemProps {
   item: CartItem;
@@ -36,7 +37,7 @@ const POSCartItem: React.FC<POSCartItemProps> = ({ item, updateQuantity, removeI
                 {item.type === 'membership' && <Ticket className="h-3 w-3 text-blue-500" />}
                 {item.name}
             </p>
-            <p className="text-sm text-muted-foreground">${item.price.toFixed(2)} x {item.quantity}</p>
+            <p className="text-sm text-muted-foreground">{formatCurrency(item.price)} x {item.quantity}</p>
         </div>
       </div>
       <div className="flex items-center gap-1 shrink-0">

@@ -9,12 +9,13 @@ import { Separator } from '@/components/ui/separator';
 import { User, Mail, Phone, Calendar, Clock, DollarSign, Edit, RefreshCw, XCircle, History, Save } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { getTransactionsByMemberId } from '@/utils/transaction-utils';
-import MemberRenewalForm from './MemberRenewalForm.tsx';
-import MemberStatusActions from './MemberStatusActions.tsx';
+import MemberRenewalForm from './MemberRenewalForm';
+import MemberStatusActions from './MemberStatusActions';
 import { updateMember } from '@/utils/member-utils';
 import { showSuccess, showError } from '@/utils/toast';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { formatCurrency } from '@/utils/currency-utils';
 
 interface MemberProfileDialogProps {
   member: Member;
@@ -238,7 +239,7 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member, onUpd
                                         <p className="text-xs text-muted-foreground">{tx.date} | {t(tx.paymentMethod.toLowerCase())}</p>
                                     </div>
                                     <div className="text-right shrink-0">
-                                        <p className="font-bold text-base text-green-600">${tx.amount.toFixed(2)}</p>
+                                        <p className="font-bold text-base text-green-600">{formatCurrency(tx.amount)}</p>
                                         <Badge variant="secondary" className="text-xs">{t(tx.type.replace(/\s/g, '_').toLowerCase())}</Badge>
                                     </div>
                                 </div>

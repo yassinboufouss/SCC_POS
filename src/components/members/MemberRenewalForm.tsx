@@ -13,6 +13,7 @@ import { showSuccess, showError } from '@/utils/toast';
 import { useTranslation } from 'react-i18next';
 import { format, addDays } from 'date-fns';
 import { CreditCard, Ticket } from 'lucide-react';
+import { formatCurrency } from '@/utils/currency-utils';
 
 interface MemberRenewalFormProps {
   member: Member;
@@ -103,7 +104,7 @@ const MemberRenewalForm: React.FC<MemberRenewalFormProps> = ({ member, onRenewal
                 <SelectContent>
                   {membershipPlans.map(plan => (
                     <SelectItem key={plan.id} value={plan.id}>
-                      {plan.name} (${plan.price.toFixed(2)}) - {plan.durationDays} {t("days")}
+                      {plan.name} ({formatCurrency(plan.price)}) - {plan.durationDays} {t("days")}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -129,7 +130,7 @@ const MemberRenewalForm: React.FC<MemberRenewalFormProps> = ({ member, onRenewal
             <Separator />
             <div className="flex justify-between text-lg font-bold">
               <span>{t("total_due")}</span>
-              <span>${renewalSummary.totalDue.toFixed(2)}</span>
+              <span>{formatCurrency(renewalSummary.totalDue)}</span>
             </div>
           </div>
         )}

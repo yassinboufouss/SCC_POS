@@ -143,7 +143,7 @@ export const fr = {
     "process_sale": "Traiter la Vente",
     "clear_cart": "Vider le Panier",
     "select_payment_method_error": "Veuillez sélectionner un mode de paiement.",
-    "sale_processed_success": "{{type}} traitée avec succès via {{method}} ! Total : ${{total}}",
+    "sale_processed_success": "{{type}} traitée avec succès via {{method}} ! Total : {{total}} MAD",
     "search_select_member": "Rechercher et Sélectionner un Membre",
     "search_by_name_or_id": "Rechercher par nom ou ID...",
     "no_members_found": "Aucun membre trouvé.",
@@ -188,5 +188,6 @@ export const fr = {
     "save_plan_changes": "Enregistrer les Modifications du Plan",
     "plan_updated_success": "Plan d'adhésion '{{name}}' mis à jour avec succès.",
     "associated_members_placeholder": "La liste des membres associés et les statistiques d'utilisation apparaîtront ici.",
+    "currency_symbol": "MAD",
   }
 };

@@ -6,6 +6,7 @@ import { inventoryItems, InventoryItem } from '@/data/inventory';
 import { membershipPlans, MembershipPlan } from '@/data/membership-plans';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
+import { formatCurrency } from '@/utils/currency-utils';
 
 interface POSProductSelectionProps {
   inventorySearchTerm: string;
@@ -50,7 +51,7 @@ const POSProductSelection: React.FC<POSProductSelectionProps> = ({
                   <p className="text-xs text-muted-foreground">{plan.durationDays} {t("days")}</p>
                 </div>
                 <div className="mt-2">
-                  <span className="text-lg font-bold text-blue-600 dark:text-blue-400">${plan.price.toFixed(2)}</span>
+                  <span className="text-lg font-bold text-blue-600 dark:text-blue-400">{formatCurrency(plan.price)}</span>
                 </div>
               </div>
             ))}
@@ -99,7 +100,7 @@ const POSProductSelection: React.FC<POSProductSelectionProps> = ({
                   <p className="text-xs text-muted-foreground">{item.category}</p>
                 </div>
                 <div className="mt-2 flex justify-between items-center">
-                  <span className="text-lg font-bold text-primary">${item.price.toFixed(2)}</span>
+                  <span className="text-lg font-bold text-primary">{formatCurrency(item.price)}</span>
                   <span className={`text-xs font-semibold ${item.stock < 10 ? 'text-red-500' : 'text-green-500'}`}>
                     {t("stock")} {item.stock}
                   </span>

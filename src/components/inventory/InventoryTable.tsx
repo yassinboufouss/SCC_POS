@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Search, Image } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import InventoryItemActions from '@/components/inventory/InventoryItemActions';
+import { formatCurrency } from '@/utils/currency-utils';
 
 const InventoryTable: React.FC = () => {
   const { t } = useTranslation();
@@ -84,7 +85,7 @@ const InventoryTable: React.FC = () => {
                   <TableCell className="font-medium text-xs">{item.id}</TableCell>
                   <TableCell>{item.name}</TableCell>
                   <TableCell>{item.category}</TableCell>
-                  <TableCell className="text-right">${item.price.toFixed(2)}</TableCell>
+                  <TableCell className="text-right">{formatCurrency(item.price)}</TableCell>
                   <TableCell className="text-center">
                     <Badge variant={getStockVariant(item.stock)}>
                       {item.stock} {item.stock === 0 ? t("out_of_stock") : t("in_stock")}

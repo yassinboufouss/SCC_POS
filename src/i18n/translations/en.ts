@@ -143,7 +143,7 @@ export const en = {
     "process_sale": "Process Sale",
     "clear_cart": "Clear Cart",
     "select_payment_method_error": "Please select a payment method.",
-    "sale_processed_success": "{{type}} processed successfully via {{method}}! Total: ${{total}}",
+    "sale_processed_success": "{{type}} processed successfully via {{method}}! Total: {{total}} MAD",
     "search_select_member": "Search & Select Member",
     "search_by_name_or_id": "Search by name or ID...",
     "no_members_found": "No members found.",
@@ -188,5 +188,6 @@ export const en = {
     "save_plan_changes": "Save Plan Changes",
     "plan_updated_success": "Membership plan '{{name}}' updated successfully.",
     "associated_members_placeholder": "List of associated members and usage statistics will appear here.",
+    "currency_symbol": "MAD",
   }
 };

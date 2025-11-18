@@ -2,11 +2,12 @@ import React, { useMemo } from 'react';
 import Layout from '@/components/Layout';
 import { useTranslation } from 'react-i18next';
 import { Users, DollarSign, Package, QrCode } from 'lucide-react';
-import DashboardMetricCard from '@/components/dashboard/DashboardMetricCard.tsx';
-import ExpiringMemberships from '@/components/dashboard/ExpiringMemberships.tsx';
-import LowStockAlerts from '@/components/dashboard/LowStockAlerts.tsx';
-import RecentTransactionsTable from '@/components/dashboard/RecentTransactionsTable.tsx';
+import DashboardMetricCard from '@/components/dashboard/DashboardMetricCard';
+import ExpiringMemberships from '@/components/dashboard/ExpiringMemberships';
+import LowStockAlerts from '@/components/dashboard/LowStockAlerts';
+import RecentTransactionsTable from '@/components/dashboard/RecentTransactionsTable';
 import { getDashboardMetrics } from '@/utils/dashboard-utils';
+import { formatCurrency } from '@/utils/currency-utils';
 
 const DashboardPage: React.FC = () => {
   const { t } = useTranslation();
@@ -29,7 +30,7 @@ const DashboardPage: React.FC = () => {
           />
           <DashboardMetricCard
             title={t("total_revenue_mtd")}
-            value={`$${metrics.monthlyRevenue.toFixed(2)}`}
+            value={formatCurrency(metrics.monthlyRevenue)}
             icon={DollarSign}
             description={t("this_months_sales")}
           />

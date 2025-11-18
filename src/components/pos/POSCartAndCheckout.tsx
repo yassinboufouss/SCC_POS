@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import POSCartItem from './POSCartItem.tsx';
 import { CartItem, PaymentMethod } from '@/types/pos.ts';
 import { useTranslation } from 'react-i18next';
+import { formatCurrency } from '@/utils/currency-utils';
 
 interface POSCartAndCheckoutProps {
   cart: CartItem[];
@@ -94,7 +95,7 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
           <div className="space-y-1 text-sm">
             <div className="flex justify-between">
               <span>{t("subtotal")}</span>
-              <span className="font-medium">${subtotal.toFixed(2)}</span>
+              <span className="font-medium">{formatCurrency(subtotal)}</span>
             </div>
             
             {/* Discount Input */}
@@ -117,19 +118,19 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
             {discountAmount > 0 && (
               <div className="flex justify-between text-red-500">
                   <span>{t("discount_applied")}</span>
-                  <span className="font-medium">-${discountAmount.toFixed(2)}</span>
+                  <span className="font-medium">-{formatCurrency(discountAmount)}</span>
               </div>
             )}
             
             <div className="flex justify-between">
               <span>{t("tax_inventory")}</span>
-              <span className="font-medium">${tax.toFixed(2)}</span>
+              <span className="font-medium">{formatCurrency(tax)}</span>
             </div>
             
             <Separator className="my-2" />
             <div className="flex justify-between text-lg font-bold">
               <span>{t("total")}</span>
-              <span>${total.toFixed(2)}</span>
+              <span>{formatCurrency(total)}</span>
             </div>
           </div>
           

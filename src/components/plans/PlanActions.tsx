@@ -13,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { updateMembershipPlan } from '@/utils/plan-utils';
 import { showSuccess } from '@/utils/toast';
 import { Separator } from '@/components/ui/separator';
+import { formatCurrency } from '@/utils/currency-utils';
 
 interface PlanActionsProps {
   plan: MembershipPlan;
@@ -114,7 +115,7 @@ const PlanActions: React.FC<PlanActionsProps> = ({ plan, onUpdate }) => {
                 name="price"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("price")}</FormLabel>
+                    <FormLabel>{t("price")} ({t("currency_symbol")})</FormLabel>
                     <FormControl>
                       <Input type="number" step="0.01" min="0.01" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
                     </FormControl>

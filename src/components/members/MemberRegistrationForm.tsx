@@ -13,6 +13,7 @@ import { showSuccess, showError } from '@/utils/toast';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { CalendarIcon, UserPlus } from 'lucide-react';
+import { formatCurrency } from '@/utils/currency-utils';
 
 interface MemberRegistrationFormProps {
   onSuccess: () => void;
@@ -151,7 +152,7 @@ const MemberRegistrationForm: React.FC<MemberRegistrationFormProps> = ({ onSucce
                     <SelectContent>
                       {membershipPlans.map(plan => (
                         <SelectItem key={plan.id} value={plan.id}>
-                          {plan.name} (${plan.price.toFixed(2)})
+                          {plan.name} ({formatCurrency(plan.price)})
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -165,7 +166,7 @@ const MemberRegistrationForm: React.FC<MemberRegistrationFormProps> = ({ onSucce
               <div className="mt-4 p-3 border rounded-md bg-secondary/50 text-sm">
                 <p className="font-semibold">{t("plan_details")}:</p>
                 <p>{t("duration")}: {selectedPlan.durationDays} {t("days")}</p>
-                <p>{t("price")}: ${selectedPlan.price.toFixed(2)}</p>
+                <p>{t("price")}: {formatCurrency(selectedPlan.price)}</p>
                 <p className="text-muted-foreground mt-1">{selectedPlan.description}</p>
               </div>
             )}

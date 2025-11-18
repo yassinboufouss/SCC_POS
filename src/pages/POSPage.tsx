@@ -11,6 +11,7 @@ import POSCheckIn from '@/components/pos/POSCheckIn';
 import { CartItem, PaymentMethod } from '@/types/pos';
 import { useTranslation } from 'react-i18next';
 import Layout from '@/components/Layout';
+import { formatCurrency } from '@/utils/currency-utils';
 
 const POSPage = () => {
   const { t } = useTranslation();
@@ -184,8 +185,8 @@ const POSPage = () => {
     showSuccess(t("sale_processed_success", { 
         type: transactionType, 
         method: t(paymentMethod.toLowerCase()), 
-        total: total.toFixed(2),
-        defaultValue: `${transactionType} processed successfully via ${paymentMethod}! Total: $${total.toFixed(2)}`
+        total: formatCurrency(total),
+        defaultValue: `${transactionType} processed successfully via ${paymentMethod}! Total: ${formatCurrency(total)}`
     }));
     
     // Reset state
