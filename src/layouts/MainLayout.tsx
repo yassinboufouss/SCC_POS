@@ -5,9 +5,11 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const MainLayout = () => {
   const isMobile = useIsMobile();
+  const { t } = useTranslation();
 
   if (isMobile) {
     return (
@@ -24,7 +26,7 @@ const MainLayout = () => {
               <Sidebar className="w-full border-none" />
             </SheetContent>
           </Sheet>
-          <h1 className="text-xl font-semibold">Gym POS</h1>
+          <h1 className="text-xl font-semibold">{t("app_title")}</h1>
         </header>
         <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
           <Outlet />

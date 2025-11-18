@@ -13,64 +13,66 @@ import {
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 const navItems = [
   {
-    name: "Dashboard",
+    nameKey: "dashboard",
     icon: Home,
     path: "/dashboard",
     roles: ["Admin", "Manager", "Receptionist", "Trainer"],
   },
   {
-    name: "Members",
+    nameKey: "members",
     icon: Users,
     path: "/members",
     roles: ["Admin", "Manager", "Receptionist"],
   },
   {
-    name: "Check-In",
+    nameKey: "check_in",
     icon: LogIn,
     path: "/checkin",
     roles: ["Admin", "Receptionist"],
   },
   {
-    name: "POS", // New Item
+    nameKey: "pos",
     icon: ShoppingCart,
     path: "/pos",
     roles: ["Admin", "Manager", "Receptionist"],
   },
   {
-    name: "Classes",
+    nameKey: "classes",
     icon: Calendar,
     path: "/classes",
     roles: ["Admin", "Manager", "Trainer"],
   },
   {
-    name: "Trainers",
+    nameKey: "trainers",
     icon: Dumbbell,
     path: "/trainers",
     roles: ["Admin", "Manager"],
   },
   {
-    name: "Inventory",
+    nameKey: "inventory",
     icon: Package,
     path: "/inventory",
     roles: ["Admin", "Manager"],
   },
   {
-    name: "Membership Plans",
+    nameKey: "membership_plans",
     icon: Ticket,
     path: "/plans",
     roles: ["Admin", "Manager"],
   },
   {
-    name: "Finance & Reports",
+    nameKey: "finance_reports",
     icon: DollarSign,
     path: "/finance",
     roles: ["Admin", "Manager"],
   },
   {
-    name: "Settings",
+    nameKey: "settings",
     icon: Settings,
     path: "/settings",
     roles: ["Admin"],
@@ -83,6 +85,7 @@ interface SidebarProps {
 
 const Sidebar = ({ className }: SidebarProps) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   // Placeholder for current user role (assuming Admin for full view initially)
   const currentUserRole = "Admin"; 
 
@@ -104,12 +107,12 @@ const Sidebar = ({ className }: SidebarProps) => {
       )}
     >
       <div className="mb-8 text-2xl font-bold text-sidebar-primary">
-        Gym POS
+        {t("app_title")}
       </div>
       <nav className="flex flex-col space-y-1">
         {filteredNavItems.map((item) => (
           <NavLink
-            key={item.name}
+            key={item.nameKey}
             to={item.path}
             className={({ isActive }) =>
               cn(
@@ -119,18 +122,18 @@ const Sidebar = ({ className }: SidebarProps) => {
             }
           >
             <item.icon className="h-5 w-5" />
-            {item.name}
+            {t(item.nameKey)}
           </NavLink>
         ))}
       </nav>
-      <div className="mt-auto pt-4 border-t border-sidebar-border">
-        {/* Placeholder for User Profile/Logout */}
+      <div className="mt-auto pt-4 border-t border-sidebar-border space-y-2">
+        <LanguageSwitcher />
         <Button 
           variant="ghost" 
           className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent"
           onClick={handleLogout}
         >
-          Logout
+          {t("logout")}
         </Button>
       </div>
     </div>

@@ -6,9 +6,11 @@ import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import { Dumbbell } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 const Index = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleLogin = () => {
     // Simulate successful login and redirect to dashboard
@@ -33,16 +35,16 @@ const Index = () => {
             <Dumbbell className="h-10 w-10 text-primary" />
           </div>
           <CardTitle className="text-3xl font-bold">
-            Gym POS System
+            {t("app_title")}
           </CardTitle>
           <CardDescription>
-            Enter your credentials to access the management dashboard.
+            {t("login_description", { defaultValue: "Enter your credentials to access the management dashboard." })}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="username">{t("username", { defaultValue: "Username" })}</Label>
               <Input 
                 id="username" 
                 type="email" 
@@ -50,7 +52,7 @@ const Index = () => {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t("password", { defaultValue: "Password" })}</Label>
               <Input 
                 id="password" 
                 type="password" 
@@ -58,7 +60,7 @@ const Index = () => {
               />
             </div>
             <Button onClick={handleLogin} className="w-full mt-2">
-              Log In
+              {t("log_in")}
             </Button>
           </div>
         </CardContent>
