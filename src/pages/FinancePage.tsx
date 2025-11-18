@@ -5,6 +5,7 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import RecentTransactions from '@/components/RecentTransactions';
 import { calculateDashboardMetrics } from '@/utils/dashboard-metrics';
+import RevenueBreakdownChart from '@/components/RevenueBreakdownChart';
 
 const FinancePage = () => {
   const metrics = calculateDashboardMetrics();
@@ -36,7 +37,7 @@ const FinancePage = () => {
           </CardContent>
         </Card>
         
-        {/* New Members */}
+        {/* Active Members */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
@@ -79,25 +80,29 @@ const FinancePage = () => {
         </Card>
       </div>
 
+      {/* Charts and Reports Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <RevenueBreakdownChart />
+        <Card className="h-full">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" /> Detailed Reports
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-muted-foreground">Generate and view detailed financial reports for various periods.</p>
+            <Separator />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Button variant="outline" className="justify-start">Membership Sales Report</Button>
+              <Button variant="outline" className="justify-start">Inventory Profit Report</Button>
+              <Button variant="outline" className="justify-start">Trainer Payroll Summary</Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Recent Transactions Table */}
       <RecentTransactions />
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5" /> Detailed Reports
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-muted-foreground">Generate and view detailed financial reports for various periods.</p>
-          <Separator />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Button variant="outline" className="justify-start">Membership Sales Report</Button>
-            <Button variant="outline" className="justify-start">Inventory Profit Report</Button>
-            <Button variant="outline" className="justify-start">Trainer Payroll Summary</Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };

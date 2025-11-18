@@ -1,5 +1,5 @@
 import { mockMembers } from "@/data/members";
-import { mockTransactions } from "@/data/transactions";
+import { mockTransactions, Transaction } from "@/data/transactions";
 import { inventoryItems } from "@/data/inventory";
 import { isSameMonth, parseISO } from "date-fns";
 
@@ -8,6 +8,11 @@ export interface DashboardMetrics {
   monthlyRevenue: number;
   lowStockItems: number;
   expiredMemberships: number;
+}
+
+export interface RevenueBreakdown {
+  type: 'Membership' | 'POS Sale' | 'Mixed Sale';
+  amount: number;
 }
 
 export const calculateDashboardMetrics = (): DashboardMetrics => {
@@ -35,4 +40,20 @@ export const calculateDashboardMetrics = (): DashboardMetrics => {
     lowStockItems,
     expiredMemberships,
   };
+};
+
+export const calculateMonthlyRevenueBreakdown = (): RevenueBreakdown[] => {
+  const today = new Date();
+  const monthlyTransactions = mockTransactions.filter(tx => isSameMonth(parseISO(tx.date), today));
+
+  const breakdownMap = monthlyTransactions.reduce((acc, tx) => {
+    const type = tx.type;
+    acc[type] = (acc[type] || 0) + tx.amount;
+    return acc;
+  }, {} as Record<Transaction['type'], number>);
+
+  return Object.entries(breakdownMap).map(([type, amount]) => ({
+    type: type as Transaction['type'],
+    amount,
+  }));
 };
