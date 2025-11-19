@@ -82,48 +82,34 @@ export const registerNewUserAndProfile = async (newMemberData: Omit<NewMemberInp
 
 // Utility to simulate renewing a member's plan (Used by Member Profile Renewal Form)
 export const renewMemberPlan = async (profileId: string, planId: string): Promise<{ profile: Profile, plan: Pick<MembershipPlan, 'id' | 'name' | 'duration_days' | 'price'> } | null> => {
-  // 1. Fetch current profile and plan details
-  const [{ data: profile, error: profileError }, { data: planData, error: planError }] = await Promise.all([
-    supabase.from('profiles').select('expiration_date, first_name, last_name, member_code').eq('id', profileId).single(),
+  // 1. Call the secure RPC function to handle renewal logic and date calculation
+  const { data: renewalResult, error: rpcError } = await supabase.rpc('renew_member_plan_rpc', {
+    p_profile_id: profileId,
+    p_plan_id: planId,
+  });
+
+  if (rpcError) {
+    console.error("Supabase renewMemberPlan RPC error:", rpcError);
+    throw new Error(rpcError.message || "Failed to renew membership plan via RPC.");
+  }
+  
+  if (!renewalResult || renewalResult.length === 0) {
+      throw new Error("Renewal RPC returned no data.");
+  }
+  
+  // 2. Fetch the updated profile and plan details for the client response
+  const [{ data: updatedProfile, error: profileError }, { data: planData, error: planError }] = await Promise.all([
+    supabase.from('profiles').select('*').eq('id', profileId).single(),
     supabase.from('membership_plans').select('id, name, duration_days, price').eq('id', planId).single(),
   ]);
 
-  if (profileError || !profile) {
-    console.error("Member not found for renewal:", profileError);
-    throw new Error("Member not found.");
+  if (profileError || !updatedProfile) {
+    console.error("Member not found after renewal:", profileError);
+    throw new Error("Member profile missing after renewal.");
   }
   if (planError || !planData) {
-    console.error("Plan not found for renewal:", planError);
-    throw new Error("Plan not found.");
-  }
-
-  // 2. Calculate new dates
-  const today = new Date();
-  const currentExpiration = profile.expiration_date ? new Date(profile.expiration_date) : today;
-  
-  let newStartDate = today;
-  
-  // If membership is still active (expiration date is in the future), start the new plan immediately after the current one ends.
-  if (currentExpiration.getTime() > today.getTime()) {
-      // Add 1 day to the current expiration date to get the new start date
-      newStartDate = addDays(currentExpiration, 1);
-  }
-  
-  const newExpirationDate = addDays(newStartDate, planData.duration_days);
-
-  // 3. Update profile
-  const updatedProfileData = {
-    plan_name: planData.name,
-    status: 'Active' as const,
-    start_date: format(newStartDate, 'yyyy-MM-dd'),
-    expiration_date: format(newExpirationDate, 'yyyy-MM-dd'),
-    updated_at: new Date().toISOString(),
-  };
-
-  const updatedProfile = await updateProfile({ id: profileId, ...updatedProfileData });
-  
-  if (!updatedProfile) {
-      throw new Error("Failed to update profile during renewal.");
+    console.error("Plan not found after renewal:", planError);
+    throw new Error("Plan details missing after renewal.");
   }
   
   return { profile: updatedProfile, plan: planData };
