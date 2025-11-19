@@ -18,7 +18,7 @@ const RecentTransactionsTable: React.FC<RecentTransactionsTableProps> = ({ trans
   const { t } = useTranslation();
 
   return (
-    <Card>
+    <Card className="shadow-lg">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
           <History className="h-5 w-5" /> {t("recent_transactions_title", { count: transactions.length })}

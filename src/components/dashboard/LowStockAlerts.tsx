@@ -16,7 +16,7 @@ const LowStockAlerts: React.FC<LowStockAlertsProps> = ({ items, isLoading }) => 
   const { t } = useTranslation();
 
   return (
-    <Card className="h-full flex flex-col">
+    <Card className="h-full flex flex-col shadow-lg">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
           <Package className="h-5 w-5 text-red-500" /> {t("low_stock_alerts")}
@@ -36,7 +36,7 @@ const LowStockAlerts: React.FC<LowStockAlertsProps> = ({ items, isLoading }) => 
         ) : (
           <div className="space-y-3">
             {items.map((item) => (
-              <div key={item.id} className="flex items-center justify-between p-2 border rounded-md bg-red-50/50 hover:bg-red-100/50 transition-colors">
+              <div key={item.id} className="flex items-center justify-between p-3 border rounded-md bg-red-50/50 hover:bg-red-100/70 transition-colors">
                 <div className="flex items-center gap-3 min-w-0">
                   <AlertTriangle className="h-5 w-5 text-red-500 shrink-0" />
                   <div className="min-w-0">

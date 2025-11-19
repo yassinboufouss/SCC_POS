@@ -18,7 +18,7 @@ const ExpiringMemberships: React.FC<ExpiringMembershipsProps> = ({ members, isLo
   const now = new Date();
 
   return (
-    <Card className="h-full flex flex-col">
+    <Card className="h-full flex flex-col shadow-lg">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
           <AlertTriangle className="h-5 w-5 text-yellow-500" /> {t("expiring_memberships")}
@@ -43,7 +43,7 @@ const ExpiringMemberships: React.FC<ExpiringMembershipsProps> = ({ members, isLo
               const daysText = t(daysLeft === 1 ? "days_left" : "days_left_plural", { count: daysLeft });
               
               return (
-                <div key={member.id} className="flex items-center justify-between p-2 border rounded-md hover:bg-secondary/50 transition-colors">
+                <div key={member.id} className="flex items-center justify-between p-3 border rounded-md hover:bg-secondary transition-colors">
                   <div className="flex items-center gap-3 min-w-0">
                     <User className="h-5 w-5 text-primary/70 shrink-0" />
                     <div className="min-w-0">
