@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Users, ShoppingCart, LogOut, Package, Ticket, QrCode, LayoutDashboard, History, Shield, BarChart3 } from 'lucide-react';
+import { Users, ShoppingCart, LogOut, Package, Ticket, QrCode, LayoutDashboard, History, Shield, BarChart3, Dumbbell } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -42,8 +42,9 @@ const Sidebar: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen border-r bg-sidebar text-sidebar-foreground p-4 w-64 sticky top-0">
-      <div className="text-2xl font-bold text-sidebar-primary mb-8 flex items-center justify-center gap-2">
-        <span className="text-3xl">🏋️</span> {t("app_title")}
+      <div className="text-2xl font-extrabold text-sidebar-primary mb-8 flex items-center justify-center gap-2">
+        <Dumbbell className="h-7 w-7 text-sidebar-primary" />
+        {t("app_title")}
       </div>
       
       <nav className="flex-1 space-y-2">
