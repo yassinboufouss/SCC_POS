@@ -214,9 +214,6 @@ export const ar = {
     "weekly_sales_total": "إجمالي المبيعات الأسبوعية",
     "monthly_sales_total": "إجمالي المبيعات الشهرية",
     "sales_summary": "ملخص المبيعات",
-    "print": "طباعة",
-    "print_summary_success": "تم إنشاء ملف PDF لملخص المبيعات بنجاح.",
-    "print_summary_failed": "فشل إنشاء ملف PDF لملخص المبيعات.",
     "login_successful": "تم تسجيل الدخول بنجاح!",
     "logout_successful": "تم تسجيل الخروج بنجاح.",
     "logging_in": "جاري تسجيل الدخول...",
@@ -411,5 +408,9 @@ export const ar = {
     "total_revenue": "إجمالي الإيرادات",
     "period_totals": "إجماليات الفترة",
     "daily_breakdowns": "التفاصيل اليومية",
+    "monthly_breakdowns": "التفاصيل الشهرية",
+    "monthly_inventory_sales": "مبيعات المخزون (شهريًا)",
+    "monthly_membership_sales": "مبيعات العضوية (شهريًا)",
+    "today": "اليوم",
   }
 };
