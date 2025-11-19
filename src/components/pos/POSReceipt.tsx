@@ -81,22 +81,36 @@ const POSReceipt: React.FC<POSReceiptProps> = ({ summary, dailyBreakdowns, class
         </div>
       )}
       
-      {/* 3. Individual Transactions List */}
+      {/* 3. Individual Transactions List (Optimized to use Table) */}
       <div className="space-y-4 mb-6">
         <h2 className="text-lg font-bold border-b pb-1 mb-2">{t("daily_transactions_list")}</h2>
         
         {summary.dailyTransactions.length > 0 ? (
-          <div className="space-y-2">
-            {summary.dailyTransactions.map((tx, index) => (
-              <div key={tx.id} className="flex justify-between items-center text-sm p-2 border rounded-md bg-gray-50">
-                <div className="min-w-0 flex-1 pr-2">
+          <table className="w-full text-sm border-collapse">
+            <thead>
+              <tr className="border-b border-gray-300 text-left font-semibold text-gray-700">
+                <th className="py-1 w-1/3">{t("member")}</th>
+                <th className="py-1 w-1/3">{t("type")}</th>
+                <th className="py-1 w-1/3 text-right">{t("amount")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {summary.dailyTransactions.map((tx) => (
+                <tr key={tx.id} className="border-b border-gray-100 last:border-b-0">
+                  <td className="py-1">
                     <p className="font-medium truncate">{tx.member_name}</p>
-                    <p className="text-xs text-gray-500 truncate">{t(tx.type.replace(/\s/g, '_').toLowerCase())} via {t(tx.payment_method.toLowerCase())}</p>
-                </div>
-                <span className="font-bold text-green-600 shrink-0">{formatCurrency(tx.amount)}</span>
-              </div>
-            ))}
-          </div>
+                    <p className="text-xs text-gray-500 truncate">{tx.item_description}</p>
+                  </td>
+                  <td className="py-1 text-xs">
+                    {t(tx.type.replace(/\s/g, '_').toLowerCase())}
+                  </td>
+                  <td className="py-1 font-bold text-green-600 text-right">
+                    {formatCurrency(tx.amount)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         ) : (
           <p className="text-center text-gray-500 text-sm">{t("no_sales_today")}</p>
         )}
