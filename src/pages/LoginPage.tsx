@@ -118,15 +118,27 @@ const LoginPage: React.FC = () => {
 
   return (
     <div 
-      className={cn(
-        "flex items-center justify-center min-h-screen p-4",
-        "bg-gradient-to-br from-[#E0E7FF] to-[#F9FAFB] dark:from-gray-900 dark:to-gray-950" // Custom gradient background
-      )}
+      className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden"
     >
+      {/* Background Video */}
+      <video
+        autoPlay
+        loop
+        muted // Muted for autoplay compatibility, user can unmute
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover opacity-30 dark:opacity-10"
+      >
+        <source src="/gym-motivation.mp4" type="video/mp4" />
+        {t("video_not_supported")}
+      </video>
+
+      {/* Overlay and Card */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#E0E7FF]/80 to-[#F9FAFB]/80 dark:from-gray-900/90 dark:to-gray-950/90 z-0"></div>
+      
       <Card 
         className={cn(
-          "w-full max-w-md z-10 p-10 rounded-[16px] shadow-[0px_8px_24px_rgba(0,0,0,0.08)]", // Custom shadow and radius
-          "bg-white dark:bg-card"
+          "w-full max-w-md z-10 p-10 rounded-[16px] shadow-[0px_8px_24px_rgba(0,0,0,0.08)]", 
+          "bg-white/90 dark:bg-card/90 backdrop-blur-sm"
         )}
       >
         <CardHeader className="text-center p-0 mb-8">

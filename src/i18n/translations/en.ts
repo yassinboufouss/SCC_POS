@@ -391,5 +391,8 @@ export const en = {
     "voiding": "Voiding...",
     "transaction_void_success": "Transaction ID {{id}} successfully voided.",
     "transaction_void_failed": "Failed to void transaction.",
+    
+    // NEW Video Fallback
+    "video_not_supported": "Your browser does not support the video tag.",
   }
 };

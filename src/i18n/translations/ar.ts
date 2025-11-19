@@ -391,5 +391,8 @@ export const ar = {
     "voiding": "جاري الإلغاء...",
     "transaction_void_success": "تم إلغاء المعاملة رقم {{id}} بنجاح.",
     "transaction_void_failed": "فشل إلغاء المعاملة.",
+    
+    // NEW Video Fallback
+    "video_not_supported": "متصفحك لا يدعم علامة الفيديو.",
   }
 };

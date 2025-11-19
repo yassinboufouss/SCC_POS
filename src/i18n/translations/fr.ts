@@ -391,5 +391,8 @@ export const fr = {
     "voiding": "Annulation en cours...",
     "transaction_void_success": "Transaction ID {{id}} annulée avec succès.",
     "transaction_void_failed": "Échec de l'annulation de la transaction.",
+    
+    // NEW Video Fallback
+    "video_not_supported": "Votre navigateur ne supporte pas la balise vidéo.",
   }
 };
