@@ -7,7 +7,6 @@ import { showSuccess, showError } from '@/utils/toast';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import POSReceipt from './POSReceipt';
-import { Transaction } from '@/types/supabase';
 import { SalesSummary } from '@/utils/transaction-utils';
 
 interface POSSalesSummaryDialogProps {
@@ -37,46 +36,45 @@ const POSSalesSummaryDialog: React.FC<POSSalesSummaryDialogProps> = ({ summary, 
     try {
         const element = receiptRef.current;
         
-        // Capture the visible element inside the dialog
+        // Use a higher scale for better resolution in the PDF
         const canvas = await html2canvas(element, { 
-            scale: 2,
+            scale: 3, // Increased scale for better quality
             useCORS: true, 
+            logging: false,
         });
+        
         const imgData = canvas.toDataURL('image/jpeg', 1.0);
+
+        // A4 dimensions in mm (210 x 297)
+        const A4_WIDTH_MM = 210;
+        const A4_HEIGHT_MM = 297;
 
         const pdf = new jsPDF({
             orientation: 'portrait',
             unit: 'mm',
-            format: 'a4', // Changed from 'a3' to 'a4'
+            format: 'a4',
         });
 
         const imgProps = pdf.getImageProperties(imgData);
-        const pdfWidth = pdf.internal.pageSize.getWidth();
+        
+        // Calculate the width of the image in the PDF based on A4 width
+        const pdfWidth = A4_WIDTH_MM;
+        // Calculate the height of the image in the PDF to maintain aspect ratio
         const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-        // Check if content exceeds one page height
-        if (pdfHeight > pdf.internal.pageSize.getHeight()) {
-            // If content is too long, we need to handle pagination.
-            // For simplicity and given the nature of a daily summary, we will scale it down 
-            // to fit the A4 page width and let it flow onto multiple pages if necessary, 
-            // but we'll ensure the image is added correctly.
-            
-            let position = 0;
-            let heightLeft = pdfHeight;
-            
+        let heightLeft = pdfHeight;
+        let position = 0;
+
+        // Add the first page
+        pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, pdfHeight);
+        heightLeft -= A4_HEIGHT_MM;
+
+        // Handle multi-page content
+        while (heightLeft > 0) {
+            position = heightLeft * -1;
+            pdf.addPage();
             pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, pdfHeight);
-            heightLeft -= pdf.internal.pageSize.getHeight();
-            
-            while (heightLeft >= 0) {
-                position = heightLeft - pdfHeight;
-                pdf.addPage();
-                pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, pdfHeight);
-                heightLeft -= pdf.internal.pageSize.getHeight();
-            }
-            
-        } else {
-            // If content fits, add normally
-            pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+            heightLeft -= A4_HEIGHT_MM;
         }
         
         pdf.save(`Sales_Summary_${new Date().toISOString().split('T')[0]}.pdf`);
