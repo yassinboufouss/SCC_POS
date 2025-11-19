@@ -22,6 +22,7 @@ interface POSCartAndCheckoutProps {
   setDiscountPercent: (percent: number) => void;
   updateQuantity: (sourceId: string, type: 'inventory' | 'membership', delta: number) => void;
   removeItem: (sourceId: string, type: 'inventory' | 'membership') => void;
+  updatePrice: (sourceId: string, type: 'inventory' | 'membership', newPrice: number) => void; // NEW
   handleCheckout: () => void;
   handleClearCart: () => void;
   subtotal: number;
@@ -42,6 +43,7 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
   setDiscountPercent,
   updateQuantity,
   removeItem,
+  updatePrice, // NEW
   handleCheckout,
   handleClearCart,
   subtotal,
@@ -102,6 +104,7 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
                 item={item} 
                 updateQuantity={updateQuantity} 
                 removeItem={removeItem} 
+                updatePrice={updatePrice} // Pass down
               />
             ))
           )}

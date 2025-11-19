@@ -3,7 +3,8 @@ import { InventoryItem, MembershipPlan } from "./supabase";
 export interface CartItem {
   sourceId: string; // ID of the source item/plan (UUID)
   name: string;
-  price: number;
+  price: number; // This is the current price (can be overridden)
+  originalPrice: number; // NEW: Store the original price for reference
   quantity: number;
   type: 'inventory' | 'membership';
   stock?: number; 

@@ -39,6 +39,17 @@ const POSPage = () => {
   const { mutateAsync: renewMember } = useRenewMemberPlan();
 
   // --- Cart Manipulation Functions ---
+  
+  const updatePrice = (sourceId: string, type: 'inventory' | 'membership', newPrice: number) => {
+    setCart(prevCart => prevCart.map(item => {
+        if (item.sourceId === sourceId && item.type === type) {
+            // Ensure price is non-negative
+            const price = Math.max(0, newPrice);
+            return { ...item, price };
+        }
+        return item;
+    }));
+  };
 
   const addInventoryToCart = (item: InventoryItem) => {
     setCart(prevCart => {
@@ -66,6 +77,7 @@ const POSPage = () => {
           sourceId: item.id, 
           name: item.name, 
           price: item.price, 
+          originalPrice: item.price, // Added originalPrice
           quantity: 1, 
           type: 'inventory', 
           stock: currentStock,
@@ -92,6 +104,7 @@ const POSPage = () => {
                 sourceId: plan.id, 
                 name: `${plan.name} (${plan.duration_days} ${t("days")})`, 
                 price: plan.price, 
+                originalPrice: plan.price, // Added originalPrice
                 quantity: 1, 
                 type: 'membership' 
             });
@@ -119,6 +132,7 @@ const POSPage = () => {
                         sourceId: giveawayItem.id,
                         name: `${giveawayItem.name} (${t("free_giveaway")})`,
                         price: 0, // FREE
+                        originalPrice: giveawayItem.price, // Store original price for reference, even if price is 0
                         quantity: 1,
                         type: 'inventory',
                         stock: giveawayItem.stock,
@@ -258,6 +272,7 @@ const POSPage = () => {
     // Only calculate price based on non-giveaway items
     const payableCart = cart.filter(item => !item.isGiveaway);
     
+    // Use item.price (which might be overridden) for calculation
     const rawSubtotal = payableCart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     
     // 1. Apply Discount to Subtotal
@@ -467,6 +482,7 @@ const POSPage = () => {
                   total={total}
                   isProcessingSale={isProcessingSale}
                   onClearMember={handleClearMember}
+                  updatePrice={updatePrice} // Pass the new function
                   className="flex-1"
               />
           </div>
