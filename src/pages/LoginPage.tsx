@@ -126,7 +126,6 @@ const LoginPage: React.FC = () => {
         loop
         muted // Muted for autoplay compatibility, user can unmute
         playsInline
-        poster="/gym-poster.jpg" // Added poster image
         className="absolute inset-0 w-full h-full object-cover opacity-30 dark:opacity-10"
       >
         {/* Using a public CDN link for reliability */}
