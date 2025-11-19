@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { formatCurrency } from '@/utils/currency-utils';
 import { Transaction } from '@/types/supabase';
 import { cn } from '@/lib/utils';
+import { Dumbbell } from 'lucide-react'; // Import Dumbbell icon
 
 interface POSReceiptProps {
   summary: {
@@ -27,9 +28,12 @@ const POSReceipt: React.FC<POSReceiptProps> = ({ summary, dailyBreakdowns, class
   return (
     <div className={cn("w-full p-6 bg-white text-gray-900 border border-gray-300 rounded-lg shadow-xl print:shadow-none print:border-0 print:p-0", className)}>
       
-      {/* Header */}
+      {/* Header with Logo */}
       <div className="text-center border-b pb-4 mb-4">
-        <h1 className="text-2xl font-extrabold text-primary">{t("app_title")}</h1>
+        <div className="flex items-center justify-center mb-2">
+            <Dumbbell className="h-6 w-6 text-primary" />
+            <h1 className="text-2xl font-extrabold text-gray-900 ml-2">{t("app_title")}</h1>
+        </div>
         <p className="text-sm text-gray-600">{t("daily_sales_invoice")}</p>
         <p className="text-xs text-gray-500 mt-1">{t("date")}: {today}</p>
       </div>

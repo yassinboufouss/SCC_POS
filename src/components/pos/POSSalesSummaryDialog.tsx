@@ -51,14 +51,37 @@ const POSSalesSummaryDialog: React.FC<POSSalesSummaryDialogProps> = ({ summary, 
         const pdf = new jsPDF({
             orientation: 'portrait',
             unit: 'mm',
-            format: 'a3', // Changed from 'a4' to 'a3'
+            format: 'a4', // Changed from 'a3' to 'a4'
         });
 
         const imgProps = pdf.getImageProperties(imgData);
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+        // Check if content exceeds one page height
+        if (pdfHeight > pdf.internal.pageSize.getHeight()) {
+            // If content is too long, we need to handle pagination.
+            // For simplicity and given the nature of a daily summary, we will scale it down 
+            // to fit the A4 page width and let it flow onto multiple pages if necessary, 
+            // but we'll ensure the image is added correctly.
+            
+            let position = 0;
+            let heightLeft = pdfHeight;
+            
+            pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, pdfHeight);
+            heightLeft -= pdf.internal.pageSize.getHeight();
+            
+            while (heightLeft >= 0) {
+                position = heightLeft - pdfHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, pdfHeight);
+                heightLeft -= pdf.internal.pageSize.getHeight();
+            }
+            
+        } else {
+            // If content fits, add normally
+            pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+        }
         
         pdf.save(`Sales_Summary_${new Date().toISOString().split('T')[0]}.pdf`);
         
