@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { User, Mail, Phone, Calendar, Clock, DollarSign, Edit, RefreshCw, History, Save } from 'lucide-react';
+import { User, Mail, Phone, Calendar, Clock, DollarSign, Edit, RefreshCw, History, Save, QrCode } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import MemberRenewalForm from './MemberRenewalForm';
 import MemberStatusActions from './MemberStatusActions';
@@ -159,6 +159,7 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member, canEd
                         <p className="flex items-center gap-2"><Mail className="h-4 w-4 text-muted-foreground" /> {displayMember.email || 'N/A'}</p>
                         <p className="flex items-center gap-2"><Phone className="h-4 w-4 text-muted-foreground" /> {displayMember.phone || 'N/A'}</p>
                         <p className="flex items-center gap-2"><Calendar className="h-4 w-4 text-muted-foreground" /> {displayMember.dob || 'N/A'}</p>
+                        <p className="flex items-center gap-2"><QrCode className="h-4 w-4 text-muted-foreground" /> {t("member_code")}: <span className="font-medium">{displayMember.member_code || 'N/A'}</span></p>
                     </div>
                 )}
               </CardContent>

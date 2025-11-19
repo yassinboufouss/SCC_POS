@@ -94,6 +94,7 @@ const MemberProfilePage: React.FC = () => {
                         <p className="flex items-center gap-2"><Mail className="h-4 w-4 text-muted-foreground" /> {profile.email || 'N/A'}</p>
                         <p className="flex items-center gap-2"><Phone className="h-4 w-4 text-muted-foreground" /> {profile.phone || 'N/A'}</p>
                         <p className="flex items-center gap-2"><Calendar className="h-4 w-4 text-muted-foreground" /> {profile.dob || 'N/A'}</p>
+                        <p className="flex items-center gap-2"><QrCode className="h-4 w-4 text-muted-foreground" /> {t("member_code")}: <span className="font-medium">{profile.member_code || 'N/A'}</span></p>
                     </div>
                 )}
             </CardContent>
