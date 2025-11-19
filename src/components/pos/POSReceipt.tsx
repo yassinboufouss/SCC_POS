@@ -25,7 +25,7 @@ const POSReceipt: React.FC<POSReceiptProps> = ({ summary, dailyBreakdowns, class
   const today = format(new Date(), 'yyyy-MM-dd');
 
   return (
-    <div className={cn("p-6 bg-white text-gray-900 border border-gray-300 rounded-lg shadow-xl mx-auto print:shadow-none print:border-0 print:p-0", className)}>
+    <div className={cn("w-full p-6 bg-white text-gray-900 border border-gray-300 rounded-lg shadow-xl print:shadow-none print:border-0 print:p-0", className)}>
       
       {/* Header */}
       <div className="text-center border-b pb-4 mb-4">
