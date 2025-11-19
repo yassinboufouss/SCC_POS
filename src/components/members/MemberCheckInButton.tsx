@@ -9,9 +9,10 @@ import { isToday } from 'date-fns';
 
 interface MemberCheckInButtonProps {
   member: Profile;
+  onCheckInSuccess?: (updatedMember: Profile) => void;
 }
 
-const MemberCheckInButton: React.FC<MemberCheckInButtonProps> = ({ member }) => {
+const MemberCheckInButton: React.FC<MemberCheckInButtonProps> = ({ member, onCheckInSuccess }) => {
   const { t } = useTranslation();
   const { mutateAsync: processCheckIn, isPending } = useProcessCheckIn();
 
@@ -34,6 +35,7 @@ const MemberCheckInButton: React.FC<MemberCheckInButtonProps> = ({ member }) => 
         
         if (checkedInMember) {
             showSuccess(t("checked_in_successfully_profile", { name: `${checkedInMember.first_name} ${checkedInMember.last_name}` }));
+            onCheckInSuccess?.(checkedInMember);
         } else {
             showError(t("checkin_failed", { name: `${member.first_name} ${member.last_name}` }));
         }

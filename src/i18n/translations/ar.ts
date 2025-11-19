@@ -136,6 +136,7 @@ export const ar = {
     "membership_is": "العضوية هي {{status}}.",
     "cannot_check_in": "لا يمكن تسجيل الدخول.",
     "member_code_not_found": "لم يتم العثور على رمز العضو '{{code}}'.",
+    "member_found": "تم العثور على العضو {{name}}.",
     "renew_membership_now": "تجديد العضوية الآن",
     "point_of_sale": "نقطة البيع (POS)",
     "membership_plans_title": "خطط العضوية",
@@ -180,7 +181,7 @@ export const ar = {
     "restock": "إعادة التخزين",
     "restock_invalid_quantity": "كمية إعادة التخزين غير صالحة.",
     "restock_success": "تمت إعادة تخزين {{quantity}} وحدة من {{name}}. المخزون الجديد: {{stock}}.",
-    "restock_failed": "فشلت إعادة التخزين.",
+    "restock_failed": "فشل إعادة التخزين.",
     "edit_item_details": "تعديل تفاصيل العنصر",
     "product_image_url": "رابط صورة المنتج",
     "current_stock_manual": "المخزون الحالي (يدوي)",
@@ -262,10 +263,6 @@ export const ar = {
     "current_role": "الدور الحالي",
     "assign_new_role": "تعيين دور جديد",
     "select_role": "اختر الدور",
-    "role_update_success": "تم تحديث دور {{name}} بنجاح إلى {{role}}.",
-    "role_update_failed": "فشل تحديث دور المستخدم.",
-    "no_users_found": "لم يتم العثور على مستخدمين.",
-    "access_denied": "تم رفض الوصول.",
     "owner": "المالك",
     "manager": "المدير",
     "cashier": "أمين الصندوق",
@@ -321,19 +318,24 @@ export const ar = {
     "copyright_text": "© {{year}} SCC POS. جميع الحقوق محفوظة. تطوير: xD Manga.",
     
     // Giveaway Management (NEW)
-    "giveaways": "الهدايا اليدوية", // Updated name
-    "giveaway_management": "إصدار الهدايا اليدوي", // Updated name
-    "giveaway_items_list": "عناصر المخزون ({{count}})", // Updated name
+    "giveaways": "الهدايا اليدوية",
+    "giveaway_management": "إصدار الهدايا اليدوي",
+    "giveaway_items_list": "عناصر المخزون ({{count}})",
     "issue_giveaway": "إصدار هدية",
     "issue_giveaway_to_member": "إصدار هدية للعضو",
     "select_member_to_issue": "اختر العضو لإصدار الهدية",
     "giveaway_issued_success": "تم إصدار {{item}} بنجاح إلى {{member}}.",
     "giveaway_issued_failed": "فشل إصدار الهدية.",
-    "no_giveaway_items": "لم يتم العثور على عناصر مخزون مطابقة لبحثك.", // Updated message
+    "no_giveaway_items": "لم يتم العثور على عناصر مخزون مطابقة لبحثك.",
     "select_item_to_issue": "اختر العنصر المراد إصداره",
     "item_stock": "مخزون العنصر",
-    "item_is_giveaway_for": "مرتبط بالخطط:", // Updated name
+    "item_is_giveaway_for": "مرتبط بالخطط:",
     "issue_item": "إصدار العنصر",
     "item_not_in_stock": "العنصر نفد من المخزون.",
+    "role_update_success": "تم تحديث دور {{name}} بنجاح إلى {{role}}.",
+    "role_update_failed": "فشل تحديث دور المستخدم.",
+    "no_users_found": "لم يتم العثور على مستخدمين.",
+    "access_denied": "تم رفض الوصول.",
+    "view_full_profile": "عرض الملف الشخصي الكامل",
   }
 };

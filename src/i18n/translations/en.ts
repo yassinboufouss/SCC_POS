@@ -136,6 +136,7 @@ export const en = {
     "membership_is": "Membership is {{status}}.",
     "cannot_check_in": "Cannot check in.",
     "member_code_not_found": "Member code '{{code}}' not found.",
+    "member_found": "Member {{name}} found.",
     "renew_membership_now": "Renew Membership Now",
     "point_of_sale": "Point of Sale (POS)",
     "membership_plans_title": "Membership Plans",
@@ -262,10 +263,6 @@ export const en = {
     "current_role": "Current Role",
     "assign_new_role": "Assign New Role",
     "select_role": "Select Role",
-    "role_update_success": "Successfully updated {{name}}'s role to {{role}}.",
-    "role_update_failed": "Failed to update user role.",
-    "no_users_found": "No users found.",
-    "access_denied": "Access Denied.",
     "owner": "Owner",
     "manager": "Manager",
     "cashier": "Cashier",
@@ -321,19 +318,24 @@ export const en = {
     "copyright_text": "© {{year}} SCC POS. All rights reserved. Developed by xD Manga.",
     
     // Giveaway Management (NEW)
-    "giveaways": "Manual Giveaways", // Updated name
-    "giveaway_management": "Manual Giveaway Issuance", // Updated name
-    "giveaway_items_list": "Inventory Items ({{count}})", // Updated name
+    "giveaways": "Manual Giveaways",
+    "giveaway_management": "Manual Giveaway Issuance",
+    "giveaway_items_list": "Inventory Items ({{count}})",
     "issue_giveaway": "Issue Giveaway",
     "issue_giveaway_to_member": "Issue Giveaway to Member",
     "select_member_to_issue": "Select Member to Issue Giveaway",
     "giveaway_issued_success": "Successfully issued {{item}} to {{member}}.",
     "giveaway_issued_failed": "Failed to issue giveaway.",
-    "no_giveaway_items": "No inventory items found matching your search.", // Updated message
+    "no_giveaway_items": "No inventory items found matching your search.",
     "select_item_to_issue": "Select Item to Issue",
     "item_stock": "Item Stock",
-    "item_is_giveaway_for": "Linked to Plans:", // Updated name
+    "item_is_giveaway_for": "Linked to Plans:",
     "issue_item": "Issue Item",
     "item_not_in_stock": "Item is out of stock.",
+    "role_update_success": "Successfully updated {{name}}'s role to {{role}}.",
+    "role_update_failed": "Failed to update user role.",
+    "no_users_found": "No users found.",
+    "access_denied": "Access Denied.",
+    "view_full_profile": "View Full Profile",
   }
 };

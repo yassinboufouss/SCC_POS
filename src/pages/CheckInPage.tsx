@@ -1,6 +1,6 @@
 import React from 'react';
 import Layout from '@/components/Layout';
-import MemberCheckInScanner from '@/components/members/MemberCheckInScanner';
+import MemberLookup from '@/components/members/MemberLookup';
 import { useTranslation } from 'react-i18next';
 
 const CheckInPage: React.FC = () => {
@@ -12,7 +12,7 @@ const CheckInPage: React.FC = () => {
         <h1 className="text-3xl font-bold">{t("check_in")}</h1>
         
         <div className="max-w-lg mx-auto">
-          <MemberCheckInScanner />
+          <MemberLookup />
           <p className="mt-4 text-sm text-muted-foreground text-center">
             {t("checkin_note")}
           </p>

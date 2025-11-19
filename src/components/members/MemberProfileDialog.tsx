@@ -27,11 +27,19 @@ import { useUserRole } from '@/hooks/use-user-role'; // Import useUserRole
 interface MemberProfileDialogProps {
   member: Profile; // Initial member data from the list
   canEdit: boolean; // New prop to control editing access
+  isDialogOpen?: boolean; // NEW: External control
+  setIsDialogOpen?: (open: boolean) => void; // NEW: External control
 }
 
-const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member, canEdit }) => {
+const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member, canEdit, isDialogOpen: externalOpen, setIsDialogOpen: setExternalOpen }) => {
   const { t } = useTranslation();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  
+  // Determine which state setter/getter to use
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = externalOpen !== undefined && setExternalOpen !== undefined;
+  const isDialogOpen = isControlled ? externalOpen : internalOpen;
+  const setIsDialogOpen = isControlled ? setExternalOpen : setInternalOpen;
+  
   const [activeTab, setActiveTab] = useState('profile'); 
   const [isEditing, setIsEditing] = useState(false);
   const { isOwner, isStaff } = useUserRole(); // Use role hook to determine renewal/check-in access
@@ -106,11 +114,14 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member, canEd
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          <Edit className="h-4 w-4" />
-        </Button>
-      </DialogTrigger>
+      {/* Only render trigger if not externally controlled */}
+      {!isControlled && (
+        <DialogTrigger asChild>
+          <Button variant="outline" size="sm">
+            <Edit className="h-4 w-4" />
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -159,7 +170,7 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member, canEd
                 canRenew={canRenew} // Pass canRenew to disable the button inside
             />
             
-            {canCheckIn && <MemberCheckInButton member={displayMember} />}
+            {canCheckIn && <MemberCheckInButton member={displayMember} onCheckInSuccess={(updatedMember) => { /* No need to update local state here, handled by query invalidation */ }} />}
             
             {canChangeStatus && <MemberStatusActions member={displayMember} />}
           </TabsContent>

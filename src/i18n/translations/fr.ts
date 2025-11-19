@@ -136,6 +136,7 @@ export const fr = {
     "membership_is": "L'adhésion est {{status}}.",
     "cannot_check_in": "Impossible de s'enregistrer.",
     "member_code_not_found": "Code membre '{{code}}' introuvable.",
+    "member_found": "Membre {{name}} trouvé.",
     "renew_membership_now": "Renouveler l'Adhésion Maintenant",
     "point_of_sale": "Point de Vente (PDV)",
     "membership_plans_title": "Plans d'Adhésion",
@@ -262,10 +263,6 @@ export const fr = {
     "current_role": "Rôle Actuel",
     "assign_new_role": "Attribuer un Nouveau Rôle",
     "select_role": "Sélectionner un Rôle",
-    "role_update_success": "Rôle de {{name}} mis à jour avec succès à {{role}}.",
-    "role_update_failed": "Échec de la mise à jour du rôle utilisateur.",
-    "no_users_found": "Aucun utilisateur trouvé.",
-    "access_denied": "Accès Refusé.",
     "owner": "Propriétaire",
     "manager": "Manager",
     "cashier": "Caissier",
@@ -321,19 +318,24 @@ export const fr = {
     "copyright_text": "© {{year}} SCC PDV. Tous droits réservés. Développé par xD Manga.",
     
     // Giveaway Management (NEW)
-    "giveaways": "Cadeaux Manuels", // Updated name
-    "giveaway_management": "Distribution Manuelle de Cadeaux", // Updated name
-    "giveaway_items_list": "Articles d'Inventaire ({{count}})", // Updated name
+    "giveaways": "Cadeaux Manuels",
+    "giveaway_management": "Distribution Manuelle de Cadeaux",
+    "giveaway_items_list": "Articles d'Inventaire ({{count}})",
     "issue_giveaway": "Distribuer un Cadeau",
     "issue_giveaway_to_member": "Distribuer un Cadeau à un Membre",
     "select_member_to_issue": "Sélectionner le Membre pour le Cadeau",
     "giveaway_issued_success": "Cadeau {{item}} distribué avec succès à {{member}}.",
     "giveaway_issued_failed": "Échec de la distribution du cadeau.",
-    "no_giveaway_items": "Aucun article d'inventaire trouvé correspondant à votre recherche.", // Updated message
+    "no_giveaway_items": "Aucun article d'inventaire trouvé correspondant à votre recherche.",
     "select_item_to_issue": "Sélectionner l'Article à Distribuer",
     "item_stock": "Stock de l'Article",
-    "item_is_giveaway_for": "Lié aux Plans :", // Updated name
+    "item_is_giveaway_for": "Lié aux Plans :",
     "issue_item": "Distribuer l'Article",
     "item_not_in_stock": "L'article est en rupture de stock.",
+    "role_update_success": "Rôle de {{name}} mis à jour avec succès à {{role}}.",
+    "role_update_failed": "Échec de la mise à jour du rôle utilisateur.",
+    "no_users_found": "Aucun utilisateur trouvé.",
+    "access_denied": "Accès Refusé.",
+    "view_full_profile": "Voir le Profil Complet",
   }
 };

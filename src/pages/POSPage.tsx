@@ -7,7 +7,6 @@ import { useInventory } from '@/integrations/supabase/data/use-inventory.ts';
 import { useRenewMemberPlan } from '@/integrations/supabase/data/use-members.ts';
 import POSProductSelection from '@/components/pos/POSProductSelection';
 import POSCartAndCheckout from '@/components/pos/POSCartAndCheckout';
-import MemberCheckInScanner from '@/components/members/MemberCheckInScanner';
 import POSMemberSelector from '@/components/pos/POSMemberSelector';
 import POSTransactionSummary from '@/components/pos/POSTransactionSummary';
 import { CartItem, PaymentMethod } from '@/types/pos';
@@ -238,12 +237,6 @@ const POSPage = () => {
     setJustRegisteredMemberId(null);
   };
   
-  // Handler for member lookup via check-in scanner
-  const handleMemberFound = (member: Profile) => {
-      setSelectedMember(member);
-      setJustRegisteredMemberId(null); // Ensure flag is cleared if member is looked up
-  };
-  
   // Handler for successful registration via POS tab (UPDATED)
   const handleRegistrationSuccess = ({ member, plan, paymentMethod }: { member: Profile, plan: Pick<MembershipPlan, 'id' | 'name' | 'duration_days' | 'price' | 'giveaway_item_id'>, paymentMethod: PaymentMethod }) => {
     // 1. Select the new member
@@ -456,8 +449,7 @@ const POSPage = () => {
           <div className="lg:col-span-1 flex flex-col space-y-4 min-h-0"> 
               <POSTransactionSummary />
               
-              {/* Updated Check-In Scanner */}
-              <MemberCheckInScanner onMemberFound={handleMemberFound} />
+              {/* Removed MemberCheckInScanner as it is now only on the Check-In page */}
               
               <POSMemberSelector 
                 selectedMember={selectedMember}
