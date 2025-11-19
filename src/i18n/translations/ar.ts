@@ -232,7 +232,7 @@ export const ar = {
     "pos_products_tab": "Produits et Plans",
     "pos_register_tab": "Inscription Nouveau Membre",
     "registration_and_cart_success": "Inscription terminée. {{name}} sélectionné et plan ajouté à la caisse.",
-    "plan_not_found_after_registration": "Détails du plan introuvables après l'inscription, veuillez vérifier le panier manuellement.",
+    "plan_not_found_after_registration": "Détails du plan introuvables après l'inscription، veuillez vérifier le panier manuellement.",
     "view_details": "Voir les Détails",
     "transaction_details": "Détails de la Transaction",
     "transaction_id": "ID de la Transaction",
@@ -250,18 +250,18 @@ export const ar = {
     "giveaway_item_not_found": "Article cadeau introuvable dans l'inventaire.",
     "checkout_failed_stock_issue": "Échec du paiement : Stock insuffisant pour {{name}}.",
     "plan_creation_failed": "Échec de la création du plan d'adhésion.",
-    "welcome_member": "Bienvenue, {{name}}",
+    "welcome_member": "Bienvenue، {{name}}",
     "check_in_status": "Statut d'Enregistrement",
     "never_checked_in": "Jamais enregistré",
     
     // New Role Management Translations
-    "role_management": "Gestion des Rôles",
+    "role_management": "Gestion des الرول",
     "user_roles_directory": "Annuaire des Rôles Utilisateur ({{count}})",
     "search_users_by_name_email": "Rechercher des utilisateurs par nom ou e-mail...",
     "current_role": "Rôle Actuel",
     "assign_new_role": "Attribuer un Nouveau Rôle",
     "select_role": "Sélectionner un Rôle",
-    "role_update_success": "Rôle de {{name}} mis à jour avec succès à {{role}}.",
+    "role_update_success": "Rôle de {{name}} mis à jour بنجاح à {{role}}.",
     "role_update_failed": "Échec de la mise à jour du rôle utilisateur.",
     "no_users_found": "Aucun utilisateur trouvé.",
     "access_denied": "Accès Refusé.",
@@ -270,8 +270,10 @@ export const ar = {
     "cashier": "Caissier",
     
     // Theme Toggle Keys
-    "light_mode": "Mode Clair",
-    "dark_mode": "Mode Sombre",
+    "light_mode": "الوضع الفاتح",
+    "dark_mode": "الوضع الداكن",
+    "blue_mode": "الوضع الأزرق",
+    "switch_to_theme": "التبديل إلى {{theme}}",
     
     // Transaction Filters
     "membership": "Adhésion",
@@ -286,24 +288,24 @@ export const ar = {
     "delete_item": "Supprimer l'Article",
     "delete_plan": "Supprimer le Plan",
     "confirm_deletion": "Confirmer la Suppression",
-    "delete_item_confirmation": "Êtes-vous sûr de vouloir supprimer définitivement l'article d'inventaire '{{name}}' ? Cette action est irréversible.",
-    "delete_plan_confirmation": "Êtes-vous sûr de vouloir supprimer définitivement le plan d'adhésion '{{name}}' ? Cette action est irréversible et pourrait affecter les membres existants.",
-    "confirm_delete": "Oui, Supprimer",
-    "deleting": "Suppression en cours...",
-    "item_deleted_success": "Article d'inventaire '{{name}}' supprimé avec succès.",
-    "plan_deleted_success": "Plan d'adhésion '{{name}}' supprimé avec succès.",
-    "cancel": "Annuler",
+    "delete_item_confirmation": "Êtes-vous sûr de vouloir supprimer définitivement l'article d'inventaire '{{name}}' ؟ هذه العملية لا يمكن التراجع عنها.",
+    "delete_plan_confirmation": "Êtes-vous sûr de vouloir supprimer définitivement le plan d'adhésion '{{name}}' ؟ هذه العملية لا يمكن التراجع عنها وقد تؤثر على الأعضاء الحاليين.",
+    "confirm_delete": "نعم، حذف",
+    "deleting": "جاري الحذف...",
+    "item_deleted_success": "تم حذف عنصر المخزون '{{name}}' بنجاح.",
+    "plan_deleted_success": "تم حذف خطة العضوية '{{name}}' بنجاح.",
+    "cancel": "إلغاء",
     
     // Chart Keys
-    "monthly_revenue_trend": "Tendance des Revenus Mensuels (6 Derniers Mois)",
-    "revenue": "Revenu",
+    "monthly_revenue_trend": "اتجاه الإيرادات الشهرية (آخر 6 أشهر)",
+    "revenue": "الإيرادات",
     
     // New Analytics Keys
-    "sales_analytics_title": "Analyse des Ventes",
-    "total_transactions_count": "Total des Transactions",
-    "all_time": "Depuis le début",
-    "member_status_distribution": "Distribution du Statut des Membres",
-    "count": "Compte",
-    "percentage": "Pourcentage",
+    "sales_analytics_title": "تحليلات المبيعات",
+    "total_transactions_count": "إجمالي المعاملات",
+    "all_time": "منذ البداية",
+    "member_status_distribution": "توزيع حالة الأعضاء",
+    "count": "العدد",
+    "percentage": "النسبة المئوية",
   }
 };

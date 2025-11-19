@@ -272,6 +272,8 @@ export const en = {
     // Theme Toggle Keys
     "light_mode": "Light Mode",
     "dark_mode": "Dark Mode",
+    "blue_mode": "Blue Mode",
+    "switch_to_theme": "Switch to {{theme}}",
     
     // Transaction Filters
     "membership": "Membership",

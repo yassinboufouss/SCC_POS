@@ -272,6 +272,8 @@ export const fr = {
     // Theme Toggle Keys
     "light_mode": "Mode Clair",
     "dark_mode": "Mode Sombre",
+    "blue_mode": "Mode Bleu",
+    "switch_to_theme": "Passer au {{theme}}",
     
     // Transaction Filters
     "membership": "Adhésion",
