@@ -410,5 +410,6 @@ export const ar = {
     "adjustments_tax": "التعديلات/الضريبة",
     "no_sales_today": "لم يتم تسجيل مبيعات اليوم.",
     "view_summary": "عرض الملخص",
+    "total_revenue": "إجمالي الإيرادات",
   }
 };

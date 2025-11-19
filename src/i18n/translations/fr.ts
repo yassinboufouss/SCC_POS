@@ -410,5 +410,6 @@ export const fr = {
     "adjustments_tax": "Ajustements/Taxe",
     "no_sales_today": "Aucune vente enregistrée aujourd'sui.",
     "view_summary": "Voir le Résumé",
+    "total_revenue": "Revenu Total",
   }
 };
