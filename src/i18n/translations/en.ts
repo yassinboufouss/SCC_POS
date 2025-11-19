@@ -399,5 +399,8 @@ export const en = {
     "daily_transaction_count": "Daily Transaction Count",
     "payment_method_breakdown": "Payment Method Breakdown (Daily)",
     "transaction_type_breakdown": "Transaction Type Breakdown (Daily)",
+    "daily_transactions_list": "Daily Transactions List",
+    "and_more_transactions": "and {{count}} more transactions",
+    "thank_you_for_using_pos": "Thank you for using SCC POS.",
   }
 };

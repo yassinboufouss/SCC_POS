@@ -399,5 +399,8 @@ export const fr = {
     "daily_transaction_count": "Nombre de Transactions Quotidiennes",
     "payment_method_breakdown": "Répartition par Mode de Paiement (Quotidien)",
     "transaction_type_breakdown": "Répartition par Type de Transaction (Quotidien)",
+    "daily_transactions_list": "Liste des Transactions Quotidiennes",
+    "and_more_transactions": "et {{count}} transactions supplémentaires",
+    "thank_you_for_using_pos": "Merci d'utiliser SCC PDV.",
   }
 };

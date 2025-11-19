@@ -10,6 +10,7 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { useTransactions } from '@/integrations/supabase/data/use-transactions.ts';
 import { Skeleton } from '@/components/ui/skeleton';
+import POSReceipt from './POSReceipt'; // Import the new receipt component
 
 const POSTransactionSummary: React.FC = () => {
   const { t } = useTranslation();
@@ -19,7 +20,7 @@ const POSTransactionSummary: React.FC = () => {
   
   const summary = transactions ? calculateSalesSummary(transactions) : { dailyTotal: 0, weeklyTotal: 0, monthlyTotal: 0, dailyTransactions: [] };
 
-  // NEW: Calculate daily breakdowns
+  // Calculate daily breakdowns
   const dailyBreakdowns = useMemo(() => {
       const paymentBreakdown: Record<string, number> = {};
       const typeBreakdown: Record<string, number> = {};
@@ -110,14 +111,21 @@ const POSTransactionSummary: React.FC = () => {
         </Button>
       </CardHeader>
       <CardContent className="p-0">
-        {/* Content to be captured by PDF generator */}
-        <div ref={summaryRef} className="p-2"> 
-            <h4 className="text-lg font-bold mb-3">{t("sales_summary")} - {t("today_so_far")}</h4>
-            
-            {/* NEW: Daily Transaction Count */}
-            <div className="mb-4 p-2 border rounded-md bg-secondary/50 text-center">
+        {/* Hidden element for PDF generation (uses POSReceipt for professional look) */}
+        <div className="absolute -z-10 opacity-0 pointer-events-none" ref={summaryRef}>
+            <POSReceipt 
+                summary={summary} 
+                dailyBreakdowns={dailyBreakdowns} 
+                className="w-[80mm] p-4" // Set a fixed width for receipt style
+            />
+        </div>
+        
+        {/* Visible Live Summary */}
+        <div className="space-y-4">
+            {/* Daily Transaction Count */}
+            <div className="p-3 border rounded-md bg-secondary/50 text-center">
                 <p className="text-xs font-medium text-muted-foreground">{t("daily_transaction_count")}</p>
-                <p className="text-xl font-bold mt-0.5 text-primary">{dailyBreakdowns.count}</p>
+                {isLoading ? <Skeleton className="h-6 w-1/3 mx-auto mt-1" /> : <p className="text-xl font-bold mt-0.5 text-primary">{dailyBreakdowns.count}</p>}
             </div>
             
             {isLoading ? (
@@ -136,9 +144,9 @@ const POSTransactionSummary: React.FC = () => {
                 </div>
             )}
             
-            {/* NEW: Detailed Breakdowns (Daily) */}
+            {/* Detailed Breakdowns (Live View - simplified) */}
             {!isLoading && dailyBreakdowns.count > 0 && (
-                <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="mt-4 space-y-4">
                     {/* Payment Breakdown */}
                     <div className="space-y-2 p-3 border rounded-md">
                         <h5 className="font-semibold text-sm border-b pb-1">{t("payment_method_breakdown")}</h5>
@@ -149,20 +157,8 @@ const POSTransactionSummary: React.FC = () => {
                             </div>
                         ))}
                     </div>
-                    
-                    {/* Type Breakdown */}
-                    <div className="space-y-2 p-3 border rounded-md">
-                        <h5 className="font-semibold text-sm border-b pb-1">{t("transaction_type_breakdown")}</h5>
-                        {Object.entries(dailyBreakdowns.typeBreakdown).map(([type, total]) => (
-                            <div key={type} className="flex justify-between text-sm">
-                                <span>{t(type.replace(/\s/g, '_').toLowerCase())}</span>
-                                <span className="font-medium">{formatCurrency(total)}</span>
-                            </div>
-                        ))}
-                    </div>
                 </div>
             )}
-            
         </div>
       </CardContent>
     </Card>

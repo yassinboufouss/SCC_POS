@@ -399,5 +399,8 @@ export const ar = {
     "daily_transaction_count": "عدد المعاملات اليومية",
     "payment_method_breakdown": "توزيع طريقة الدفع (يومي)",
     "transaction_type_breakdown": "توزيع نوع المعاملة (يومي)",
+    "daily_transactions_list": "قائمة المعاملات اليومية",
+    "and_more_transactions": "و {{count}} معاملات أخرى",
+    "thank_you_for_using_pos": "شكرًا لاستخدامك SCC POS.",
   }
 };
