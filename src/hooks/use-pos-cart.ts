@@ -1,20 +1,22 @@
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
-import { useAddTransaction } from '@/integrations/supabase/data/use-transactions.ts';
 import { useInventory } from '@/integrations/supabase/data/use-inventory.ts';
 import { usePlans } from '@/integrations/supabase/data/use-plans.ts';
-import { useRenewMemberPlan } from '@/integrations/supabase/data/use-members.ts';
-import { CartItem, PaymentMethod } from '@/types/pos';
-import { Profile, InventoryItem, MembershipPlan, TransactionItemData } from '@/types/supabase';
-import { reduceInventoryStock } from '@/utils/inventory-utils';
+import { CartItem, PaymentMethod, CheckoutPayload, CheckoutResponse } from '@/types/pos';
+import { Profile, InventoryItem, MembershipPlan } from '@/types/supabase';
 import { showSuccess, showError } from '@/utils/toast';
 import { formatCurrency } from '@/utils/currency-utils';
-import { v4 as uuidv4 } from 'uuid';
+import { supabase } from '@/integrations/supabase/client';
+import { useSession } from '@/components/auth/SessionContextProvider';
+
+// Define the Edge Function URL (Hardcoded Project ID is required for Edge Functions)
+const CHECKOUT_FUNCTION_URL = "https://izbuyhpftsehzwnhhjrc.supabase.co/functions/v1/checkout";
 
 export const usePOSCart = () => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const { session } = useSession();
   
   // --- State ---
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -22,12 +24,12 @@ export const usePOSCart = () => {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('Cash'); 
   const [discountPercent, setDiscountPercent] = useState(0);
   const [justRegisteredMemberId, setJustRegisteredMemberId] = useState<string | null>(null); 
-  
+  const [isProcessingSale, setIsProcessingSale] = useState(false); // Local processing state
+
   // --- Data Hooks ---
   const { data: liveInventoryItems } = useInventory();
   const { data: membershipPlans } = usePlans();
-  const { mutateAsync: addTransaction, isPending: isProcessingSale } = useAddTransaction();
-  const { mutateAsync: renewMember } = useRenewMemberPlan();
+  // Removed useAddTransaction and useRenewMemberPlan from this hook
 
   // --- Cart Manipulation Functions ---
   
@@ -35,7 +37,7 @@ export const usePOSCart = () => {
     setCart(prevCart => prevCart.map(item => {
         if (item.sourceId === sourceId && item.type === type) {
             const price = Math.max(0, newPrice);
-            return { ...item, price };
+            return { ...item, price, originalPrice: item.originalPrice }; // Keep originalPrice intact
         }
         return item;
     }));
@@ -231,7 +233,7 @@ export const usePOSCart = () => {
   };
 
 
-  // --- Calculations ---
+  // --- Calculations (Client-side for display only) ---
 
   const { subtotal, discountAmount, tax, total } = useMemo(() => {
     const payableCart = cart.filter(item => !item.isGiveaway);
@@ -260,116 +262,64 @@ export const usePOSCart = () => {
     };
   }, [cart, discountPercent]);
 
-  // --- Checkout Logic ---
+  // --- Secure Checkout Logic ---
 
   const handleCheckout = async () => {
-    if (cart.length === 0) return;
+    if (cart.length === 0 || !session) return;
+    
+    setIsProcessingSale(true);
     
     try {
-        // 1. Process inventory stock reduction
-        const inventoryItemsSold = cart.filter(item => item.type === 'inventory');
+        const checkoutPayload: CheckoutPayload = {
+            cart: cart.map(item => ({
+                sourceId: item.sourceId,
+                quantity: item.quantity,
+                type: item.type,
+                price: item.price,
+                originalPrice: item.originalPrice,
+                isGiveaway: item.isGiveaway,
+            })),
+            memberId: selectedMember?.id || null,
+            paymentMethod: paymentMethod,
+            discountPercent: discountPercent,
+            isInitialRegistration: !!justRegisteredMemberId,
+        };
         
-        await Promise.all(inventoryItemsSold.map(async item => {
-            if (item.stock !== Infinity) { 
-                const currentStock = liveInventoryItems?.find(i => i.id === item.sourceId)?.stock || item.stock || 0;
-                if (currentStock >= item.quantity) {
-                    await reduceInventoryStock(item.sourceId, item.quantity);
-                } else {
-                    if (item.isGiveaway) {
-                        console.warn(`Giveaway item ${item.name} is out of stock but sale proceeded.`);
-                    } else {
-                        throw new Error(t("checkout_failed_stock_issue", { name: item.name }));
-                    }
-                }
-            }
-        }));
+        const response = await fetch(CHECKOUT_FUNCTION_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session.access_token}`,
+            },
+            body: JSON.stringify(checkoutPayload),
+        });
         
-        // 2. Process Membership Renewals/Activation
-        const membershipItemsSold = cart.filter(item => item.type === 'membership');
-        
-        if (selectedMember && membershipItemsSold.length > 0) {
-            let renewalPerformed = false;
-            
-            for (const item of membershipItemsSold) {
-                const planId = item.sourceId;
-                const isInitialRegistrationPlan = selectedMember.id === justRegisteredMemberId;
-                
-                if (!isInitialRegistrationPlan) {
-                    for (let i = 0; i < item.quantity; i++) {
-                        const updatedMemberResult = await renewMember({ profileId: selectedMember.id, planId });
-                        if (updatedMemberResult?.profile) {
-                            setSelectedMember(updatedMemberResult.profile); 
-                            renewalPerformed = true;
-                        }
-                    }
-                }
-            }
-            
-            if (renewalPerformed) {
-                showSuccess(t("membership_renewal_pos_success", { name: `${selectedMember.first_name} ${selectedMember.last_name}` }));
-            }
-        }
-        
-        // 3. Determine transaction type and description
-        const hasMembership = membershipItemsSold.length > 0;
-        const hasInventory = inventoryItemsSold.length > 0;
-        
-        let transactionType: 'Membership' | 'POS Sale' | 'Mixed Sale';
-        if (hasMembership && hasInventory) {
-            transactionType = 'Mixed Sale';
-        } else if (hasMembership) {
-            transactionType = 'Membership';
-        } else {
-            transactionType = 'POS Sale';
-        }
-        
-        const itemDescription = cart.map(item => `${item.name} x${item.quantity}`).join(', ');
-        
-        const itemsData: TransactionItemData[] = cart.map(item => ({
-            sourceId: item.sourceId,
-            name: item.name,
-            quantity: item.quantity,
-            price: item.price,
-            type: item.type,
-            isGiveaway: item.isGiveaway,
-        }));
-        
-        const memberId = selectedMember?.member_code || selectedMember?.id || 'GUEST';
-        const memberName = selectedMember ? `${selectedMember.first_name} ${selectedMember.last_name}` : t('guest_customer');
-        
-        if (total > 0 || cart.some(item => item.isGiveaway)) {
-            const newTransaction = {
-                member_id: memberId,
-                member_name: memberName,
-                type: transactionType,
-                item_description: itemDescription,
-                items_data: itemsData, 
-                amount: total,
-                payment_method: paymentMethod,
-            };
+        const result: CheckoutResponse | { error: string } = await response.json();
 
-            await addTransaction(newTransaction);
+        if (!response.ok || 'error' in result) {
+            throw new Error(result.error || t("checkout_failed"));
         }
 
-        showSuccess(t("sale_processed_success", { 
-            type: transactionType, 
-            method: t(paymentMethod.toLowerCase()), 
-            total: formatCurrency(total),
-        }));
-        
-        // Invalidate relevant queries
+        // 1. Invalidate relevant queries after successful server-side processing
         queryClient.invalidateQueries({ queryKey: ['inventory'] });
         queryClient.invalidateQueries({ queryKey: ['dashboard'] });
         queryClient.invalidateQueries({ queryKey: ['transactions'] });
         queryClient.invalidateQueries({ queryKey: ['profiles'] });
 
+        showSuccess(t("sale_processed_success", { 
+            type: cart.some(item => item.type === 'membership') ? 'Mixed Sale' : 'POS Sale', 
+            method: t(paymentMethod.toLowerCase()), 
+            total: formatCurrency(result.total),
+        }));
         
-        // Reset state
+        // 2. Reset state
         handleClearCart();
         
     } catch (error) {
         console.error("Checkout failed:", error);
-        showError(t("checkout_failed"));
+        showError(error.message || t("checkout_failed"));
+    } finally {
+        setIsProcessingSale(false);
     }
   };
 

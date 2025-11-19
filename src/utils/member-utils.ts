@@ -2,6 +2,7 @@ import { Profile, MembershipPlan } from "@/types/supabase";
 import { supabase } from "@/integrations/supabase/client";
 import { addDays, format } from "date-fns";
 import { PaymentMethod } from "@/types/pos"; 
+import { v4 as uuidv4 } from 'uuid'; // Import uuid for secure password generation
 
 // Define the expected input structure from the registration form
 export type NewMemberInput = {
@@ -60,10 +61,13 @@ export const registerNewUserAndProfile = async (newMemberData: Omit<NewMemberInp
     throw new Error("Plan not found.");
   }
   
+  // Generate a secure random password (UUID is long and complex enough)
+  const secureRandomPassword = uuidv4();
+  
   // 2. Sign up the user via Auth
   const { data: authData, error: authError } = await supabase.auth.signUp({
       email: memberDetails.email,
-      password: 'password123', // Mock password for registration flow
+      password: secureRandomPassword, // Use secure random password
       options: {
           data: {
               first_name: memberDetails.first_name,
@@ -79,10 +83,20 @@ export const registerNewUserAndProfile = async (newMemberData: Omit<NewMemberInp
   
   const userId = authData.user.id;
   
+  // 3. Immediately trigger a password reset email for the new user
+  const { error: resetError } = await supabase.auth.resetPasswordForEmail(memberDetails.email, {
+      redirectTo: `${window.location.origin}/`, // Redirect to login page after reset
+  });
+  
+  if (resetError) {
+      console.warn("Failed to send initial password reset email:", resetError);
+      // We proceed, but warn staff that the member needs manual password reset
+  }
+  
   const startDate = new Date();
   const expirationDate = addDays(startDate, planData.duration_days);
   
-  // 3. Update the profile created by the trigger (handle_new_user) with membership details.
+  // 4. Update the profile created by the trigger (handle_new_user) with membership details.
   const newProfileData = {
     id: userId,
     first_name: memberDetails.first_name,
@@ -115,7 +129,7 @@ export const registerNewUserAndProfile = async (newMemberData: Omit<NewMemberInp
 
 
 // Utility to simulate renewing a member's plan (Used by POS checkout and Member Profile Renewal Form)
-// NOTE: This utility only updates the profile (plan, dates, status). Transaction recording must be handled by the caller.
+// NOTE: This utility is now only used by MemberRenewalForm. POS checkout uses the Edge Function.
 export const renewMemberPlan = async (profileId: string, planId: string): Promise<{ profile: Profile, plan: Pick<MembershipPlan, 'id' | 'name' | 'duration_days' | 'price'> } | null> => {
   // 1. Fetch current profile and plan details
   const [{ data: profile, error: profileError }, { data: planData, error: planError }] = await Promise.all([

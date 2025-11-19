@@ -254,6 +254,10 @@ const MemberRegistrationForm: React.FC<MemberRegistrationFormProps> = ({ onSucce
           <UserPlus className="h-4 w-4 mr-2" />
           {isPending ? t("register_member_process_payment_loading") : t("register_member_process_payment")}
         </Button>
+        
+        <p className="text-xs text-muted-foreground text-center">
+            {t("email_update_confirmation_sent", { email: t("member_email") })}
+        </p>
       </form>
     </Form>
   );

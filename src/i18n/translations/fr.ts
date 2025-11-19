@@ -356,6 +356,7 @@ export const fr = {
     "email_update_failed": "فشل تحديث البريد الإلكتروني: {{error}}",
     "email_already_current": "هذا هو بالفعل عنوان بريدك الإلكتروني الحالي.",
     "email_update_note": "يتطلب تغيير بريدك الإلكتروني تأكيدًا عبر رابط يتم إرساله إلى العنوان الجديد.",
+    "member_email": "البريد الإلكتروني للعضو",
     
     // NEW Account Info Keys
     "account_information": "معلومات الحساب",
@@ -415,5 +416,6 @@ export const fr = {
     "monthly_inventory_sales": "مبيعات المخزون (شهريًا)",
     "monthly_membership_sales": "مبيعات العضوية (شهريًا)",
     "today": "اليوم",
+    "print_receipt": "طباعة الإيصال",
   }
 };

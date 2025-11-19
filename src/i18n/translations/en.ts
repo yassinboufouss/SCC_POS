@@ -353,6 +353,7 @@ export const en = {
     "email_update_failed": "Email update failed: {{error}}",
     "email_already_current": "This is already your current email address.",
     "email_update_note": "Changing your email requires confirmation via a link sent to the new address.",
+    "member_email": "member's email",
     
     // NEW Account Info Keys
     "account_information": "Account Information",
