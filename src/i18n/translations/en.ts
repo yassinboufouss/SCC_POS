@@ -302,5 +302,8 @@ export const en = {
     "sales_analytics_title": "Sales Analytics",
     "total_transactions_count": "Total Transactions",
     "all_time": "All Time",
+    "member_status_distribution": "Member Status Distribution",
+    "count": "Count",
+    "percentage": "Percentage",
   }
 };

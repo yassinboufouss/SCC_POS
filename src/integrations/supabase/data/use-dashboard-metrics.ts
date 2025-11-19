@@ -17,6 +17,7 @@ export interface DashboardMetrics {
   lowStockItems: InventoryItem[];
   recentTransactions: Transaction[];
   allTransactions: Transaction[]; // NEW: Expose all transactions for charting
+  memberStatusDistribution: { active: number, expired: number, pending: number }; 
 }
 
 const fetchDashboardData = async (): Promise<{ profiles: Profile[], inventory: InventoryItem[], transactions: Transaction[] }> => {
@@ -46,9 +47,32 @@ const fetchDashboardData = async (): Promise<{ profiles: Profile[], inventory: I
 const calculateMetrics = (profiles: Profile[], inventory: InventoryItem[], transactions: Transaction[]): DashboardMetrics => {
     const now = new Date();
 
-    // 1. Active Members
-    const activeMembers = profiles.filter(m => m.status === 'Active');
-    const totalActiveMembers = activeMembers.length;
+    // 1. Active Members (and calculate status distribution)
+    let activeCount = 0;
+    let expiredCount = 0;
+    let pendingCount = 0;
+    
+    const processedProfiles = profiles.map(profile => {
+        let currentStatus = profile.status;
+        
+        if (currentStatus === 'Active' && profile.expiration_date) {
+            const expirationDate = new Date(profile.expiration_date);
+            if (!isFuture(expirationDate)) {
+                currentStatus = 'Expired' as const;
+            }
+        }
+        
+        if (currentStatus === 'Active') activeCount++;
+        else if (currentStatus === 'Expired') expiredCount++;
+        else pendingCount++;
+        
+        return { ...profile, status: currentStatus };
+    });
+    
+    const totalActiveMembers = activeCount; // This metric remains the same, based on the calculated status
+    
+    // FIX: Define activeMembers based on the processed list
+    const activeMembers = processedProfiles.filter(p => p.status === 'Active');
 
     // 2. Monthly Revenue (MTD)
     const { monthlyTotal: monthlyRevenue } = calculateSalesSummary(transactions);
@@ -95,6 +119,7 @@ const calculateMetrics = (profiles: Profile[], inventory: InventoryItem[], trans
         lowStockItems,
         recentTransactions,
         allTransactions: transactions, // Return the full list
+        memberStatusDistribution: { active: activeCount, expired: expiredCount, pending: pendingCount },
     };
 };
 

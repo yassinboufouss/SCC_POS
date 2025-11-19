@@ -5,6 +5,7 @@ import { BarChart3, DollarSign, History, Users, LucideIcon } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import DashboardMetricCard from '@/components/dashboard/DashboardMetricCard';
 import MonthlySalesChart from '@/components/dashboard/MonthlySalesChart';
+import MemberStatusChart from '@/components/dashboard/MemberStatusChart'; // Import new chart
 import { useDashboardMetrics } from '@/integrations/supabase/data/use-dashboard-metrics.ts';
 import { aggregateMonthlySales } from '@/utils/transaction-utils';
 import { formatCurrency } from '@/utils/currency-utils';
@@ -28,6 +29,7 @@ const AnalyticsPage: React.FC = () => {
     totalActiveMembers: 0,
     monthlyRevenue: 0,
     allTransactions: [],
+    memberStatusDistribution: { active: 0, expired: 0, pending: 0 },
   };
   
   const currentMetrics = metrics || defaultMetrics;
@@ -76,8 +78,17 @@ const AnalyticsPage: React.FC = () => {
           )}
         </div>
         
-        {/* Monthly Revenue Chart (Full Width) */}
-        <MonthlySalesChart data={monthlySalesData} isLoading={isLoading} />
+        {/* Charts Section */}
+        <div className="grid gap-6 lg:grid-cols-2">
+            {/* Monthly Revenue Chart */}
+            <MonthlySalesChart data={monthlySalesData} isLoading={isLoading} />
+            
+            {/* Member Status Distribution Chart */}
+            <MemberStatusChart 
+                distribution={currentMetrics.memberStatusDistribution} 
+                isLoading={isLoading} 
+            />
+        </div>
         
         {/* Additional Analytics (Placeholder for future expansion) */}
         <Card>
