@@ -118,8 +118,7 @@ const LoginPage: React.FC = () => {
   return (
     <div 
       className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden 
-                 bg-gradient-to-r from-primary/10 via-background to-primary/10 
-                 bg-[length:400%_400%] animate-gradient-shift"
+             bg-spider-web"
     >
       {/* Removed Background Video and Overlay */}
       
