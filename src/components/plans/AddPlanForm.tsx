@@ -62,10 +62,10 @@ const AddPlanForm: React.FC<AddPlanFormProps> = ({ onSuccess }) => {
             showSuccess(t("plan_created_success", { name: newPlan.name }));
             onSuccess();
         } else {
-            showError(t("registration_failed"));
+            showError(t("plan_creation_failed")); // Use specific error key
         }
     } catch (error) {
-        showError(t("registration_failed"));
+        showError(t("plan_creation_failed")); // Use specific error key
     }
   };
 
