@@ -5,8 +5,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSession } from '@/components/auth/SessionContextProvider';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { LogIn } from 'lucide-react';
+import ThemeToggle from '@/components/ThemeToggle'; // Import ThemeToggle
 
 const LoginPage: React.FC = () => {
   const { t } = useTranslation();
@@ -80,6 +81,9 @@ const LoginPage: React.FC = () => {
             }}
           />
         </CardContent>
+        <CardFooter className="justify-center pt-4">
+            <ThemeToggle />
+        </CardFooter>
       </Card>
     </div>
   );

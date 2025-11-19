@@ -337,5 +337,15 @@ export const en = {
     "no_users_found": "No users found.",
     "access_denied": "Access Denied.",
     "view_full_profile": "View Full Profile",
+    
+    // Password Management Keys
+    "password_management": "Password Management",
+    "new_password": "New Password",
+    "confirm_new_password": "Confirm New Password",
+    "change_password": "Change Password",
+    "password_update_success": "Password updated successfully.",
+    "password_update_failed": "Password update failed: {{error}}",
+    "saving": "Saving...",
+    "unknown_error": "Unknown error",
   }
 };

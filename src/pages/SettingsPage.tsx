@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Layout from '@/components/Layout';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Settings, User, Mail, Phone, Calendar, Edit, Save, Shield } from 'lucide-react';
+import { Settings, User, Mail, Phone, Calendar, Edit, Save, Shield, Key } from 'lucide-react';
 import { useSession } from '@/components/auth/SessionContextProvider';
 import { Skeleton } from '@/components/ui/skeleton';
 import MemberBasicInfoForm from '@/components/members/MemberBasicInfoForm';
@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useUserRole } from '@/hooks/use-user-role';
 import { Profile } from '@/types/supabase';
+import PasswordManagementForm from '@/components/settings/PasswordManagementForm.tsx'; // FIX: Added .tsx extension
 
 const SettingsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -103,7 +104,19 @@ const SettingsPage: React.FC = () => {
             </CardContent>
         </Card>
         
-        {/* Security Settings Placeholder */}
+        {/* Password Management Card */}
+        <Card className="shadow-lg">
+            <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                    <Key className="h-5 w-5" /> {t("password_management")}
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
+                <PasswordManagementForm />
+            </CardContent>
+        </Card>
+        
+        {/* Security Settings Placeholder (Removed old placeholder content) */}
         <Card className="shadow-lg">
             <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">

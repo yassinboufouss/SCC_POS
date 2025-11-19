@@ -337,5 +337,15 @@ export const ar = {
     "no_users_found": "لم يتم العثور على مستخدمين.",
     "access_denied": "تم رفض الوصول.",
     "view_full_profile": "عرض الملف الشخصي الكامل",
+    
+    // Password Management Keys
+    "password_management": "إدارة كلمة المرور",
+    "new_password": "كلمة المرور الجديدة",
+    "confirm_new_password": "تأكيد كلمة المرور الجديدة",
+    "change_password": "تغيير كلمة المرور",
+    "password_update_success": "تم تحديث كلمة المرور بنجاح.",
+    "password_update_failed": "فشل تحديث كلمة المرور: {{error}}",
+    "saving": "جاري الحفظ...",
+    "unknown_error": "خطأ غير معروف",
   }
 };

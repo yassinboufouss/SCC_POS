@@ -337,5 +337,15 @@ export const fr = {
     "no_users_found": "Aucun utilisateur trouvé.",
     "access_denied": "Accès Refusé.",
     "view_full_profile": "Voir le Profil Complet",
+    
+    // Password Management Keys
+    "password_management": "Gestion du Mot de Passe",
+    "new_password": "Nouveau Mot de Passe",
+    "confirm_new_password": "Confirmer le Nouveau Mot de Passe",
+    "change_password": "Changer le Mot de Passe",
+    "password_update_success": "Mot de passe mis à jour avec succès.",
+    "password_update_failed": "Échec de la mise à jour du mot de passe : {{error}}",
+    "saving": "Enregistrement...",
+    "unknown_error": "Erreur inconnue",
   }
 };
