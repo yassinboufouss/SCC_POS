@@ -7,7 +7,6 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Dumbbell } from 'lucide-react';
-import ThemeToggle from '@/components/ThemeToggle';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { cn } from '@/lib/utils';
 
@@ -94,7 +93,6 @@ const LoginPage: React.FC = () => {
           />
         </CardContent>
         <CardFooter className="flex flex-col gap-2 pt-4 px-6 pb-6">
-            <ThemeToggle />
             <LanguageSwitcher />
         </CardFooter>
       </Card>
