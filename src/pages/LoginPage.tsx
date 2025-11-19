@@ -16,7 +16,6 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
 import { showError } from '@/utils/toast';
-import SocialAuthButtons from '@/components/auth/SocialAuthButtons';
 
 // --- Zod Schemas ---
 const baseSchema = (t: (key: string) => string) => z.object({
@@ -245,17 +244,7 @@ const LoginPage: React.FC = () => {
             </form>
           </Form>
           
-          {/* Divider Section */}
-          <div className="flex items-center my-8">
-              <Separator className="flex-1 bg-[#E5E7EB] dark:bg-muted" />
-              <span className="px-4 text-xs font-medium text-[#6B7280] dark:text-muted-foreground uppercase whitespace-nowrap">
-                  {t("or_continue_with")}
-              </span>
-              <Separator className="flex-1 bg-[#E5E7EB] dark:bg-muted" />
-          </div>
-          
-          {/* Social Login Buttons */}
-          <SocialAuthButtons />
+          {/* Removed Divider and Social Login Buttons */}
           
         </CardContent>
         
