@@ -36,34 +36,41 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
   const [profile, setProfile] = useState<Profile | null>(null); // State for profile
   const [isLoading, setIsLoading] = useState(true);
 
-  const getProfile = async (currentUser: User) => {
-      const minimalProfile: Profile = {
-          id: currentUser.id,
-          email: currentUser.email || null,
-          role: 'member', // Default role
-          first_name: null,
-          last_name: null,
-          avatar_url: null,
-          updated_at: null,
-          member_code: null,
-          phone: null,
-          dob: null,
-          plan_name: null,
-          status: 'Pending',
-          start_date: null,
-          expiration_date: null,
-          last_check_in: null,
-          total_check_ins: 0,
-      };
+  const getMinimalProfile = (currentUser: User): Profile => ({
+      id: currentUser.id,
+      email: currentUser.email || null,
+      role: 'member', // Default role
+      first_name: null,
+      last_name: null,
+      avatar_url: null,
+      updated_at: null,
+      member_code: null,
+      phone: null,
+      dob: null,
+      plan_name: null,
+      status: 'Pending',
+      start_date: null,
+      expiration_date: null,
+      last_check_in: null,
+      total_check_ins: 0,
+  });
 
-      const userProfile = await fetchUserProfile(currentUser.id);
+  const getProfile = async (currentUser: User) => {
+      const minimalProfile = getMinimalProfile(currentUser);
       
-      // Merge email from the User object into the profile object
-      if (userProfile) {
-          const completeProfile = { ...userProfile, email: currentUser.email || null };
-          setProfile(completeProfile);
-      } else {
-          // If profile doesn't exist yet or fetch failed, use the minimal profile
+      try {
+          const userProfile = await fetchUserProfile(currentUser.id);
+          
+          if (userProfile) {
+              // Merge email from the User object into the profile object
+              const completeProfile = { ...userProfile, email: currentUser.email || null };
+              setProfile(completeProfile);
+          } else {
+              // If profile doesn't exist yet or fetch failed, use the minimal profile
+              setProfile(minimalProfile);
+          }
+      } catch (e) {
+          console.error("Error fetching user profile, falling back to minimal profile:", e);
           setProfile(minimalProfile);
       }
   };
@@ -82,6 +89,7 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
   };
 
   useEffect(() => {
+    // Set up listener for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, currentSession) => {
       if (event === 'SIGNED_IN') {
         handleSession(currentSession);
@@ -90,13 +98,13 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
         handleSession(null);
         showSuccess(t('logout_successful'));
       } else if (event === 'INITIAL_SESSION') {
-        handleSession(currentSession);
+        // Initial session handled below to ensure we wait for profile fetch
       } else {
         setIsLoading(false);
       }
     });
 
-    // Fetch initial session manually in case onAuthStateChange misses it on first load
+    // Fetch initial session manually to ensure we have the state before rendering protected routes
     supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
         handleSession(initialSession);
     });
