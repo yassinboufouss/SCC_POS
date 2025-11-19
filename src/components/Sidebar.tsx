@@ -42,8 +42,12 @@ const Sidebar: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen border-r bg-sidebar text-sidebar-foreground p-4 w-64 sticky top-0">
-      <div className="text-2xl font-bold text-sidebar-primary mb-8">
-        {t("app_title")}
+      <div className="text-2xl font-bold text-sidebar-primary mb-8 flex items-center justify-center">
+        <img 
+            src="/gym-logo.png" 
+            alt={t("app_title")} 
+            className="h-12 w-auto object-contain" 
+        />
       </div>
       
       <nav className="flex-1 space-y-2">
