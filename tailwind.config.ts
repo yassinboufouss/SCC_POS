@@ -95,17 +95,18 @@ export default {
             transform: "translateY(0)",
           },
         },
+        // UPDATED: Define diagonal shift for the spider web effect
         "gradient-shift": {
-          "0%": { backgroundPosition: "0% 50%" },
-          "50%": { backgroundPosition: "100% 50%" },
-          "100%": { backgroundPosition: "0% 50%" },
+          "0%": { backgroundPosition: "0% 0%" },
+          "50%": { backgroundPosition: "100% 100%" },
+          "100%": { backgroundPosition: "0% 0%" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-in-up": "fade-in-up 0.6s ease-out forwards",
-        "gradient-shift": "gradient-shift 15s ease infinite",
+        "gradient-shift": "gradient-shift 20s linear infinite", // Increased duration and set to linear for smoother loop
       },
     },
   },
