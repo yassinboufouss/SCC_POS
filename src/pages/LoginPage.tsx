@@ -118,9 +118,24 @@ const LoginPage: React.FC = () => {
   return (
     <div 
       className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden 
-             bg-spider-web"
+             bg-gray-900" // Use a dark background color as fallback
     >
-      {/* Removed Background Video and Overlay */}
+      {/* Video Background */}
+      <video 
+        autoPlay 
+        loop 
+        muted 
+        playsInline 
+        poster="/gym-background.jpg" // Static image fallback
+        className="absolute inset-0 w-full h-full object-cover opacity-50"
+      >
+        {/* NOTE: Assuming a video file named gym-video.mp4 exists in public/ */}
+        <source src="/gym-video.mp4" type="video/mp4" />
+        {t("video_not_supported")}
+      </video>
+      
+      {/* Dark Overlay */}
+      <div className="absolute inset-0 bg-black/40 z-0"></div>
       
       <Card 
         className={cn(
@@ -230,8 +245,6 @@ const LoginPage: React.FC = () => {
               </Button>
             </form>
           </Form>
-          
-          {/* Removed Divider and Social Login Buttons */}
           
         </CardContent>
         
