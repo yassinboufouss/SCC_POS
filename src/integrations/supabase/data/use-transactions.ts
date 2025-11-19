@@ -5,6 +5,8 @@ import { queryKeys } from './query-keys.ts';
 import { addTransaction, voidTransaction } from '@/utils/transaction-utils';
 import { PaymentMethod } from '@/types/pos';
 import { format } from 'date-fns';
+import { useTranslation } from 'react-i18next';
+import { showSuccess, showError, showWarning } from '@/utils/toast';
 
 // --- Fetch Hooks ---
 
@@ -97,14 +99,21 @@ export const useAddTransaction = () => {
 // NEW: Hook for voiding a transaction
 export const useVoidTransaction = () => {
     const queryClient = useQueryClient();
+    const { t } = useTranslation();
     return useMutation({
         mutationFn: (transactionId: string) => voidTransaction(transactionId),
-        onSuccess: () => {
+        onSuccess: (requiresManualMembershipReversal, transactionId) => {
             // Invalidate all relevant data sources
             queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
             queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.metrics });
             queryClient.invalidateQueries({ queryKey: queryKeys.inventory.all });
             queryClient.invalidateQueries({ queryKey: queryKeys.profiles.all }); // In case membership status was affected
+            
+            if (requiresManualMembershipReversal) {
+                showWarning(t("transaction_void_success_with_warning", { id: transactionId.substring(0, 8) }));
+            } else {
+                showSuccess(t("transaction_void_success", { id: transactionId.substring(0, 8) }));
+            }
         },
     });
 };

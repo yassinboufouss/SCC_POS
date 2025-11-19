@@ -392,6 +392,7 @@ export const fr = {
     "voiding": "جاري الإلغاء...",
     "transaction_void_success": "تم إلغاء المعاملة رقم {{id}} بنجاح.",
     "transaction_void_failed": "فشل إلغاء المعاملة.",
+    "transaction_void_success_with_warning": "تم إلغاء المعاملة رقم {{id}}. تحذير: قد تتطلب حالة العضوية تعديلاً يدويًا.",
     
     // NEW Video Fallback
     "video_not_supported": "متصفحك لا يدعم علامة الفيديو.",

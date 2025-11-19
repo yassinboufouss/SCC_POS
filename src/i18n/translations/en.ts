@@ -389,6 +389,7 @@ export const en = {
     "voiding": "Voiding...",
     "transaction_void_success": "Transaction ID {{id}} successfully voided.",
     "transaction_void_failed": "Failed to void transaction.",
+    "transaction_void_success_with_warning": "Transaction ID {{id}} voided. WARNING: Membership status may require manual adjustment.",
     
     // NEW Video Fallback
     "video_not_supported": "Your browser does not support the video tag.",
