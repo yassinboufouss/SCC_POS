@@ -19,6 +19,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Package, UserPlus } from 'lucide-react';
 import MemberRegistrationForm from '@/components/members/MemberRegistrationForm';
 import { usePlans } from '@/integrations/supabase/data/use-plans.ts';
+import { v4 as uuidv4 } from 'uuid';
 
 const POSPage = () => {
   const { t } = useTranslation();
@@ -48,6 +49,11 @@ const POSPage = () => {
         }
         return item;
     }));
+  };
+
+  const addCustomItemToCart = (item: CartItem) => {
+    setCart(prevCart => [...prevCart, item]);
+    showSuccess(t("item_added_to_cart", { name: item.name }));
   };
 
   const addInventoryToCart = (item: InventoryItem) => {
@@ -171,7 +177,7 @@ const POSPage = () => {
         return prevCart.filter(i => !(i.sourceId === sourceId && i.type === type));
       }
       
-      if (item.type === 'inventory') {
+      if (item.type === 'inventory' && item.stock !== Infinity) { // Check stock only for real inventory
         const inventoryStock = liveInventoryItems?.find(i => i.id === sourceId)?.stock || item.stock || 0;
         if (newQuantity > inventoryStock) {
           showError(t("cannot_add_more_stock_limit", { name: item.name }));
@@ -274,7 +280,8 @@ const POSPage = () => {
     
     const TAX_RATE = 0.08; // 8% sales tax
     
-    // 2. Calculate Taxable Base (only inventory items, after discount, excluding giveaways)
+    // 2. Calculate Taxable Base (only inventory items, including custom items, after discount, excluding giveaways)
+    // Custom items are treated as inventory for tax purposes.
     const rawTaxableSubtotal = payableCart
         .filter(item => item.type === 'inventory')
         .reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -300,22 +307,24 @@ const POSPage = () => {
     if (cart.length === 0) return;
     
     try {
-        // 1. Process inventory stock reduction (using RPC for atomic update)
-        // This includes both paid inventory items AND free giveaway items
+        // 1. Process inventory stock reduction (only for real inventory items, excluding custom items where stock is Infinity)
         const inventoryItemsSold = cart.filter(item => item.type === 'inventory');
         
         await Promise.all(inventoryItemsSold.map(async item => {
-            // Only reduce stock if the item is actually in stock (prevents errors on 0 stock items)
-            const currentStock = liveInventoryItems?.find(i => i.id === item.sourceId)?.stock || item.stock || 0;
-            if (currentStock >= item.quantity) {
-                await reduceInventoryStock(item.sourceId, item.quantity);
-            } else {
-                // If a giveaway item is out of stock, we should still proceed with the sale, 
-                // but log a warning or notify staff (for now, we just log and proceed).
-                if (item.isGiveaway) {
-                    console.warn(`Giveaway item ${item.name} is out of stock but sale proceeded.`);
+            // Check if it's a real inventory item (stock is not Infinity)
+            if (item.stock !== Infinity) { 
+                // Use live stock data for check
+                const currentStock = liveInventoryItems?.find(i => i.id === item.sourceId)?.stock || item.stock || 0;
+                if (currentStock >= item.quantity) {
+                    await reduceInventoryStock(item.sourceId, item.quantity);
                 } else {
-                    throw new Error(t("checkout_failed_stock_issue", { name: item.name }));
+                    // If a giveaway item is out of stock, we should still proceed with the sale, 
+                    // but log a warning or notify staff (for now, we just log and proceed).
+                    if (item.isGiveaway) {
+                        console.warn(`Giveaway item ${item.name} is out of stock but sale proceeded.`);
+                    } else {
+                        throw new Error(t("checkout_failed_stock_issue", { name: item.name }));
+                    }
                 }
             }
         }));
@@ -436,6 +445,7 @@ const POSPage = () => {
                       setInventorySearchTerm={setInventorySearchTerm}
                       addInventoryToCart={addInventoryToCart}
                       addMembershipToCart={addMembershipToCart}
+                      addCustomItemToCart={addCustomItemToCart}
                     />
                 </TabsContent>
                 

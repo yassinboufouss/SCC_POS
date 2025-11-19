@@ -360,5 +360,12 @@ export const fr = {
     // NEW Account Info Keys
     "account_information": "Informations du Compte",
     "user_id": "ID Utilisateur",
+    
+    // NEW Custom Item Keys
+    "custom_sale_item": "Article de Vente Personnalisé",
+    "service_fee_or_custom_product": "Frais de Service ou Produit Personnalisé",
+    "quantity": "Quantité",
+    "add_to_cart": "Ajouter au Panier",
+    "item_added_to_cart": "{{name}} ajouté au panier.",
   }
 };

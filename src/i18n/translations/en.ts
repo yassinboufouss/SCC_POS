@@ -360,5 +360,12 @@ export const en = {
     // NEW Account Info Keys
     "account_information": "Account Information",
     "user_id": "User ID",
+    
+    // NEW Custom Item Keys
+    "custom_sale_item": "Custom Sale Item",
+    "service_fee_or_custom_product": "Service Fee or Custom Product",
+    "quantity": "Quantity",
+    "add_to_cart": "Add to Cart",
+    "item_added_to_cart": "{{name}} added to cart.",
   }
 };

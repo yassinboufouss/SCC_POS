@@ -360,5 +360,12 @@ export const ar = {
     // NEW Account Info Keys
     "account_information": "معلومات الحساب",
     "user_id": "معرف المستخدم",
+    
+    // NEW Custom Item Keys
+    "custom_sale_item": "عنصر بيع مخصص",
+    "service_fee_or_custom_product": "رسوم الخدمة أو منتج مخصص",
+    "quantity": "الكمية",
+    "add_to_cart": "أضف إلى العربة",
+    "item_added_to_cart": "تمت إضافة {{name}} إلى العربة.",
   }
 };

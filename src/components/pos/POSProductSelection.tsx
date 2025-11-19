@@ -9,12 +9,15 @@ import { formatCurrency } from '@/utils/currency-utils';
 import { useInventory } from '@/integrations/supabase/data/use-inventory.ts';
 import { usePlans } from '@/integrations/supabase/data/use-plans.ts';
 import { Skeleton } from '@/components/ui/skeleton';
+import POSCustomItemForm from './POSCustomItemForm';
+import { CartItem } from '@/types/pos';
 
 interface POSProductSelectionProps {
   inventorySearchTerm: string;
   setInventorySearchTerm: (term: string) => void;
   addInventoryToCart: (item: InventoryItem) => void;
   addMembershipToCart: (plan: MembershipPlan) => void;
+  addCustomItemToCart: (item: CartItem) => void;
 }
 
 const POSProductSelection: React.FC<POSProductSelectionProps> = ({
@@ -22,6 +25,7 @@ const POSProductSelection: React.FC<POSProductSelectionProps> = ({
   setInventorySearchTerm,
   addInventoryToCart,
   addMembershipToCart,
+  addCustomItemToCart,
 }) => {
   const { t } = useTranslation();
   
@@ -30,6 +34,9 @@ const POSProductSelection: React.FC<POSProductSelectionProps> = ({
 
   return (
     <div className="space-y-4">
+      
+      {/* Custom Item Form (NEW) */}
+      <POSCustomItemForm addCustomItemToCart={addCustomItemToCart} />
       
       {/* Membership Plans Section */}
       <Card>
