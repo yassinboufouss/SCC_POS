@@ -379,5 +379,7 @@ export const fr = {
     "invalid_email_address": "Adresse e-mail invalide.",
     "password_min_length": "Le mot de passe doit contenir au moins 6 caractères.",
     "login_failed_error": "Échec de la connexion : {{error}}",
+    "continue_with_google": "Continuer avec Google",
+    "continue_with_github": "Continuer avec GitHub",
   }
 };

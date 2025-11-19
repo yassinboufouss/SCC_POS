@@ -379,5 +379,7 @@ export const ar = {
     "invalid_email_address": "عنوان بريد إلكتروني غير صالح.",
     "password_min_length": "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل.",
     "login_failed_error": "فشل تسجيل الدخول: {{error}}",
+    "continue_with_google": "المتابعة باستخدام جوجل",
+    "continue_with_github": "المتابعة باستخدام جيت هاب",
   }
 };

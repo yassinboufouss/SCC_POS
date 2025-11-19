@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
 import { showError } from '@/utils/toast';
+import SocialAuthButtons from '@/components/auth/SocialAuthButtons';
 
 // --- Zod Schemas ---
 const baseSchema = (t: (key: string) => string) => z.object({
@@ -240,10 +241,8 @@ const LoginPage: React.FC = () => {
               <Separator className="flex-1 bg-[#E5E7EB] dark:bg-muted" />
           </div>
           
-          {/* Social Login Placeholder (Skipped as per instructions) */}
-          <div className="text-center">
-              <p className="text-xs text-muted-foreground">{t("social_login_placeholder")}</p>
-          </div>
+          {/* Social Login Buttons */}
+          <SocialAuthButtons />
           
         </CardContent>
         
