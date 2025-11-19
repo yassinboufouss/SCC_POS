@@ -1,23 +1,20 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSession } from '@/components/auth/SessionContextProvider';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { User, History, QrCode, Mail, Phone, Calendar, Edit, RefreshCw, X } from 'lucide-react';
-import MemberDetailsCard from '@/components/members/MemberDetailsCard';
-import MemberTransactionHistory from '@/components/members/MemberTransactionHistory';
+import { User, History, RefreshCw, X } from 'lucide-react';
 import { useMemberTransactions } from '@/integrations/supabase/data/use-transactions.ts';
 import { Skeleton } from '@/components/ui/skeleton';
-import { format } from 'date-fns';
 import MemberLogoutButton from '@/components/members/MemberLogoutButton';
 import { Button } from '@/components/ui/button';
-import MemberBasicInfoForm from '@/components/members/MemberBasicInfoForm'; // Import form
-import MemberRenewalForm from '@/components/members/MemberRenewalForm'; // Import renewal form
+import MemberProfileTab from '@/components/members/MemberProfileTab'; // NEW
+import MemberRenewalTab from '@/components/members/MemberRenewalTab'; // NEW
+import MemberHistoryTab from '@/components/members/MemberHistoryTab'; // NEW
 
 const MemberProfilePage: React.FC = () => {
   const { t } = useTranslation();
   const { profile, isLoading: isLoadingSession } = useSession();
-  const [isEditing, setIsEditing] = React.useState(false); // State for editing mode
-  const [showRenewalForm, setShowRenewalForm] = React.useState(false); // State for renewal form visibility
+  const [showRenewalForm, setShowRenewalForm] = useState(false); 
   
   const memberId = profile?.id || '';
   const { data: transactions, isLoading: isLoadingTransactions } = useMemberTransactions(memberId);
@@ -38,15 +35,17 @@ const MemberProfilePage: React.FC = () => {
     );
   }
   
-  const handleSaveSuccess = () => {
-      setIsEditing(false);
-  };
+  // Member can always edit their own basic info, and always renew.
+  const canEdit = true;
+  const canRenew = true;
+  const canCheckIn = false; // Member doesn't need to manually check themselves in here
+  const canChangeStatus = false; // Member cannot freeze/cancel their own status via this UI
   
   // Determine if the member needs renewal (Expired or Pending)
   const needsRenewal = profile.status !== 'Active';
   
   // If renewal is needed, automatically show the form
-  React.useEffect(() => {
+  useEffect(() => {
       if (needsRenewal) {
           setShowRenewalForm(true);
       }
@@ -61,78 +60,20 @@ const MemberProfilePage: React.FC = () => {
             <h1 className="text-3xl font-bold flex items-center gap-3 text-primary">
               <User className="h-7 w-7" /> {t("welcome_member", { name: profile.first_name })}
             </h1>
-            <div className="flex gap-2 shrink-0">
-                {/* Toggle Edit Button */}
-                <Button 
-                    variant="outline" 
-                    onClick={() => setIsEditing(!isEditing)}
-                >
-                    {isEditing ? <X className="h-4 w-4 mr-2" /> : <Edit className="h-4 w-4 mr-2" />}
-                    {isEditing ? t("close_editing") : t("edit_profile")}
-                </Button>
-                <MemberLogoutButton />
-            </div>
+            <MemberLogoutButton />
         </div>
         
-        {/* Basic Info Card */}
-        <Card className="shadow-lg">
-            <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                    <User className="h-5 w-5" /> {t("contact_information")}
-                </CardTitle>
-            </CardHeader>
-            <CardContent>
-                {isEditing ? (
-                    <MemberBasicInfoForm 
-                        member={profile} 
-                        onSuccess={handleSaveSuccess} 
-                        canEdit={true} // Member can edit their own profile
-                    />
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                        <p className="flex items-center gap-2"><User className="h-4 w-4 text-muted-foreground" /> {profile.first_name} {profile.last_name}</p>
-                        <p className="flex items-center gap-2"><Mail className="h-4 w-4 text-muted-foreground" /> {profile.email || 'N/A'}</p>
-                        <p className="flex items-center gap-2"><Phone className="h-4 w-4 text-muted-foreground" /> {profile.phone || 'N/A'}</p>
-                        <p className="flex items-center gap-2"><Calendar className="h-4 w-4 text-muted-foreground" /> {profile.dob || 'N/A'}</p>
-                        <p className="flex items-center gap-2"><QrCode className="h-4 w-4 text-muted-foreground" /> {t("member_code")}: <span className="font-medium">{profile.member_code || 'N/A'}</span></p>
-                    </div>
-                )}
-            </CardContent>
-        </Card>
-
-        {/* Membership Status Card and Check-in Status Card side-by-side on desktop */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <MemberDetailsCard 
-                member={profile} 
-                onRenewClick={() => setShowRenewalForm(true)} 
-                canRenew={true} 
-            />
-            
-            {/* Check-in Status Card */}
-            <Card className="shadow-lg">
-                <CardHeader>
-                    <CardTitle className="text-lg flex items-center gap-2">
-                        <QrCode className="h-5 w-5" /> {t("check_in_status")}
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                            <p className="text-muted-foreground">{t("total_check_ins")}</p>
-                            <p className="text-2xl font-bold text-primary">{profile.total_check_ins || 0}</p>
-                        </div>
-                        <div>
-                            <p className="text-muted-foreground">{t("last_check_in")}</p>
-                            <p className="text-sm font-medium">
-                                {profile.last_check_in ? format(new Date(profile.last_check_in), 'yyyy-MM-dd hh:mm a') : t('never_checked_in')}
-                            </p>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
-        </div>
+        {/* 1. Profile & Membership Details (Uses MemberProfileTab) */}
+        <MemberProfileTab 
+            member={profile}
+            canEdit={canEdit}
+            canRenew={canRenew}
+            canCheckIn={canCheckIn}
+            canChangeStatus={canChangeStatus}
+            onRenewClick={() => setShowRenewalForm(true)}
+        />
         
-        {/* Conditional Renewal Form */}
+        {/* 2. Conditional Renewal Form (Uses MemberRenewalTab) */}
         {showRenewalForm && (
             <Card className="shadow-lg">
                 <CardHeader className="flex flex-row items-center justify-between">
@@ -144,25 +85,17 @@ const MemberProfilePage: React.FC = () => {
                     </Button>
                 </CardHeader>
                 <CardContent>
-                    <MemberRenewalForm member={profile} canRenew={true} />
+                    <MemberRenewalTab member={profile} canRenew={canRenew} />
                 </CardContent>
             </Card>
         )}
         
-        {/* Transaction History */}
-        <Card className="shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-                <History className="h-5 w-5" /> {t("transaction_history", { count: transactions?.length || 0 })}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <MemberTransactionHistory 
-                transactions={transactions || []} 
-                isLoading={isLoadingTransactions} 
-            />
-          </CardContent>
-        </Card>
+        {/* 3. History (Uses MemberHistoryTab) */}
+        <MemberHistoryTab 
+            member={profile} 
+            transactions={transactions} 
+            isLoadingTransactions={isLoadingTransactions} 
+        />
         
       </div>
     </div>
