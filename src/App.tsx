@@ -24,7 +24,7 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ThemeProvider defaultTheme="light" attribute="class"> {/* Wrap with ThemeProvider */}
+    <ThemeProvider defaultTheme="dark" forcedTheme="dark" attribute="class"> {/* ENFORCING DARK THEME */}
       <TooltipProvider>
         <Sonner />
         <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
