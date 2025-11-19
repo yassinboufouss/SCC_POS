@@ -89,18 +89,18 @@ const MembersPage: React.FC = () => {
           </Dialog>
         </div>
 
-        <Card>
+        <Card className="shadow-lg">
           <CardHeader>
             <CardTitle>{t("member_directory", { count: members?.length || 0 })}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="mb-4 flex items-center gap-4">
+            <div className="mb-4 flex flex-wrap items-center gap-4">
                 <Search className="h-4 w-4 text-muted-foreground shrink-0" />
                 <Input
                     placeholder={t("search_members_by_name")}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="max-w-sm flex-1"
+                    className="max-w-sm flex-1 min-w-[150px]"
                 />
                 
                 <Select value={statusFilter} onValueChange={(value: Profile['status'] | 'All') => setStatusFilter(value)}>
@@ -143,7 +143,7 @@ const MembersPage: React.FC = () => {
                     ))
                   ) : members && members.length > 0 ? (
                     members.map((member) => (
-                      <TableRow key={member.id}>
+                      <TableRow key={member.id} className="hover:bg-secondary/50 transition-colors">
                         <TableCell className="font-medium text-xs">{member.member_code || member.id.substring(0, 8)}...</TableCell>
                         <TableCell>{member.first_name} {member.last_name}</TableCell>
                         <TableCell>{member.plan_name}</TableCell>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Layout from '@/components/Layout';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Ticket, Plus } from 'lucide-react';
+import { Ticket, Plus, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import PlanTable from '@/components/plans/PlanTable.tsx';
@@ -46,7 +46,7 @@ const PlansPage: React.FC = () => {
             </Dialog>
         </div>
         
-        <Card>
+        <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
                 <Ticket className="h-5 w-5" /> {t("current_plans", { count: membershipPlans?.length || 0 })}
@@ -54,11 +54,12 @@ const PlansPage: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="mb-4 flex items-center gap-2">
+                <Search className="h-4 w-4 text-muted-foreground shrink-0" />
                 <Input
                     placeholder={t("search_plans_by_name")}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="max-w-sm"
+                    className="max-w-sm flex-1"
                 />
             </div>
             {isLoading ? (

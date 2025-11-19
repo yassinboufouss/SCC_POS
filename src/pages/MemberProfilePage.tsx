@@ -48,11 +48,11 @@ const MemberProfilePage: React.FC = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 lg:p-8">
       <div className="max-w-4xl mx-auto space-y-6">
         
-        <div className="flex justify-between items-center">
+        <div className="flex flex-wrap justify-between items-center gap-4">
             <h1 className="text-3xl font-bold flex items-center gap-3 text-primary">
               <User className="h-7 w-7" /> {t("welcome_member", { name: profile.first_name })}
             </h1>
-            <div className="flex gap-2">
+            <div className="flex gap-2 shrink-0">
                 {/* Toggle Edit Button */}
                 <Button 
                     variant="outline" 
@@ -66,7 +66,7 @@ const MemberProfilePage: React.FC = () => {
         </div>
         
         {/* Basic Info Card */}
-        <Card>
+        <Card className="shadow-lg">
             <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                     <User className="h-5 w-5" /> {t("contact_information")}
@@ -90,16 +90,41 @@ const MemberProfilePage: React.FC = () => {
             </CardContent>
         </Card>
 
-        {/* Membership Status Card */}
-        <MemberDetailsCard 
-            member={profile} 
-            onRenewClick={() => { /* Read-only, no action */ }} 
-            canRenew={false} 
-        />
+        {/* Membership Status Card and Check-in Status Card side-by-side on desktop */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <MemberDetailsCard 
+                member={profile} 
+                onRenewClick={() => { /* Read-only, no action */ }} 
+                canRenew={false} 
+            />
+            
+            {/* Check-in Status Card */}
+            <Card className="shadow-lg">
+                <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                        <QrCode className="h-5 w-5" /> {t("check_in_status")}
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <p className="text-muted-foreground">{t("total_check_ins")}</p>
+                            <p className="text-2xl font-bold text-primary">{profile.total_check_ins || 0}</p>
+                        </div>
+                        <div>
+                            <p className="text-muted-foreground">{t("last_check_in")}</p>
+                            <p className="text-sm font-medium">
+                                {profile.last_check_in ? format(new Date(profile.last_check_in), 'yyyy-MM-dd hh:mm a') : t('never_checked_in')}
+                            </p>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
         
         {/* Conditional Renewal Form */}
         {needsRenewal && (
-            <Card>
+            <Card className="shadow-lg">
                 <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2 text-green-600">
                         <RefreshCw className="h-5 w-5" /> {t("renew_membership")}
@@ -111,31 +136,8 @@ const MemberProfilePage: React.FC = () => {
             </Card>
         )}
         
-        {/* Check-in Status Card */}
-        <Card>
-            <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                    <QrCode className="h-5 w-5" /> {t("check_in_status")}
-                </CardTitle>
-            </CardHeader>
-            <CardContent>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                        <p className="text-muted-foreground">{t("total_check_ins")}</p>
-                        <p className="text-xl font-bold text-primary">{profile.total_check_ins || 0}</p>
-                    </div>
-                    <div>
-                        <p className="text-muted-foreground">{t("last_check_in")}</p>
-                        <p className="text-sm font-medium">
-                            {profile.last_check_in ? format(new Date(profile.last_check_in), 'yyyy-MM-dd hh:mm a') : t('never_checked_in')}
-                        </p>
-                    </div>
-                </div>
-            </CardContent>
-        </Card>
-
         {/* Transaction History */}
-        <Card>
+        <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
                 <History className="h-5 w-5" /> {t("transaction_history", { count: transactions?.length || 0 })}

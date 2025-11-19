@@ -48,7 +48,7 @@ const POSProductSelection: React.FC<POSProductSelectionProps> = ({
               {membershipPlans?.map((plan) => (
                 <div 
                   key={plan.id} 
-                  className="border rounded-lg p-3 cursor-pointer bg-blue-50 dark:bg-blue-950 hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors flex flex-col justify-between"
+                  className="border rounded-lg p-3 cursor-pointer bg-blue-50/50 dark:bg-blue-950 shadow-sm hover:shadow-md hover:bg-blue-100/70 dark:hover:bg-blue-900 transition-all flex flex-col justify-between"
                   onClick={() => addMembershipToCart(plan)}
                 >
                   <div>
@@ -89,8 +89,8 @@ const POSProductSelection: React.FC<POSProductSelectionProps> = ({
                 <div 
                   key={item.id} 
                   className={cn(
-                      "border rounded-lg p-3 cursor-pointer hover:bg-primary/10 transition-colors flex flex-col justify-between",
-                      item.stock === 0 && "opacity-50 cursor-not-allowed"
+                      "border rounded-lg p-3 cursor-pointer shadow-sm hover:shadow-md transition-all flex flex-col justify-between",
+                      item.stock === 0 ? "opacity-50 cursor-not-allowed bg-muted/50" : "hover:bg-primary/5"
                   )}
                   onClick={() => item.stock > 0 && addInventoryToCart(item)}
                 >

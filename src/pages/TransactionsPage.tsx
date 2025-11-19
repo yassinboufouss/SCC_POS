@@ -51,7 +51,7 @@ const TransactionsPage: React.FC = () => {
             <h1 className="text-3xl font-bold">{t("transactions")}</h1>
         </div>
         
-        <Card>
+        <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
                 <History className="h-5 w-5" /> {t("transaction_history", { count: totalTransactions })}
@@ -75,7 +75,7 @@ const TransactionsPage: React.FC = () => {
                     value={typeFilter} 
                     onValueChange={(value: Transaction['type'] | 'All') => setTypeFilter(value)}
                 >
-                    <SelectTrigger className="w-[150px]">
+                    <SelectTrigger className="w-[150px] min-w-[150px]">
                         <SelectValue placeholder={t("filter_by_type")} />
                     </SelectTrigger>
                     <SelectContent>
@@ -92,7 +92,7 @@ const TransactionsPage: React.FC = () => {
                     value={paymentMethodFilter} 
                     onValueChange={(value: PaymentMethod | 'All') => setPaymentMethodFilter(value)}
                 >
-                    <SelectTrigger className="w-[150px]">
+                    <SelectTrigger className="w-[150px] min-w-[150px]">
                         <SelectValue placeholder={t("filter_by_payment")} />
                     </SelectTrigger>
                     <SelectContent>
@@ -111,7 +111,7 @@ const TransactionsPage: React.FC = () => {
                             id="date"
                             variant={"outline"}
                             className={cn(
-                                "w-[240px] justify-start text-left font-normal",
+                                "w-full md:w-[240px] justify-start text-left font-normal",
                                 !dateRange && "text-muted-foreground"
                             )}
                         >

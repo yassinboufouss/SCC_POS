@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Layout from '@/components/Layout';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Package, PackagePlus } from 'lucide-react';
+import { Package, PackagePlus, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import InventoryTable from '@/components/inventory/InventoryTable';
@@ -47,7 +47,7 @@ const InventoryPage: React.FC = () => {
             </Dialog>
         </div>
         
-        <Card>
+        <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
                 <Package className="h-5 w-5" /> {t("inventory")} ({inventoryItems?.length || 0})
@@ -55,11 +55,12 @@ const InventoryPage: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="mb-4 flex items-center gap-2">
+                <Search className="h-4 w-4 text-muted-foreground shrink-0" />
                 <Input
                     placeholder={t("search_items_by_name")}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="max-w-sm"
+                    className="max-w-sm flex-1"
                 />
             </div>
             {isLoading ? (

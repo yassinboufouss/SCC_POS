@@ -68,7 +68,7 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
   };
 
   return (
-    <Card className={cn("h-full flex flex-col", className)}>
+    <Card className={cn("h-full flex flex-col shadow-lg", className)}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <ShoppingCart className="h-5 w-5" /> {t("shopping_cart", { count: cart.length })}

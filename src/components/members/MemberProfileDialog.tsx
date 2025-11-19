@@ -132,7 +132,7 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member, canEd
           
           {/* Profile Tab */}
           <TabsContent value="profile" className="space-y-4 mt-4">
-            <Card>
+            <Card className="shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-lg">{t("contact_information")}</CardTitle>
                 <Button variant="ghost" size="sm" onClick={() => setIsEditing(!isEditing)} disabled={!canEdit}>
@@ -143,7 +143,7 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member, canEd
                 {isEditing ? (
                     <MemberBasicInfoForm member={displayMember} onSuccess={handleSaveBasicDetailsSuccess} canEdit={canEdit} />
                 ) : (
-                    <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <p className="flex items-center gap-2"><User className="h-4 w-4 text-muted-foreground" /> {displayMember.first_name} {displayMember.last_name}</p>
                         <p className="flex items-center gap-2"><Mail className="h-4 w-4 text-muted-foreground" /> {displayMember.email || 'N/A'}</p>
                         <p className="flex items-center gap-2"><Phone className="h-4 w-4 text-muted-foreground" /> {displayMember.phone || 'N/A'}</p>
@@ -166,7 +166,7 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member, canEd
           
           {/* Renewal Tab */}
           <TabsContent value="renewal" className="mt-4">
-            <Card>
+            <Card className="shadow-sm">
               <CardHeader>
                 <CardTitle className="text-lg">{t("renew_membership_for", { name: `${displayMember.first_name} ${displayMember.last_name}` })}</CardTitle>
               </CardHeader>
@@ -178,7 +178,7 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member, canEd
           
           {/* History Tab */}
           <TabsContent value="history" className="mt-4">
-            <Card>
+            <Card className="shadow-sm">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                     <History className="h-5 w-5" /> {t("activity_history")}
@@ -188,11 +188,11 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member, canEd
                 <div className="space-y-4">
                     {/* Check-in Metrics */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <Card className="p-3 text-center">
+                        <Card className="p-3 text-center shadow-sm">
                             <p className="text-xs text-muted-foreground">{t("total_check_ins")}</p>
                             <p className="text-2xl font-bold text-primary">{displayMember.total_check_ins || 0}</p>
                         </Card>
-                        <Card className="p-3 text-center md:col-span-3">
+                        <Card className="p-3 text-center md:col-span-3 shadow-sm">
                             <p className="text-xs text-muted-foreground">{t("last_check_in")}</p>
                             <p className="text-lg font-bold text-primary mt-1">
                                 {displayMember.last_check_in ? format(new Date(displayMember.last_check_in), 'yyyy-MM-dd hh:mm a') : 'N/A'}
