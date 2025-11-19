@@ -43,7 +43,7 @@ const POSTransactionSummary: React.FC = () => {
   }, [summary.dailyTransactions]);
 
   const handlePrint = async () => {
-    if (!summaryRef.current) {
+    if (isLoading || !transactions || !summaryRef.current) {
         showError(t("print_summary_failed"));
         return;
     }
@@ -106,19 +106,22 @@ const POSTransactionSummary: React.FC = () => {
         <CardTitle className="flex items-center gap-2 text-xl">
           <DollarSign className="h-5 w-5" /> {t("sales_summary")}
         </CardTitle>
-        <Button variant="outline" size="sm" onClick={handlePrint} disabled={isLoading}>
+        <Button variant="outline" size="sm" onClick={handlePrint} disabled={isLoading || summary.dailyTransactions.length === 0}>
             <Printer className="h-4 w-4 mr-2" /> {t("print")}
         </Button>
       </CardHeader>
       <CardContent className="p-0">
         {/* Hidden element for PDF generation (uses POSReceipt for professional look) */}
-        <div className="absolute -z-10 opacity-0 pointer-events-none" ref={summaryRef}>
-            <POSReceipt 
-                summary={summary} 
-                dailyBreakdowns={dailyBreakdowns} 
-                className="w-[80mm] p-4" // Set a fixed width for receipt style
-            />
-        </div>
+        {/* Ensure this is always rendered when data is available */}
+        {!isLoading && transactions && (
+            <div className="absolute -z-10 opacity-0 pointer-events-none" ref={summaryRef}>
+                <POSReceipt 
+                    summary={summary} 
+                    dailyBreakdowns={dailyBreakdowns} 
+                    className="w-[80mm] p-4" // Set a fixed width for receipt style
+                />
+            </div>
+        )}
         
         {/* Visible Live Summary */}
         <div className="space-y-4">
