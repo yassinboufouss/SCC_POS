@@ -94,6 +94,7 @@ export const en = {
     "last_check_in": "Last Check-in",
     "save_member_changes": "Save Member Changes",
     "member_profile_updated_success": "{{name}}'s profile updated successfully.",
+    "edit_profile": "Edit Profile",
     "renew_membership": "Renew Membership",
     "freeze_cancel_membership": "Freeze / Cancel Membership",
     "recent_transactions_title": "Recent Transactions ({{count}})",

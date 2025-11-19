@@ -59,7 +59,8 @@ const MemberBasicInfoForm: React.FC<MemberBasicInfoFormProps> = ({ member, onSuc
       id: member.id,
       first_name: values.first_name,
       last_name: values.last_name,
-      email: values.email || null,
+      // NOTE: We do not update email here, as it requires a separate Auth flow.
+      // We only update the profile table fields.
       phone: values.phone || null,
       dob: values.dob || null,
     };
@@ -107,7 +108,7 @@ const MemberBasicInfoForm: React.FC<MemberBasicInfoFormProps> = ({ member, onSuc
             )}
           />
           
-          {/* Email */}
+          {/* Email - Disabled for self-service/non-Auth updates */}
           <FormField
             control={form.control}
             name="email"
@@ -115,7 +116,7 @@ const MemberBasicInfoForm: React.FC<MemberBasicInfoFormProps> = ({ member, onSuc
               <FormItem>
                 <FormLabel>{t("email")}</FormLabel>
                 <FormControl>
-                  <Input placeholder="jane.doe@example.com" {...field} disabled={!canEdit} />
+                  <Input placeholder="jane.doe@example.com" {...field} disabled={true} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

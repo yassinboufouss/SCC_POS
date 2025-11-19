@@ -2,17 +2,20 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSession } from '@/components/auth/SessionContextProvider';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { User, History, QrCode } from 'lucide-react';
+import { User, History, QrCode, Mail, Phone, Calendar, Edit, Save } from 'lucide-react';
 import MemberDetailsCard from '@/components/members/MemberDetailsCard';
 import MemberTransactionHistory from '@/components/members/MemberTransactionHistory';
 import { useMemberTransactions } from '@/integrations/supabase/data/use-transactions.ts';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
-import MemberLogoutButton from '@/components/members/MemberLogoutButton'; // Import the new component
+import MemberLogoutButton from '@/components/members/MemberLogoutButton';
+import { Button } from '@/components/ui/button';
+import MemberBasicInfoForm from '@/components/members/MemberBasicInfoForm'; // Import form
 
 const MemberProfilePage: React.FC = () => {
   const { t } = useTranslation();
   const { profile, isLoading: isLoadingSession } = useSession();
+  const [isEditing, setIsEditing] = React.useState(false); // State for editing mode
   
   const memberId = profile?.id || '';
   const { data: transactions, isLoading: isLoadingTransactions } = useMemberTransactions(memberId);
@@ -33,8 +36,9 @@ const MemberProfilePage: React.FC = () => {
     );
   }
   
-  // Note: MemberDetailsCard expects onRenewClick and canRenew props, but since this is a read-only member portal, 
-  // we pass no-op and false respectively.
+  const handleSaveSuccess = () => {
+      setIsEditing(false);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 lg:p-8">
@@ -44,9 +48,44 @@ const MemberProfilePage: React.FC = () => {
             <h1 className="text-3xl font-bold flex items-center gap-3 text-primary">
               <User className="h-7 w-7" /> {t("welcome_member", { name: profile.first_name })}
             </h1>
-            <MemberLogoutButton /> {/* Added Logout Button */}
+            <div className="flex gap-2">
+                {/* Toggle Edit Button */}
+                <Button 
+                    variant="outline" 
+                    onClick={() => setIsEditing(!isEditing)}
+                >
+                    {isEditing ? <Save className="h-4 w-4 mr-2" /> : <Edit className="h-4 w-4 mr-2" />}
+                    {isEditing ? t("save_member_changes") : t("edit_profile")}
+                </Button>
+                <MemberLogoutButton />
+            </div>
         </div>
         
+        {/* Basic Info Card */}
+        <Card>
+            <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                    <User className="h-5 w-5" /> {t("contact_information")}
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
+                {isEditing ? (
+                    <MemberBasicInfoForm 
+                        member={profile} 
+                        onSuccess={handleSaveSuccess} 
+                        canEdit={true} // Member can edit their own profile
+                    />
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <p className="flex items-center gap-2"><User className="h-4 w-4 text-muted-foreground" /> {profile.first_name} {profile.last_name}</p>
+                        <p className="flex items-center gap-2"><Mail className="h-4 w-4 text-muted-foreground" /> {profile.email || 'N/A'}</p>
+                        <p className="flex items-center gap-2"><Phone className="h-4 w-4 text-muted-foreground" /> {profile.phone || 'N/A'}</p>
+                        <p className="flex items-center gap-2"><Calendar className="h-4 w-4 text-muted-foreground" /> {profile.dob || 'N/A'}</p>
+                    </div>
+                )}
+            </CardContent>
+        </Card>
+
         {/* Membership Status Card */}
         <MemberDetailsCard 
             member={profile} 
