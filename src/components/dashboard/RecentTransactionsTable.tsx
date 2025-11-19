@@ -61,7 +61,7 @@ const RecentTransactionsTable: React.FC<RecentTransactionsTableProps> = ({ trans
                     <TableCell className="text-sm text-muted-foreground max-w-xs truncate">{tx.item_description}</TableCell>
                     <TableCell className="text-right font-semibold text-green-600">{formatCurrency(tx.amount)}</TableCell>
                     <TableCell className="text-right text-sm">{t(tx.payment_method.toLowerCase())}</TableCell>
-                    <TableCell className="text-right text-xs text-muted-foreground">
+                    <TableCell className="text-right text-xs text-muted-foreground select-none">
                         {tx.transaction_date ? format(new Date(tx.transaction_date), 'yyyy-MM-dd') : 'N/A'}
                     </TableCell>
                   </TableRow>
