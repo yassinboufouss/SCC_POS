@@ -26,14 +26,10 @@ const ProtectedRoute: React.FC = () => {
     return <Navigate to="/" replace />;
   }
   
-  // Check 2: Does the user have a profile and a defined role?
-  // If profile is null, or if the role is undefined/unrecognized, we block access to protected routes.
-  if (!profile || (!isOwner && !isStaff && !isMember)) {
-      // Logged in but lacks a valid profile/role.
-      console.error("Access Denied: User is authenticated but lacks a valid profile/role.");
-      
-      // Instead of redirecting to '/', which causes a loop because the user is authenticated, 
-      // we display an error message and suggest a refresh.
+  // Check 2: If authenticated but profile is missing after loading, something is wrong.
+  // This should ideally not happen if SessionContextProvider sets a minimal profile.
+  if (!profile) {
+      console.error("Access Denied: User is authenticated but profile data is missing.");
       return (
           <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
               <h1 className="text-2xl font-bold text-red-600">{t("access_denied")}</h1>
@@ -69,6 +65,7 @@ const ProtectedRoute: React.FC = () => {
   }
 
   // Staff/Owner accessing protected routes (other than /my-profile)
+  // If the user is authenticated and not a member, they must be staff/owner.
   return <Outlet />;
 };
 
