@@ -32,10 +32,10 @@ const TransactionDetailsDialog: React.FC<TransactionDetailsDialogProps> = ({ tra
   // Assuming item_description is a comma-separated list of items (as generated in POSPage.tsx)
   const itemsList = transaction.item_description?.split(',').map(item => item.trim()) || [];
   
-  const handleVoid = async () => {
+  const handleVoidTransaction = async () => {
       try {
           await voidTx(transaction.id);
-          showSuccess(t("transaction_void_success", { id: transaction.id.substring(0, 8) }));
+          // Success/Warning toast handled by the hook's onSuccess callback
           setIsVoidConfirmOpen(false);
           setIsDialogOpen(false);
       } catch (error) {
@@ -143,7 +143,7 @@ const TransactionDetailsDialog: React.FC<TransactionDetailsDialogProps> = ({ tra
                   <Button variant="outline" onClick={() => setIsVoidConfirmOpen(false)} disabled={isVoiding}>
                       {t("cancel")}
                   </Button>
-                  <Button variant="destructive" onClick={handleVoid} disabled={isVoiding}>
+                  <Button variant="destructive" onClick={handleVoidTransaction} disabled={isVoiding}>
                       {isVoiding ? t("voiding") : t("confirm_void_action")}
                   </Button>
               </DialogFooter>
