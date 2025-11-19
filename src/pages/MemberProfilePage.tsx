@@ -8,6 +8,7 @@ import MemberTransactionHistory from '@/components/members/MemberTransactionHist
 import { useMemberTransactions } from '@/integrations/supabase/data/use-transactions.ts';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
+import MemberLogoutButton from '@/components/members/MemberLogoutButton'; // Import the new component
 
 const MemberProfilePage: React.FC = () => {
   const { t } = useTranslation();
@@ -39,9 +40,12 @@ const MemberProfilePage: React.FC = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 lg:p-8">
       <div className="max-w-4xl mx-auto space-y-6">
         
-        <h1 className="text-3xl font-bold flex items-center gap-3 text-primary">
-          <User className="h-7 w-7" /> {t("welcome_member", { name: profile.first_name })}
-        </h1>
+        <div className="flex justify-between items-center">
+            <h1 className="text-3xl font-bold flex items-center gap-3 text-primary">
+              <User className="h-7 w-7" /> {t("welcome_member", { name: profile.first_name })}
+            </h1>
+            <MemberLogoutButton /> {/* Added Logout Button */}
+        </div>
         
         {/* Membership Status Card */}
         <MemberDetailsCard 
