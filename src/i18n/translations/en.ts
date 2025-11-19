@@ -309,6 +309,13 @@ export const en = {
     "count": "Count",
     "percentage": "Percentage",
     
+    // New Settings Keys
+    "settings": "Settings",
+    "my_profile": "My Profile",
+    "security_settings": "Security Settings",
+    "security_settings_placeholder": "Password change and two-factor authentication settings will be managed here.",
+    "save_changes": "Save Changes",
+    
     // Copyright
     "copyright_text": "© {{year}} SCC POS. All rights reserved. Developed by xD Manga.",
   }

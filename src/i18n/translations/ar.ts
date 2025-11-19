@@ -309,6 +309,13 @@ export const ar = {
     "count": "العدد",
     "percentage": "النسبة المئوية",
     
+    // New Settings Keys
+    "settings": "الإعدادات",
+    "my_profile": "ملفي الشخصي",
+    "security_settings": "إعدادات الأمان",
+    "security_settings_placeholder": "سيتم إدارة تغيير كلمة المرور وإعدادات المصادقة الثنائية هنا.",
+    "save_changes": "حفظ التغييرات",
+    
     // Copyright
     "copyright_text": "© {{year}} SCC POS. جميع الحقوق محفوظة. تطوير: xD Manga.",
   }

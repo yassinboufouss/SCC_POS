@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Users, ShoppingCart, LogOut, Package, Ticket, QrCode, LayoutDashboard, History, Shield, BarChart3, Dumbbell } from 'lucide-react';
+import { Users, ShoppingCart, LogOut, Package, Ticket, QrCode, LayoutDashboard, History, Shield, BarChart3, Dumbbell, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -76,6 +76,20 @@ const Sidebar: React.FC = () => {
       </nav>
       
       <div className="mt-auto pt-4 border-t border-sidebar-border space-y-2">
+        {/* Settings Link (for staff/owner) */}
+        {userRole !== 'member' && (
+            <Link
+              to="/settings"
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                location.pathname === '/settings' ? "bg-sidebar-primary text-sidebar-primary-foreground font-semibold" : "text-sidebar-foreground"
+              )}
+            >
+              <Settings className="h-5 w-5" />
+              {t("settings")}
+            </Link>
+        )}
+        
         <ThemeToggle /> {/* Added Theme Toggle */}
         <LanguageSwitcher />
         <button

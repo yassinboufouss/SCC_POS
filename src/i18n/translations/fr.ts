@@ -309,6 +309,13 @@ export const fr = {
     "count": "Compte",
     "percentage": "Pourcentage",
     
+    // New Settings Keys
+    "settings": "Paramètres",
+    "my_profile": "Mon Profil",
+    "security_settings": "Paramètres de Sécurité",
+    "security_settings_placeholder": "La modification du mot de passe et les paramètres d'authentification à deux facteurs seront gérés ici.",
+    "save_changes": "Enregistrer les Modifications",
+    
     // Copyright
     "copyright_text": "© {{year}} SCC PDV. Tous droits réservés. Développé par xD Manga.",
   }
