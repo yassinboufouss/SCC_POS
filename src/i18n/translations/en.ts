@@ -247,7 +247,7 @@ export const en = {
     "select_optional_item": "Select optional item",
     "no_giveaway": "No Giveaway",
     "free_giveaway": "FREE",
-    "free_item": "FREE Item",
+    "free_item": "Free Item",
     "cannot_remove_giveaway": "Cannot remove giveaway item. Remove the associated plan instead.",
     "giveaway_item_not_found": "Giveaway item not found in inventory.",
     "checkout_failed_stock_issue": "Checkout failed: Insufficient stock for {{name}}.",
@@ -409,5 +409,6 @@ export const en = {
     "raw_subtotal": "Raw Subtotal",
     "adjustments_tax": "Adjustments/Tax",
     "no_sales_today": "No sales recorded today.",
+    "view_summary": "View Summary",
   }
 };

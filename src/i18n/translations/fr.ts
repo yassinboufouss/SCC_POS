@@ -408,6 +408,7 @@ export const fr = {
     "items_sold_today": "Articles Vendus Aujourd'hui",
     "raw_subtotal": "Sous-total Brut",
     "adjustments_tax": "Ajustements/Taxe",
-    "no_sales_today": "Aucune vente enregistrée aujourd'hui.",
+    "no_sales_today": "Aucune vente enregistrée aujourd'sui.",
+    "view_summary": "Voir le Résumé",
   }
 };

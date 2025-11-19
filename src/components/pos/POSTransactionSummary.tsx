@@ -1,20 +1,16 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { DollarSign, Printer, Calendar, Clock, TrendingUp } from 'lucide-react';
+import { DollarSign, Calendar, Clock, TrendingUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { calculateSalesSummary } from '@/utils/transaction-utils';
 import { formatCurrency } from '@/utils/currency-utils';
-import { showSuccess, showError } from '@/utils/toast';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 import { useTransactions } from '@/integrations/supabase/data/use-transactions.ts';
 import { Skeleton } from '@/components/ui/skeleton';
-import POSReceipt from './POSReceipt'; // Import the new receipt component
+import POSSalesSummaryDialog from './POSSalesSummaryDialog'; // Import the new dialog
 
 const POSTransactionSummary: React.FC = () => {
   const { t } = useTranslation();
-  const summaryRef = useRef<HTMLDivElement>(null);
   
   const { data: transactions, isLoading } = useTransactions();
   
@@ -41,43 +37,6 @@ const POSTransactionSummary: React.FC = () => {
           typeBreakdown,
       };
   }, [summary.dailyTransactions]);
-
-  const handlePrint = async () => {
-    if (isLoading || !transactions || !summaryRef.current) {
-        showError(t("print_summary_failed"));
-        return;
-    }
-
-    try {
-        const element = summaryRef.current;
-        
-        // Use html2canvas to capture the element as an image
-        const canvas = await html2canvas(element, { scale: 2 });
-        const imgData = canvas.toDataURL('image/jpeg', 1.0);
-
-        // Initialize jsPDF
-        const pdf = new jsPDF({
-            orientation: 'portrait',
-            unit: 'mm',
-            format: 'a4',
-        });
-
-        const imgProps = pdf.getImageProperties(imgData);
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-        // Add the image to the PDF
-        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-        
-        // Save the PDF
-        pdf.save(`Sales_Summary_${new Date().toISOString().split('T')[0]}.pdf`);
-        
-        showSuccess(t("print_summary_success"));
-    } catch (error) {
-        console.error("PDF generation failed:", error);
-        showError(t("print_summary_failed"));
-    }
-  };
 
   const metrics = [
     { 
@@ -106,22 +65,15 @@ const POSTransactionSummary: React.FC = () => {
         <CardTitle className="flex items-center gap-2 text-xl">
           <DollarSign className="h-5 w-5" /> {t("sales_summary")}
         </CardTitle>
-        <Button variant="outline" size="sm" onClick={handlePrint} disabled={isLoading || summary.dailyTransactions.length === 0}>
-            <Printer className="h-4 w-4 mr-2" /> {t("print")}
-        </Button>
+        
+        {/* Use the new dialog component for preview and print */}
+        <POSSalesSummaryDialog 
+            summary={summary} 
+            dailyBreakdowns={dailyBreakdowns} 
+            isLoading={isLoading} 
+        />
       </CardHeader>
       <CardContent className="p-0">
-        {/* Hidden element for PDF generation (uses POSReceipt for professional look) */}
-        {/* Ensure this is always rendered when data is available */}
-        {!isLoading && transactions && (
-            <div className="absolute -z-10 opacity-0 pointer-events-none" ref={summaryRef}>
-                <POSReceipt 
-                    summary={summary} 
-                    dailyBreakdowns={dailyBreakdowns} 
-                    className="w-[80mm] p-4" // Set a fixed width for receipt style
-                />
-            </div>
-        )}
         
         {/* Visible Live Summary */}
         <div className="space-y-4">
