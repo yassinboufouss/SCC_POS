@@ -117,23 +117,11 @@ const LoginPage: React.FC = () => {
 
   return (
     <div 
-      className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden"
+      className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden 
+                 bg-gradient-to-r from-primary/10 via-background to-primary/10 
+                 bg-[length:400%_400%] animate-gradient-shift"
     >
-      {/* Background Video */}
-      <video
-        autoPlay
-        loop
-        muted // Muted for autoplay compatibility, user can unmute
-        playsInline
-        className="absolute inset-0 w-full h-full object-cover opacity-30 dark:opacity-10"
-      >
-        {/* Using a public CDN link for reliability */}
-        <source src="https://assets.mixkit.co/videos/preview/mixkit-man-doing-pull-ups-in-a-gym-30753-large.mp4" type="video/mp4" />
-        {t("video_not_supported")}
-      </video>
-
-      {/* Overlay and Card */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#E0E7FF]/80 to-[#F9FAFB]/80 dark:from-gray-900/90 dark:to-gray-950/90 z-0"></div>
+      {/* Removed Background Video and Overlay */}
       
       <Card 
         className={cn(
