@@ -13,6 +13,11 @@ import { useSession } from '@/components/auth/SessionContextProvider';
 // Define the Edge Function URL (Hardcoded Project ID is required for Edge Functions)
 const CHECKOUT_FUNCTION_URL = "https://izbuyhpftsehzwnhhjrc.supabase.co/functions/v1/checkout";
 
+// Type guard to check if the response is an error object
+const isErrorResponse = (result: CheckoutResponse | { error: string }): result is { error: string } => {
+    return (result as { error: string }).error !== undefined;
+};
+
 export const usePOSCart = () => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
@@ -296,7 +301,7 @@ export const usePOSCart = () => {
         
         const result: CheckoutResponse | { error: string } = await response.json();
 
-        if (!response.ok || 'error' in result) {
+        if (!response.ok || isErrorResponse(result)) {
             throw new Error(result.error || t("checkout_failed"));
         }
 
