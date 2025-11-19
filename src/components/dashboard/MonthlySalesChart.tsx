@@ -28,7 +28,7 @@ const MonthlySalesChart: React.FC<MonthlySalesChartProps> = ({ data, isLoading }
   const { t } = useTranslation();
 
   return (
-    <Card className="lg:col-span-2 h-[400px] flex flex-col">
+    <Card className="lg:col-span-2 h-[400px] flex flex-col shadow-lg">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
           <TrendingUp className="h-5 w-5 text-blue-500" /> {t("monthly_revenue_trend")}

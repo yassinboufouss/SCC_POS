@@ -39,7 +39,7 @@ const MemberStatusChart: React.FC<MemberStatusChartProps> = ({ distribution, isL
   ].filter(item => item.value > 0); // Only show segments with members
 
   return (
-    <Card className="h-full flex flex-col">
+    <Card className="h-[400px] flex flex-col shadow-lg">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
           <Users className="h-5 w-5 text-primary" /> {t("member_status_distribution")}
@@ -47,13 +47,13 @@ const MemberStatusChart: React.FC<MemberStatusChartProps> = ({ distribution, isL
       </CardHeader>
       <CardContent className="flex-1 flex items-center justify-center p-0">
         {isLoading ? (
-            <Skeleton className="h-[300px] w-full" />
+            <Skeleton className="h-full w-full" />
         ) : totalMembers === 0 ? (
             <div className="text-center text-muted-foreground py-8">
                 {t("no_members_found")}
             </div>
         ) : (
-            <div className="h-[300px] w-full">
+            <div className="h-full w-full">
                 <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                         <Pie
