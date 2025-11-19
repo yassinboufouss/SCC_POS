@@ -82,7 +82,7 @@ const POSSalesSummaryDialog: React.FC<POSSalesSummaryDialogProps> = ({ summary, 
             <Eye className="h-4 w-4 mr-2" /> {t("view_summary")}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[450px] p-0">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto p-0">
         <DialogHeader className="p-6 pb-0">
           <DialogTitle className="flex items-center gap-2">
             {t("daily_sales_invoice")}
