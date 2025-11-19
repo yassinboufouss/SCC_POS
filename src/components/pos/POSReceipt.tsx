@@ -24,10 +24,8 @@ const POSReceipt: React.FC<POSReceiptProps> = ({ summary, dailyBreakdowns, class
   const { t } = useTranslation();
   const today = format(new Date(), 'yyyy-MM-dd');
 
-  // We no longer calculate aggregated items here, focusing purely on financial summary and transaction list.
-
   return (
-    <div className={cn("p-6 bg-white text-gray-900 border border-gray-300 rounded-lg shadow-xl max-w-md mx-auto print:shadow-none print:border-0 print:p-0", className)}>
+    <div className={cn("p-6 bg-white text-gray-900 border border-gray-300 rounded-lg shadow-xl mx-auto print:shadow-none print:border-0 print:p-0", className)}>
       
       {/* Header */}
       <div className="text-center border-b pb-4 mb-4">
@@ -58,9 +56,9 @@ const POSReceipt: React.FC<POSReceiptProps> = ({ summary, dailyBreakdowns, class
           {/* Payment Breakdown */}
           <div>
             <h3 className="text-base font-bold border-b pb-1 mb-2">{t("payment_method_breakdown")}</h3>
-            <div className="space-y-1 text-sm">
+            <div className="grid grid-cols-2 gap-x-8 gap-y-1 text-sm">
               {Object.entries(dailyBreakdowns.paymentBreakdown).map(([method, total]) => (
-                <div key={method} className="flex justify-between">
+                <div key={method} className="flex justify-between col-span-1">
                   <span className="text-gray-600">{t(method.toLowerCase())}</span>
                   <span className="font-medium">{formatCurrency(total)}</span>
                 </div>
@@ -71,9 +69,9 @@ const POSReceipt: React.FC<POSReceiptProps> = ({ summary, dailyBreakdowns, class
           {/* Type Breakdown */}
           <div>
             <h3 className="text-base font-bold border-b pb-1 mb-2">{t("transaction_type_breakdown")}</h3>
-            <div className="space-y-1 text-sm">
+            <div className="grid grid-cols-2 gap-x-8 gap-y-1 text-sm">
               {Object.entries(dailyBreakdowns.typeBreakdown).map(([type, total]) => (
-                <div key={type} className="flex justify-between">
+                <div key={type} className="flex justify-between col-span-1">
                   <span className="text-gray-600">{t(type.replace(/\s/g, '_').toLowerCase())}</span>
                   <span className="font-medium">{formatCurrency(total)}</span>
                 </div>
