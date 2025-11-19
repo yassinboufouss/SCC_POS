@@ -13,16 +13,18 @@ const ThemeToggle: React.FC = () => {
   const { t } = useTranslation();
   const { setTheme, theme } = useTheme();
 
-  // Ensure theme is always a string, defaulting to 'light'
-  const currentTheme = theme || 'light';
+  // Determine the theme used for cycling logic. 
+  // If the current theme is 'system' or not explicitly set, we treat it as 'light' 
+  // to ensure the cycle starts correctly (light -> dark -> blue -> light).
+  const cycleTheme = themes.includes(theme || '') ? (theme as string) : 'light';
 
   const toggleTheme = () => {
-    const currentIndex = themes.indexOf(currentTheme);
+    const currentIndex = themes.indexOf(cycleTheme);
     const nextIndex = (currentIndex + 1) % themes.length;
     setTheme(themes[nextIndex]);
   };
   
-  // Get the icon for the CURRENT theme
+  // Get the icon for the CURRENT theme based on the resolved cycleTheme
   const getCurrentIcon = (current: string) => {
       switch (current) {
           case 'dark':
@@ -35,14 +37,14 @@ const ThemeToggle: React.FC = () => {
       }
   };
   
-  // Get the name of the NEXT theme
+  // Get the name of the NEXT theme based on the cycleTheme
   const getNextThemeName = (current: string) => {
       const currentIndex = themes.indexOf(current);
       const nextIndex = (currentIndex + 1) % themes.length;
       return themes[nextIndex];
   };
   
-  const nextThemeKey = getNextThemeName(currentTheme) + '_mode';
+  const nextThemeKey = getNextThemeName(cycleTheme) + '_mode';
 
   return (
     <Button 
@@ -51,7 +53,7 @@ const ThemeToggle: React.FC = () => {
       onClick={toggleTheme}
       className="w-full justify-start bg-sidebar-accent/50 border-sidebar-border text-sidebar-foreground hover:bg-sidebar-accent"
     >
-      {getCurrentIcon(currentTheme)}
+      {getCurrentIcon(cycleTheme)}
       {t("switch_to_theme", { theme: t(nextThemeKey) })}
     </Button>
   );
