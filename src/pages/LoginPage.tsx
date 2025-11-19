@@ -126,9 +126,11 @@ const LoginPage: React.FC = () => {
         loop
         muted // Muted for autoplay compatibility, user can unmute
         playsInline
+        poster="/gym-poster.jpg" // Added poster image
         className="absolute inset-0 w-full h-full object-cover opacity-30 dark:opacity-10"
       >
-        <source src="/gym-motivation.mp4" type="video/mp4" />
+        {/* Using a public CDN link for reliability */}
+        <source src="https://assets.mixkit.co/videos/preview/mixkit-man-doing-pull-ups-in-a-gym-30753-large.mp4" type="video/mp4" />
         {t("video_not_supported")}
       </video>
 
