@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Transaction } from '@/types/supabase';
 import { queryKeys } from './query-keys.ts';
-import { addTransaction } from '@/utils/transaction-utils';
+import { addTransaction, voidTransaction } from '@/utils/transaction-utils';
 import { PaymentMethod } from '@/types/pos';
 import { format } from 'date-fns';
 
@@ -92,4 +92,19 @@ export const useAddTransaction = () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.metrics });
     },
   });
+};
+
+// NEW: Hook for voiding a transaction
+export const useVoidTransaction = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (transactionId: string) => voidTransaction(transactionId),
+        onSuccess: () => {
+            // Invalidate all relevant data sources
+            queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
+            queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.metrics });
+            queryClient.invalidateQueries({ queryKey: queryKeys.inventory.all });
+            queryClient.invalidateQueries({ queryKey: queryKeys.profiles.all }); // In case membership status was affected
+        },
+    });
 };

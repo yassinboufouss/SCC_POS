@@ -381,5 +381,15 @@ export const fr = {
     "login_failed_error": "Échec de la connexion : {{error}}",
     "continue_with_google": "Continuer avec Google",
     "continue_with_github": "Continuer avec GitHub",
+    
+    // NEW Void Transaction Keys
+    "void_transaction": "Annuler la Transaction",
+    "confirm_void": "Confirmer l'Annulation de la Transaction",
+    "void_transaction_confirmation": "Êtes-vous sûr de vouloir annuler la transaction ID {{id}} ? Cette action supprimera l'enregistrement de la transaction et tentera d'annuler les changements d'inventaire.",
+    "void_transaction_warning": "AVERTISSEMENT : Les changements d'adhésion (renouvellement/achat) ne sont PAS automatiquement annulés et doivent être gérés manuellement.",
+    "confirm_void_action": "Oui, Annuler la Transaction",
+    "voiding": "Annulation en cours...",
+    "transaction_void_success": "Transaction ID {{id}} annulée avec succès.",
+    "transaction_void_failed": "Échec de l'annulation de la transaction.",
   }
 };

@@ -1,6 +1,7 @@
 import { Transaction } from "@/types/supabase";
 import { supabase } from "@/integrations/supabase/client";
 import { format, isToday, isThisWeek, isThisMonth, parseISO, startOfMonth, subMonths } from "date-fns";
+import { incrementInventoryStock } from "./inventory-utils"; // Import stock increment utility
 
 // Utility to simulate adding a new transaction
 export const addTransaction = async (newTransaction: Omit<Transaction, 'id' | 'created_at' | 'transaction_date'>): Promise<Transaction | null> => {
@@ -36,6 +37,92 @@ export const getTransactionsByMemberId = async (memberId: string): Promise<Trans
     }
     return data || [];
 };
+
+// Helper to parse item description (Name x Quantity)
+const parseInventoryItemsFromDescription = (description: string): { name: string, quantity: number }[] => {
+    if (!description) return [];
+    const items = description.split(',').map(item => item.trim());
+    const inventoryItems: { name: string, quantity: number }[] = [];
+
+    items.forEach(itemString => {
+        // Match "Item Name xQuantity"
+        const match = itemString.match(/(.*)\sx(\d+)$/);
+        if (match) {
+            const name = match[1].trim();
+            const quantity = parseInt(match[2], 10);
+            
+            // Exclude membership plans from stock reversal logic (they contain 'days)')
+            if (!name.includes('days)')) {
+                inventoryItems.push({ name, quantity });
+            }
+        }
+    });
+    return inventoryItems;
+};
+
+/**
+ * Voids a transaction, reverses inventory stock changes, and handles membership reversal (if applicable).
+ * NOTE: Membership reversal is currently NOT implemented due to complexity.
+ */
+export const voidTransaction = async (transactionId: string): Promise<void> => {
+    // 1. Fetch the transaction details before deletion
+    const { data: tx, error: fetchError } = await supabase
+        .from('transactions')
+        .select('item_description, type')
+        .eq('id', transactionId)
+        .single();
+
+    if (fetchError || !tx) {
+        console.error("Supabase voidTransaction fetch error:", fetchError);
+        throw new Error("Transaction not found or failed to fetch.");
+    }
+    
+    // 2. Attempt Inventory Reversal (Best Effort: Match by Name)
+    if (tx.item_description && (tx.type === 'POS Sale' || tx.type === 'Mixed Sale')) {
+        const itemsToReverse = parseInventoryItemsFromDescription(tx.item_description);
+        
+        if (itemsToReverse.length > 0) {
+            // Fetch all inventory items to map names to IDs
+            const { data: inventory, error: inventoryError } = await supabase
+                .from('inventory_items')
+                .select('id, name');
+                
+            if (inventoryError) {
+                console.error("Supabase inventory fetch error during void:", inventoryError);
+                // We proceed with deletion even if inventory reversal fails, but log the error.
+            } else {
+                const inventoryMap = new Map(inventory.map(item => [item.name, item.id]));
+                
+                await Promise.all(itemsToReverse.map(async item => {
+                    const itemId = inventoryMap.get(item.name);
+                    if (itemId) {
+                        // Reverse stock using RPC
+                        await incrementInventoryStock(itemId, item.quantity);
+                    } else {
+                        console.warn(`Inventory item name '${item.name}' not found for stock reversal during void.`);
+                    }
+                }));
+            }
+        }
+    }
+    
+    // 3. Membership Reversal (Placeholder - too complex for simple implementation)
+    if (tx.type === 'Membership' || tx.type === 'Mixed Sale') {
+        console.warn(`Transaction ${transactionId} involved membership. Manual membership reversal may be required.`);
+    }
+
+    // 4. Delete the transaction
+    const { error: deleteError } = await supabase
+        .from('transactions')
+        .delete()
+        .eq('id', transactionId);
+
+    if (deleteError) {
+        console.error("Supabase voidTransaction delete error:", deleteError);
+        throw new Error("Failed to delete transaction.");
+    }
+};
+
 
 export interface SalesSummary {
     dailyTotal: number;

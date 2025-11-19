@@ -81,6 +81,19 @@ export const reduceInventoryStock = async (itemId: string, quantity: number): Pr
     }
 };
 
+// NEW: Utility to increase stock (reversal)
+export const incrementInventoryStock = async (itemId: string, quantity: number): Promise<void> => {
+    const { error } = await supabase.rpc('increment_inventory_stock', {
+        item_id: itemId,
+        quantity_to_increment: quantity,
+    });
+
+    if (error) {
+        console.error("Supabase incrementInventoryStock error:", error);
+        throw new Error("Failed to increment inventory stock.");
+    }
+};
+
 // Utility to delete an inventory item
 export const deleteInventoryItem = async (itemId: string): Promise<void> => {
     const { error } = await supabase
@@ -94,7 +107,7 @@ export const deleteInventoryItem = async (itemId: string): Promise<void> => {
     }
 };
 
-// NEW: Utility to manually issue a giveaway item
+// Utility to manually issue a giveaway item
 export const issueManualGiveaway = async (itemId: string, memberId: string, memberName: string, itemName: string): Promise<void> => {
     // 1. Reduce stock by 1 (using RPC for safety)
     await reduceInventoryStock(itemId, 1);

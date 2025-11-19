@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Transaction } from '@/types/supabase';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Eye, DollarSign, History, User, Clock } from 'lucide-react';
+import { Eye, DollarSign, History, User, Clock, Trash2, AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { formatCurrency } from '@/utils/currency-utils';
 import { Separator } from '@/components/ui/separator';
 import { format } from 'date-fns';
+import { useUserRole } from '@/hooks/use-user-role';
+import { useVoidTransaction } from '@/integrations/supabase/data/use-transactions.ts';
+import { showSuccess, showError } from '@/utils/toast';
 
 interface TransactionDetailsDialogProps {
   transaction: Transaction;
@@ -14,6 +17,13 @@ interface TransactionDetailsDialogProps {
 
 const TransactionDetailsDialog: React.FC<TransactionDetailsDialogProps> = ({ transaction }) => {
   const { t } = useTranslation();
+  const { isOwner, isManager, isCashier } = useUserRole();
+  const canVoid = isOwner || isManager || isCashier;
+  
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isVoidConfirmOpen, setIsVoidConfirmOpen] = useState(false);
+  
+  const { mutateAsync: voidTx, isPending: isVoiding } = useVoidTransaction();
   
   const formattedDate = transaction.created_at 
     ? format(new Date(transaction.created_at), 'yyyy-MM-dd hh:mm a') 
@@ -21,9 +31,20 @@ const TransactionDetailsDialog: React.FC<TransactionDetailsDialogProps> = ({ tra
 
   // Assuming item_description is a comma-separated list of items (as generated in POSPage.tsx)
   const itemsList = transaction.item_description?.split(',').map(item => item.trim()) || [];
+  
+  const handleVoid = async () => {
+      try {
+          await voidTx(transaction.id);
+          showSuccess(t("transaction_void_success", { id: transaction.id.substring(0, 8) }));
+          setIsVoidConfirmOpen(false);
+          setIsDialogOpen(false);
+      } catch (error) {
+          showError(t("transaction_void_failed"));
+      }
+  };
 
   return (
-    <Dialog>
+    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="h-8 w-8 p-0">
           <Eye className="h-4 w-4" />
@@ -88,7 +109,46 @@ const TransactionDetailsDialog: React.FC<TransactionDetailsDialogProps> = ({ tra
             <span className="text-green-600">{formatCurrency(transaction.amount)}</span>
           </div>
         </div>
+        
+        {/* Void Button (Staff Only) */}
+        {canVoid && (
+            <div className="pt-4 border-t">
+                <Button 
+                    variant="destructive" 
+                    className="w-full" 
+                    onClick={() => setIsVoidConfirmOpen(true)}
+                    disabled={isVoiding}
+                >
+                    <Trash2 className="h-4 w-4 mr-2" /> {t("void_transaction")}
+                </Button>
+            </div>
+        )}
       </DialogContent>
+      
+      {/* Void Confirmation Dialog */}
+      <Dialog open={isVoidConfirmOpen} onOpenChange={setIsVoidConfirmOpen}>
+          <DialogContent>
+              <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2 text-red-600">
+                      <AlertTriangle className="h-5 w-5" /> {t("confirm_void")}
+                  </DialogTitle>
+                  <DialogDescription>
+                      {t("void_transaction_confirmation", { id: transaction.id.substring(0, 8) })}
+                      <p className="mt-2 font-semibold text-red-700 dark:text-red-400">
+                          {t("void_transaction_warning")}
+                      </p>
+                  </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                  <Button variant="outline" onClick={() => setIsVoidConfirmOpen(false)} disabled={isVoiding}>
+                      {t("cancel")}
+                  </Button>
+                  <Button variant="destructive" onClick={handleVoid} disabled={isVoiding}>
+                      {isVoiding ? t("voiding") : t("confirm_void_action")}
+                  </Button>
+              </DialogFooter>
+          </DialogContent>
+      </Dialog>
     </Dialog>
   );
 };

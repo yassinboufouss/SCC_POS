@@ -381,5 +381,15 @@ export const en = {
     "login_failed_error": "Login failed: {{error}}",
     "continue_with_google": "Continue with Google",
     "continue_with_github": "Continue with GitHub",
+    
+    // NEW Void Transaction Keys
+    "void_transaction": "Void Transaction",
+    "confirm_void": "Confirm Void Transaction",
+    "void_transaction_confirmation": "Are you sure you want to void transaction ID {{id}}? This action will delete the transaction record and attempt to reverse inventory changes.",
+    "void_transaction_warning": "WARNING: Membership changes (renewal/purchase) are NOT automatically reversed and must be handled manually.",
+    "confirm_void_action": "Yes, Void Transaction",
+    "voiding": "Voiding...",
+    "transaction_void_success": "Transaction ID {{id}} successfully voided.",
+    "transaction_void_failed": "Failed to void transaction.",
   }
 };

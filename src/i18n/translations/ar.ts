@@ -381,5 +381,15 @@ export const ar = {
     "login_failed_error": "فشل تسجيل الدخول: {{error}}",
     "continue_with_google": "المتابعة باستخدام جوجل",
     "continue_with_github": "المتابعة باستخدام جيت هاب",
+    
+    // NEW Void Transaction Keys
+    "void_transaction": "إلغاء المعاملة",
+    "confirm_void": "تأكيد إلغاء المعاملة",
+    "void_transaction_confirmation": "هل أنت متأكد من أنك تريد إلغاء المعاملة رقم {{id}}؟ سيؤدي هذا الإجراء إلى حذف سجل المعاملة ومحاولة عكس تغييرات المخزون.",
+    "void_transaction_warning": "تحذير: لا يتم عكس تغييرات العضوية (التجديد/الشراء) تلقائيًا ويجب التعامل معها يدويًا.",
+    "confirm_void_action": "نعم، إلغاء المعاملة",
+    "voiding": "جاري الإلغاء...",
+    "transaction_void_success": "تم إلغاء المعاملة رقم {{id}} بنجاح.",
+    "transaction_void_failed": "فشل إلغاء المعاملة.",
   }
 };
