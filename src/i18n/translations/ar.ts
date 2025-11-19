@@ -412,5 +412,6 @@ export const ar = {
     "monthly_inventory_sales": "مبيعات المخزون (شهريًا)",
     "monthly_membership_sales": "مبيعات العضوية (شهريًا)",
     "today": "اليوم",
+    "print_receipt": "طباعة الإيصال",
   }
 };

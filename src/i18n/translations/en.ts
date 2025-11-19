@@ -412,5 +412,6 @@ export const en = {
     "monthly_inventory_sales": "Inventory Sales (MTD)",
     "monthly_membership_sales": "Membership Sales (MTD)",
     "today": "Today",
+    "print_receipt": "Print Receipt",
   }
 };

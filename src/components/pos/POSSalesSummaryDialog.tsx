@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Eye } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Eye, Printer } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import POSReceipt from './POSReceipt';
 import { SalesSummary } from '@/utils/transaction-utils';
@@ -20,6 +20,10 @@ const POSSalesSummaryDialog: React.FC<POSSalesSummaryDialogProps> = ({ summary, 
   const { t } = useTranslation();
   
   const hasSales = summary.dailyTransactions.length > 0;
+  
+  const handlePrint = () => {
+      window.print();
+  };
 
   return (
     <Dialog>
@@ -45,12 +49,20 @@ const POSSalesSummaryDialog: React.FC<POSSalesSummaryDialogProps> = ({ summary, 
                 <POSReceipt 
                     summary={summary}
                     dailyBreakdowns={dailyBreakdowns} 
-                    className="shadow-none border-0 p-0" // Keep styling for dialog display
+                    className="shadow-none border-0 p-0"
                 />
             </div>
         </div>
         
-        {/* No Print Footer */}
+        <DialogFooter className="p-6 pt-0">
+            <Button 
+                onClick={handlePrint} 
+                disabled={isLoading || !hasSales}
+                className="w-full"
+            >
+                <Printer className="h-4 w-4 mr-2" /> {t("print_receipt")}
+            </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
