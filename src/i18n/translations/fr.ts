@@ -208,7 +208,7 @@ export const fr = {
     "save_plan_changes": "Enregistrer les Modifications du Plan",
     "plan_updated_success": "Plan d'adhésion '{{name}}' mis à jour avec succès.",
     "associated_members_placeholder": "La liste des membres associés et les statistiques d'utilisation apparaîtront ici.",
-    "currency_symbol": "MAD",
+    "currency_symbol": "د.م.",
     "daily_sales_total": "Ventes Quotidiennes Totales",
     "weekly_sales_total": "Ventes Hebdomadaires Totales",
     "monthly_sales_total": "Ventes Mensuelles Totales",
@@ -308,6 +308,12 @@ export const fr = {
     "member_status_distribution": "Distribution du Statut des Membres",
     "count": "Compte",
     "percentage": "Pourcentage",
+    
+    // New About Page Keys
+    "about_app": "À Propos de SCC PDV",
+    "version": "Version",
+    "copyright": "Droits d'Auteur",
+    "about_description": "Cette application est un système de point de vente et de gestion conçu pour les centres de fitness et les salles de sport.",
     
     // Copyright
     "copyright_text": "© {{year}} SCC PDV. Tous droits réservés. Développé par xD Manga.",

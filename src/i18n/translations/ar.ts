@@ -309,6 +309,12 @@ export const ar = {
     "count": "العدد",
     "percentage": "النسبة المئوية",
     
+    // New About Page Keys
+    "about_app": "حول SCC POS",
+    "version": "الإصدار",
+    "copyright": "حقوق النشر",
+    "about_description": "هذا التطبيق هو نظام نقطة بيع وإدارة مصمم لمراكز اللياقة البدنية والصالات الرياضية.",
+    
     // Copyright
     "copyright_text": "© {{year}} SCC POS. جميع الحقوق محفوظة. تطوير: xD Manga.",
   }
