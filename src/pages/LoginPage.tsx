@@ -6,9 +6,10 @@ import { useSession } from '@/components/auth/SessionContextProvider';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { LogIn } from 'lucide-react';
+import { Dumbbell, LogIn } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
-import LanguageSwitcher from '@/components/LanguageSwitcher'; // Import LanguageSwitcher
+import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { cn } from '@/lib/utils';
 
 const LoginPage: React.FC = () => {
   const { t } = useTranslation();
@@ -31,14 +32,24 @@ const LoginPage: React.FC = () => {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold flex items-center justify-center gap-2">
-            <LogIn className="h-6 w-6" /> {t("app_title")}
+    <div 
+      className={cn(
+        "flex items-center justify-center min-h-screen p-4",
+        "bg-cover bg-center relative"
+      )}
+      style={{ backgroundImage: "url('/gym-background.jpg')" }}
+    >
+      {/* Dark Overlay */}
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+      
+      <Card className="w-full max-w-md z-10 shadow-2xl border-primary/20 bg-card/95 backdrop-blur-sm">
+        <CardHeader className="text-center pt-8 pb-4">
+          <CardTitle className="text-4xl font-extrabold flex items-center justify-center gap-3 text-primary animate-fade-in-up">
+            <Dumbbell className="h-8 w-8" /> {t("app_title")}
           </CardTitle>
+          <p className="text-sm text-muted-foreground mt-2">{t("login_description")}</p>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-6 pb-4">
           <Auth
             supabaseClient={supabase}
             providers={[]}
@@ -53,7 +64,7 @@ const LoginPage: React.FC = () => {
                 },
               },
             }}
-            theme="light"
+            theme="light" // ThemeSupa handles dark mode via CSS variables
             view="sign_in"
             localization={{
                 variables: {
@@ -82,7 +93,7 @@ const LoginPage: React.FC = () => {
             }}
           />
         </CardContent>
-        <CardFooter className="flex flex-col gap-2 pt-4">
+        <CardFooter className="flex flex-col gap-2 pt-4 px-6 pb-6">
             <ThemeToggle />
             <LanguageSwitcher />
         </CardFooter>
