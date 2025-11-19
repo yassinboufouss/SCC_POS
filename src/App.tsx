@@ -27,7 +27,7 @@ const App = () => (
     <ThemeProvider defaultTheme="light" attribute="class"> {/* Wrap with ThemeProvider */}
       <TooltipProvider>
         <Sonner />
-        <BrowserRouter>
+        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <SessionContextProvider>
             <Routes>
               {/* Public Route (Login) */}

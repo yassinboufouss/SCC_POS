@@ -55,7 +55,8 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
       total_check_ins: 0,
   });
 
-  const getProfile = async (currentUser: User) => {
+  // Helper function to fetch and process profile data
+  const fetchAndProcessProfile = async (currentUser: User): Promise<Profile> => {
       const minimalProfile = getMinimalProfile(currentUser);
       
       try {
@@ -63,28 +64,30 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
           
           if (userProfile) {
               // Merge email from the User object into the profile object
-              const completeProfile = { ...userProfile, email: currentUser.email || null };
-              setProfile(completeProfile);
+              return { ...userProfile, email: currentUser.email || null };
           } else {
               // If profile doesn't exist yet or fetch failed, use the minimal profile
-              setProfile(minimalProfile);
+              return minimalProfile;
           }
       } catch (e) {
           console.error("Error fetching user profile, falling back to minimal profile:", e);
-          setProfile(minimalProfile);
+          return minimalProfile;
       }
   };
 
+  // Refactored: Sets all states together after profile fetch completes
   const handleSession = async (currentSession: Session | null) => {
-      setSession(currentSession);
       const currentUser = currentSession?.user ?? null;
-      setUser(currentUser);
+      let userProfile: Profile | null = null;
       
       if (currentUser) {
-          await getProfile(currentUser);
-      } else {
-          setProfile(null);
+          userProfile = await fetchAndProcessProfile(currentUser);
       }
+      
+      // Set all states in one go (or close to it)
+      setSession(currentSession);
+      setUser(currentUser);
+      setProfile(userProfile);
       setIsLoading(false);
   };
 
@@ -92,19 +95,22 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
     // Set up listener for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, currentSession) => {
       if (event === 'SIGNED_IN') {
-        handleSession(currentSession);
-        showSuccess(t('login_successful'));
+        // Await the async operation to ensure profile is set before ProtectedRoute sees isLoading=false
+        handleSession(currentSession).then(() => {
+            showSuccess(t('login_successful'));
+        });
       } else if (event === 'SIGNED_OUT') {
-        handleSession(null);
-        showSuccess(t('logout_successful'));
+        handleSession(null).then(() => {
+            showSuccess(t('logout_successful'));
+        });
       } else if (event === 'INITIAL_SESSION') {
-        // Initial session handled below to ensure we wait for profile fetch
+        // Handled below
       } else {
         setIsLoading(false);
       }
     });
 
-    // Fetch initial session manually to ensure we have the state before rendering protected routes
+    // Fetch initial session manually and ensure we wait for profile fetch before setting isLoading=false
     supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
         handleSession(initialSession);
     });
