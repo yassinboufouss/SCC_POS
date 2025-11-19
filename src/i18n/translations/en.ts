@@ -319,5 +319,21 @@ export const en = {
     
     // Copyright
     "copyright_text": "© {{year}} SCC POS. All rights reserved. Developed by xD Manga.",
+    
+    // Giveaway Management (NEW)
+    "giveaways": "Giveaways",
+    "giveaway_management": "Giveaway Management",
+    "giveaway_items_list": "Giveaway Items List ({{count}})",
+    "issue_giveaway": "Issue Giveaway",
+    "issue_giveaway_to_member": "Issue Giveaway to Member",
+    "select_member_to_issue": "Select Member to Issue Giveaway",
+    "giveaway_issued_success": "Successfully issued {{item}} to {{member}}.",
+    "giveaway_issued_failed": "Failed to issue giveaway.",
+    "no_giveaway_items": "No inventory items are currently designated as giveaways.",
+    "select_item_to_issue": "Select Item to Issue",
+    "item_stock": "Item Stock",
+    "item_is_giveaway_for": "This item is a giveaway for:",
+    "issue_item": "Issue Item",
+    "item_not_in_stock": "Item is out of stock.",
   }
 };

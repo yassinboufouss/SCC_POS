@@ -2,6 +2,7 @@ import { InventoryItem } from "@/types/supabase";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { NewInventoryItemInput } from "@/types/pos";
+import { addTransaction } from "./transaction-utils"; // Import addTransaction
 
 // Utility to update inventory data
 export const updateInventoryItem = async (updatedItem: Partial<InventoryItem> & { id: string }): Promise<InventoryItem | null> => {
@@ -91,4 +92,20 @@ export const deleteInventoryItem = async (itemId: string): Promise<void> => {
         console.error("Supabase deleteInventoryItem error:", error);
         throw new Error("Failed to delete inventory item.");
     }
+};
+
+// NEW: Utility to manually issue a giveaway item
+export const issueManualGiveaway = async (itemId: string, memberId: string, memberName: string, itemName: string): Promise<void> => {
+    // 1. Reduce stock by 1 (using RPC for safety)
+    await reduceInventoryStock(itemId, 1);
+    
+    // 2. Record a zero-amount transaction
+    await addTransaction({
+        member_id: memberId,
+        member_name: memberName,
+        type: 'POS Sale', // Classify as POS Sale
+        item_description: `${itemName} (Manual Giveaway)`,
+        amount: 0,
+        payment_method: 'Cash', // Payment method is irrelevant for $0, default to Cash
+    });
 };

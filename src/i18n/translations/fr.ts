@@ -208,7 +208,7 @@ export const fr = {
     "save_plan_changes": "Enregistrer les Modifications du Plan",
     "plan_updated_success": "Plan d'adhésion '{{name}}' mis à jour avec succès.",
     "associated_members_placeholder": "La liste des membres associés et les statistiques d'utilisation apparaîtront ici.",
-    "currency_symbol": "د.م.",
+    "currency_symbol": "MAD",
     "daily_sales_total": "Ventes Quotidiennes Totales",
     "weekly_sales_total": "Ventes Hebdomadaires Totales",
     "monthly_sales_total": "Ventes Mensuelles Totales",
@@ -297,6 +297,18 @@ export const fr = {
     "plan_deleted_success": "Plan d'adhésion '{{name}}' supprimé avec succès.",
     "cancel": "Annuler",
     
+    // Chart Keys
+    "monthly_revenue_trend": "Tendance des Revenus Mensuels (6 Derniers Mois)",
+    "revenue": "Revenu",
+    
+    // New Analytics Keys
+    "sales_analytics_title": "Analyse des Ventes",
+    "total_transactions_count": "Total des Transactions",
+    "all_time": "Tout le Temps",
+    "member_status_distribution": "Distribution du Statut des Membres",
+    "count": "Compte",
+    "percentage": "Pourcentage",
+    
     // New Settings Keys
     "settings": "Paramètres",
     "my_profile": "Mon Profil",
@@ -307,5 +319,21 @@ export const fr = {
     
     // Copyright
     "copyright_text": "© {{year}} SCC PDV. Tous droits réservés. Développé par xD Manga.",
+    
+    // Giveaway Management (NEW)
+    "giveaways": "Cadeaux",
+    "giveaway_management": "Gestion des Cadeaux",
+    "giveaway_items_list": "Liste des Articles Cadeaux ({{count}})",
+    "issue_giveaway": "Distribuer un Cadeau",
+    "issue_giveaway_to_member": "Distribuer un Cadeau à un Membre",
+    "select_member_to_issue": "Sélectionner le Membre pour le Cadeau",
+    "giveaway_issued_success": "Cadeau {{item}} distribué avec succès à {{member}}.",
+    "giveaway_issued_failed": "Échec de la distribution du cadeau.",
+    "no_giveaway_items": "Aucun article d'inventaire n'est actuellement désigné comme cadeau.",
+    "select_item_to_issue": "Sélectionner l'Article à Distribuer",
+    "item_stock": "Stock de l'Article",
+    "item_is_giveaway_for": "Cet article est un cadeau pour :",
+    "issue_item": "Distribuer l'Article",
+    "item_not_in_stock": "L'article est en rupture de stock.",
   }
 };

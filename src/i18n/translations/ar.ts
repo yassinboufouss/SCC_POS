@@ -297,6 +297,18 @@ export const ar = {
     "plan_deleted_success": "تم حذف خطة العضوية '{{name}}' بنجاح.",
     "cancel": "إلغاء",
     
+    // Chart Keys
+    "monthly_revenue_trend": "اتجاه الإيرادات الشهرية (آخر 6 أشهر)",
+    "revenue": "الإيرادات",
+    
+    // New Analytics Keys
+    "sales_analytics_title": "تحليلات المبيعات",
+    "total_transactions_count": "إجمالي المعاملات",
+    "all_time": "كل الوقت",
+    "member_status_distribution": "توزيع حالة الأعضاء",
+    "count": "العدد",
+    "percentage": "النسبة المئوية",
+    
     // New Settings Keys
     "settings": "الإعدادات",
     "my_profile": "ملفي الشخصي",
@@ -307,5 +319,21 @@ export const ar = {
     
     // Copyright
     "copyright_text": "© {{year}} SCC POS. جميع الحقوق محفوظة. تطوير: xD Manga.",
+    
+    // Giveaway Management (NEW)
+    "giveaways": "الهدايا",
+    "giveaway_management": "إدارة الهدايا",
+    "giveaway_items_list": "قائمة عناصر الهدايا ({{count}})",
+    "issue_giveaway": "إصدار هدية",
+    "issue_giveaway_to_member": "إصدار هدية للعضو",
+    "select_member_to_issue": "اختر العضو لإصدار الهدية",
+    "giveaway_issued_success": "تم إصدار {{item}} بنجاح إلى {{member}}.",
+    "giveaway_issued_failed": "فشل إصدار الهدية.",
+    "no_giveaway_items": "لا توجد عناصر مخزون مصنفة حاليًا كهدايا.",
+    "select_item_to_issue": "اختر العنصر المراد إصداره",
+    "item_stock": "مخزون العنصر",
+    "item_is_giveaway_for": "هذا العنصر هو هدية لـ:",
+    "issue_item": "إصدار العنصر",
+    "item_not_in_stock": "العنصر نفد من المخزون.",
   }
 };

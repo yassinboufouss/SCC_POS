@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { InventoryItem } from '@/types/supabase';
 import { queryKeys } from './query-keys.ts';
-import { addInventoryItem, updateInventoryItem, restockInventoryItem, deleteInventoryItem } from '@/utils/inventory-utils';
+import { addInventoryItem, updateInventoryItem, restockInventoryItem, deleteInventoryItem, issueManualGiveaway } from '@/utils/inventory-utils';
 import { NewInventoryItemInput } from '@/types/pos';
 
 // --- Fetch Hooks ---
@@ -77,4 +77,19 @@ export const useDeleteInventoryItem = () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.metrics });
     },
   });
+};
+
+// NEW: Hook for manually issuing a giveaway item
+export const useIssueManualGiveaway = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ itemId, memberId, memberName, itemName }: { itemId: string, memberId: string, memberName: string, itemName: string }) => 
+            issueManualGiveaway(itemId, memberId, memberName, itemName),
+        onSuccess: () => {
+            // Invalidate inventory and transactions
+            queryClient.invalidateQueries({ queryKey: queryKeys.inventory.all });
+            queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
+            queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.metrics });
+        },
+    });
 };
