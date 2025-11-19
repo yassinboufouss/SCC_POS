@@ -17,6 +17,7 @@ const MemberProfilePage: React.FC = () => {
   const { t } = useTranslation();
   const { profile, isLoading: isLoadingSession } = useSession();
   const [isEditing, setIsEditing] = React.useState(false); // State for editing mode
+  const [showRenewalForm, setShowRenewalForm] = React.useState(false); // State for renewal form visibility
   
   const memberId = profile?.id || '';
   const { data: transactions, isLoading: isLoadingTransactions } = useMemberTransactions(memberId);
@@ -43,6 +44,14 @@ const MemberProfilePage: React.FC = () => {
   
   // Determine if the member needs renewal (Expired or Pending)
   const needsRenewal = profile.status !== 'Active';
+  
+  // If renewal is needed, automatically show the form
+  React.useEffect(() => {
+      if (needsRenewal) {
+          setShowRenewalForm(true);
+      }
+  }, [needsRenewal]);
+
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 lg:p-8">
@@ -94,8 +103,8 @@ const MemberProfilePage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <MemberDetailsCard 
                 member={profile} 
-                onRenewClick={() => { /* Read-only, no action */ }} 
-                canRenew={false} 
+                onRenewClick={() => setShowRenewalForm(true)} 
+                canRenew={true} 
             />
             
             {/* Check-in Status Card */}
@@ -123,12 +132,15 @@ const MemberProfilePage: React.FC = () => {
         </div>
         
         {/* Conditional Renewal Form */}
-        {needsRenewal && (
+        {showRenewalForm && (
             <Card className="shadow-lg">
-                <CardHeader>
+                <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle className="text-lg flex items-center gap-2 text-green-600">
                         <RefreshCw className="h-5 w-5" /> {t("renew_membership")}
                     </CardTitle>
+                    <Button variant="ghost" size="sm" onClick={() => setShowRenewalForm(false)}>
+                        <X className="h-4 w-4" />
+                    </Button>
                 </CardHeader>
                 <CardContent>
                     <MemberRenewalForm member={profile} canRenew={true} />

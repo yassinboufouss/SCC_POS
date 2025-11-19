@@ -9,8 +9,8 @@ import { Button } from '@/components/ui/button';
 
 interface MemberDetailsCardProps {
   member: Profile;
-  onRenewClick: () => void;
-  canRenew: boolean; // New prop
+  onRenewClick?: () => void; // Made optional
+  canRenew: boolean; 
 }
 
 const MemberDetailsCard: React.FC<MemberDetailsCardProps> = ({ member, onRenewClick, canRenew }) => {
@@ -64,7 +64,7 @@ const MemberDetailsCard: React.FC<MemberDetailsCardProps> = ({ member, onRenewCl
             </div>
         </div>
         
-        {needsRenewal && (
+        {needsRenewal && onRenewClick && (
             <Button 
                 variant="outline" 
                 className="w-full mt-4 text-green-600 border-green-200 hover:bg-green-50"
