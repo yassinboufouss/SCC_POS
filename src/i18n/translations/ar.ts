@@ -1,6 +1,6 @@
 export const ar = {
   translation: {
-    "app_title": "نظام نقاط البيع للنادي الرياضي",
+    "app_title": "FitFlow POS",
     "dashboard": "لوحة القيادة",
     "members": "الأعضاء",
     "check_in": "تسجيل الدخول",

@@ -1,6 +1,6 @@
 export const fr = {
   translation: {
-    "app_title": "Système PDV de Gym",
+    "app_title": "FitFlow PDV",
     "dashboard": "Tableau de Bord",
     "members": "Membres",
     "check_in": "Enregistrement",
