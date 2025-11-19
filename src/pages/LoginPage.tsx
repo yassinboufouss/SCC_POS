@@ -124,7 +124,7 @@ const LoginPage: React.FC = () => {
       
       <Card 
         className={cn(
-          "w-full max-w-md z-10 p-10 rounded-[16px] shadow-[0px_8px_24px_rgba(0,0,0,0.08)]", 
+          "w-full max-w-md z-10 p-6 sm:p-10 rounded-[16px] shadow-[0px_8px_24px_rgba(0,0,0,0.08)]", 
           "bg-white/90 dark:bg-card/90 backdrop-blur-sm"
         )}
       >
