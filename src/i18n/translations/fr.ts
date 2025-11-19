@@ -309,12 +309,6 @@ export const fr = {
     "count": "Compte",
     "percentage": "Pourcentage",
     
-    // New About Page Keys
-    "about_app": "À Propos de SCC PDV",
-    "version": "Version",
-    "copyright": "Droits d'Auteur",
-    "about_description": "Cette application est un système de point de vente et de gestion conçu pour les centres de fitness et les salles de sport.",
-    
     // Copyright
     "copyright_text": "© {{year}} SCC PDV. Tous droits réservés. Développé par xD Manga.",
   }

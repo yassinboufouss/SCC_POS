@@ -15,7 +15,6 @@ import TransactionsPage from "./pages/TransactionsPage";
 import MemberProfilePage from "./pages/MemberProfilePage";
 import RoleManagementPage from "./pages/RoleManagementPage";
 import AnalyticsPage from "./pages/AnalyticsPage"; // Import AnalyticsPage
-import AboutPage from "./pages/AboutPage"; // Import AboutPage
 import { SessionContextProvider } from "./components/auth/SessionContextProvider";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
@@ -44,7 +43,6 @@ const App = () => (
                 <Route path="/transactions" element={<TransactionsPage />} />
                 <Route path="/analytics" element={<AnalyticsPage />} />
                 <Route path="/roles" element={<RoleManagementPage />} />
-                <Route path="/about" element={<AboutPage />} /> {/* NEW Route */}
                 
                 {/* Member Route (Accessible only by members, staff/owner redirected away) */}
                 <Route path="/my-profile" element={<MemberProfilePage />} />

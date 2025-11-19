@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Users, ShoppingCart, LogOut, Package, Ticket, QrCode, LayoutDashboard, History, Shield, BarChart3, Dumbbell, Info } from 'lucide-react';
+import { Users, ShoppingCart, LogOut, Package, Ticket, QrCode, LayoutDashboard, History, Shield, BarChart3, Dumbbell } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -19,14 +19,13 @@ const navItems = [
   { nameKey: 'transactions', href: '/transactions', icon: History, roles: ['owner', 'manager', 'cashier'] },
   { nameKey: 'analytics', href: '/analytics', icon: BarChart3, roles: ['owner', 'manager'] },
   { nameKey: 'role_management', href: '/roles', icon: Shield, roles: ['owner'] },
-  { nameKey: 'about_app', href: '/about', icon: Info, roles: ['owner', 'manager', 'cashier'] }, // NEW: About Page
 ];
 
 const Sidebar: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
-  const { role, isOwner } = useUserRole();
+  const { role } = useUserRole();
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();

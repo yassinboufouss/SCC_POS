@@ -309,12 +309,6 @@ export const en = {
     "count": "Count",
     "percentage": "Percentage",
     
-    // New About Page Keys
-    "about_app": "About SCC POS",
-    "version": "Version",
-    "copyright": "Copyright",
-    "about_description": "This application is a Point of Sale and Management System designed for fitness centers and gyms.",
-    
     // Copyright
     "copyright_text": "© {{year}} SCC POS. All rights reserved. Developed by xD Manga.",
   }
