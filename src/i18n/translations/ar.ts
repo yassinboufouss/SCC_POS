@@ -347,5 +347,18 @@ export const ar = {
     "password_update_failed": "فشل تحديث كلمة المرور: {{error}}",
     "saving": "جاري الحفظ...",
     "unknown_error": "خطأ غير معروف",
+    
+    // NEW Email Management Keys
+    "email_management": "إدارة البريد الإلكتروني",
+    "new_email_address": "عنوان بريد إلكتروني جديد",
+    "update_email": "تحديث البريد الإلكتروني",
+    "email_update_confirmation_sent": "تم إرسال بريد إلكتروني للتأكيد إلى {{email}}. يرجى التحقق من صندوق الوارد الخاص بك لتأكيد التغيير.",
+    "email_update_failed": "فشل تحديث البريد الإلكتروني: {{error}}",
+    "email_already_current": "هذا هو بالفعل عنوان بريدك الإلكتروني الحالي.",
+    "email_update_note": "يتطلب تغيير بريدك الإلكتروني تأكيدًا عبر رابط يتم إرساله إلى العنوان الجديد.",
+    
+    // NEW Account Info Keys
+    "account_information": "معلومات الحساب",
+    "user_id": "معرف المستخدم",
   }
 };

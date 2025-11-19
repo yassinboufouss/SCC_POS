@@ -7,7 +7,8 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { LogIn } from 'lucide-react';
-import ThemeToggle from '@/components/ThemeToggle'; // Import ThemeToggle
+import ThemeToggle from '@/components/ThemeToggle';
+import LanguageSwitcher from '@/components/LanguageSwitcher'; // Import LanguageSwitcher
 
 const LoginPage: React.FC = () => {
   const { t } = useTranslation();
@@ -81,8 +82,9 @@ const LoginPage: React.FC = () => {
             }}
           />
         </CardContent>
-        <CardFooter className="justify-center pt-4">
+        <CardFooter className="flex flex-col gap-2 pt-4">
             <ThemeToggle />
+            <LanguageSwitcher />
         </CardFooter>
       </Card>
     </div>

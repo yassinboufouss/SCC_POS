@@ -287,7 +287,7 @@ export const en = {
     "delete_plan": "Delete Plan",
     "confirm_deletion": "Confirm Deletion",
     "delete_item_confirmation": "Are you sure you want to permanently delete the inventory item '{{name}}'? This action cannot be undone.",
-    "delete_plan_confirmation": "Are you sure you want to permanently delete the membership plan '{{name}}'? This action cannot be undone and may affect existing members.",
+    "delete_plan_confirmation": "Are you sure you want to permanently delete the membership plan '{{name}}'? This action is irreversible and may affect existing members.",
     "confirm_delete": "Yes, Delete",
     "deleting": "Deleting...",
     "item_deleted_success": "Inventory item '{{name}}' deleted successfully.",
@@ -347,5 +347,18 @@ export const en = {
     "password_update_failed": "Password update failed: {{error}}",
     "saving": "Saving...",
     "unknown_error": "Unknown error",
+    
+    // NEW Email Management Keys
+    "email_management": "Email Management",
+    "new_email_address": "New Email Address",
+    "update_email": "Update Email",
+    "email_update_confirmation_sent": "Confirmation email sent to {{email}}. Please check your inbox to confirm the change.",
+    "email_update_failed": "Email update failed: {{error}}",
+    "email_already_current": "This is already your current email address.",
+    "email_update_note": "Changing your email requires confirmation via a link sent to the new address.",
+    
+    // NEW Account Info Keys
+    "account_information": "Account Information",
+    "user_id": "User ID",
   }
 };

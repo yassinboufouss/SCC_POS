@@ -347,5 +347,18 @@ export const fr = {
     "password_update_failed": "Échec de la mise à jour du mot de passe : {{error}}",
     "saving": "Enregistrement...",
     "unknown_error": "Erreur inconnue",
+    
+    // NEW Email Management Keys
+    "email_management": "Gestion des E-mails",
+    "new_email_address": "Nouvelle Adresse E-mail",
+    "update_email": "Mettre à Jour l'E-mail",
+    "email_update_confirmation_sent": "E-mail de confirmation envoyé à {{email}}. Veuillez vérifier votre boîte de réception pour confirmer le changement.",
+    "email_update_failed": "Échec de la mise à jour de l'e-mail : {{error}}",
+    "email_already_current": "Ceci est déjà votre adresse e-mail actuelle.",
+    "email_update_note": "Le changement de votre e-mail nécessite une confirmation via un lien envoyé à la nouvelle adresse.",
+    
+    // NEW Account Info Keys
+    "account_information": "Informations du Compte",
+    "user_id": "ID Utilisateur",
   }
 };

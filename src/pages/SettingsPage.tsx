@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Layout from '@/components/Layout';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Settings, User, Mail, Phone, Calendar, Edit, Save, Shield, Key } from 'lucide-react';
+import { Settings, User, Mail, Phone, Calendar, Edit, Save, Shield, Key, Fingerprint, X } from 'lucide-react';
 import { useSession } from '@/components/auth/SessionContextProvider';
 import { Skeleton } from '@/components/ui/skeleton';
 import MemberBasicInfoForm from '@/components/members/MemberBasicInfoForm';
@@ -11,7 +11,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useUserRole } from '@/hooks/use-user-role';
 import { Profile } from '@/types/supabase';
-import PasswordManagementForm from '@/components/settings/PasswordManagementForm.tsx'; // FIX: Added .tsx extension
+import PasswordManagementForm from '@/components/settings/PasswordManagementForm';
+import EmailManagementForm from '@/components/settings/EmailManagementForm'; // Import new component
+import { Separator } from '@/components/ui/separator';
 
 const SettingsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -66,25 +68,44 @@ const SettingsPage: React.FC = () => {
             <MemberLogoutButton />
         </div>
         
+        {/* Role and ID Card */}
+        <Card className="shadow-lg">
+            <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                    <Fingerprint className="h-5 w-5" /> {t("account_information")}
+                </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm">
+                <div className="flex justify-between items-center p-2 border rounded-md bg-secondary/50">
+                    <span className="text-muted-foreground">{t("current_role")}:</span>
+                    <Badge variant={getRoleVariant(role)} className="text-base py-1 px-3">
+                        {t(role || 'member')}
+                    </Badge>
+                </div>
+                <Separator />
+                <p className="text-xs text-muted-foreground break-all">
+                    <span className="font-semibold">{t("user_id")}:</span> {profile.id}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                    <span className="font-semibold">{t("member_code")}:</span> {profile.member_code || 'N/A'}
+                </p>
+            </CardContent>
+        </Card>
+        
         {/* Profile Card */}
         <Card className="shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-lg flex items-center gap-2">
                     <User className="h-5 w-5" /> {t("my_profile")}
                 </CardTitle>
-                <div className="flex items-center gap-3">
-                    <Badge variant={getRoleVariant(role)} className="text-sm flex items-center gap-1">
-                        <Shield className="h-3 w-3" /> {t(role || 'member')}
-                    </Badge>
-                    <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => setIsEditing(!isEditing)}
-                    >
-                        {isEditing ? <Save className="h-4 w-4 mr-2" /> : <Edit className="h-4 w-4 mr-2" />}
-                        {isEditing ? t("save_changes") : t("edit_profile")}
-                    </Button>
-                </div>
+                <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setIsEditing(!isEditing)}
+                >
+                    {isEditing ? <X className="h-4 w-4 mr-2" /> : <Edit className="h-4 w-4 mr-2" />}
+                    {isEditing ? t("close_editing") : t("edit_profile")}
+                </Button>
             </CardHeader>
             <CardContent>
                 {isEditing ? (
@@ -104,6 +125,18 @@ const SettingsPage: React.FC = () => {
             </CardContent>
         </Card>
         
+        {/* Email Management Card */}
+        <Card className="shadow-lg">
+            <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                    <Mail className="h-5 w-5" /> {t("email_management")}
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
+                <EmailManagementForm />
+            </CardContent>
+        </Card>
+        
         {/* Password Management Card */}
         <Card className="shadow-lg">
             <CardHeader>
@@ -116,7 +149,7 @@ const SettingsPage: React.FC = () => {
             </CardContent>
         </Card>
         
-        {/* Security Settings Placeholder (Removed old placeholder content) */}
+        {/* Security Settings Placeholder */}
         <Card className="shadow-lg">
             <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
