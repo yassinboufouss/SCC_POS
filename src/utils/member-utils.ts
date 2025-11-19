@@ -218,16 +218,25 @@ export const getProfileByMemberCode = async (memberCode: string): Promise<Profil
 
 // NEW: Utility to fetch the full profile for the currently logged-in user
 export const fetchUserProfile = async (userId: string): Promise<Profile | null> => {
-    const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
+    try {
+        const { data, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', userId)
+            .single();
 
-    if (error && error.code !== 'PGRST116') {
-        console.error("Supabase fetchUserProfile error:", error);
-        throw new Error("Failed to fetch user profile.");
+        if (error) {
+            // Log error if it's not just 'No rows found'
+            if (error.code !== 'PGRST116') {
+                console.error("Supabase fetchUserProfile error:", error);
+            }
+            return null;
+        }
+        
+        return data as Profile | null;
+    } catch (e) {
+        // Catch network errors or unexpected Supabase client errors (like the 406)
+        console.error("Supabase fetchUserProfile critical error:", e);
+        return null;
     }
-    
-    return data as Profile | null;
 };

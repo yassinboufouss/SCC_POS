@@ -56,21 +56,14 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
           total_check_ins: 0,
       };
 
-      try {
-          const userProfile = await fetchUserProfile(currentUser.id);
-          
-          // Merge email from the User object into the profile object
-          if (userProfile) {
-              const completeProfile = { ...userProfile, email: currentUser.email || null };
-              setProfile(completeProfile);
-          } else {
-              // If profile doesn't exist yet (PGRST116), use the minimal profile
-              setProfile(minimalProfile);
-          }
-      } catch (e) {
-          console.error("Failed to fetch profile after sign in:", e);
-          // If fetching fails due to an unexpected error (e.g., RLS denial, network), 
-          // we still set a minimal profile to prevent the ProtectedRoute from blocking access entirely.
+      const userProfile = await fetchUserProfile(currentUser.id);
+      
+      // Merge email from the User object into the profile object
+      if (userProfile) {
+          const completeProfile = { ...userProfile, email: currentUser.email || null };
+          setProfile(completeProfile);
+      } else {
+          // If profile doesn't exist yet or fetch failed, use the minimal profile
           setProfile(minimalProfile);
       }
   };
