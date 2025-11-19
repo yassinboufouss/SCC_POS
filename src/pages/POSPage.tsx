@@ -420,11 +420,12 @@ const POSPage = () => {
 
   return (
     <Layout>
-      <div className="p-4 lg:p-6 h-screen overflow-hidden"> {/* Set fixed height and hide overflow */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full"> {/* h-full to fill parent */}
+      {/* Removed h-screen and overflow-hidden from the main container */}
+      <div className="p-4 lg:p-6 flex flex-col h-full"> 
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0"> {/* Use flex-1 and min-h-0 */}
           
           {/* Left Column (2/3 width) - Product Selection / Registration Tabs */}
-          <div className="lg:col-span-2 h-full flex flex-col"> {/* Use flex-col to manage vertical space */}
+          <div className="lg:col-span-2 flex flex-col min-h-0"> 
             <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'products' | 'register')} className="flex flex-col flex-1 min-h-0">
                 <TabsList className="grid w-full grid-cols-2 mb-4 shrink-0">
                     <TabsTrigger value="products">
@@ -435,7 +436,7 @@ const POSPage = () => {
                     </TabsTrigger>
                 </TabsList>
                 
-                {/* Make content scrollable if needed */}
+                {/* Content area needs to be scrollable if necessary */}
                 <TabsContent value="products" className="flex-1 min-h-0 overflow-y-auto pb-4">
                     <POSProductSelection
                       inventorySearchTerm={inventorySearchTerm}
@@ -452,7 +453,7 @@ const POSPage = () => {
           </div>
 
           {/* Right Column (1/3 width) - Cart & Checkout */}
-          <div className="lg:col-span-1 flex flex-col space-y-4 h-full"> {/* Changed space-y-6 to space-y-4 */}
+          <div className="lg:col-span-1 flex flex-col space-y-4 min-h-0"> 
               <POSTransactionSummary />
               
               {/* Updated Check-In Scanner */}
