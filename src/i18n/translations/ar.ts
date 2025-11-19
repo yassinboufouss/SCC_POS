@@ -8,6 +8,7 @@ export const ar = {
     "inventory": "المخزون",
     "membership_plans": "خطط العضوية",
     "transactions": "المعاملات",
+    "analytics": "التحليلات",
     "log_in": "تسجيل الدخول",
     "logout": "تسجيل الخروج",
     "search_by_name": "البحث بالاسم...",
@@ -296,5 +297,10 @@ export const ar = {
     // Chart Keys
     "monthly_revenue_trend": "اتجاه الإيرادات الشهرية (آخر 6 أشهر)",
     "revenue": "الإيرادات",
+    
+    // New Analytics Keys
+    "sales_analytics_title": "تحليلات المبيعات",
+    "total_transactions_count": "إجمالي المعاملات",
+    "all_time": "منذ البداية",
   }
 };

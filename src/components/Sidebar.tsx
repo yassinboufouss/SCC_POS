@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Users, ShoppingCart, LogOut, Package, Ticket, QrCode, LayoutDashboard, History, Shield } from 'lucide-react';
+import { Users, ShoppingCart, LogOut, Package, Ticket, QrCode, LayoutDashboard, History, Shield, BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -17,6 +17,7 @@ const navItems = [
   { nameKey: 'inventory', href: '/inventory', icon: Package, roles: ['owner', 'manager'] },
   { nameKey: 'membership_plans', href: '/plans', icon: Ticket, roles: ['owner', 'manager'] },
   { nameKey: 'transactions', href: '/transactions', icon: History, roles: ['owner', 'manager', 'cashier'] },
+  { nameKey: 'analytics', href: '/analytics', icon: BarChart3, roles: ['owner', 'manager'] }, // NEW
   { nameKey: 'role_management', href: '/roles', icon: Shield, roles: ['owner'] },
 ];
 

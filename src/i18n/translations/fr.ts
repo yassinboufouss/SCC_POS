@@ -8,6 +8,7 @@ export const fr = {
     "inventory": "Inventaire",
     "membership_plans": "Plans d'Adhésion",
     "transactions": "Transactions",
+    "analytics": "Analyse",
     "log_in": "Se Connecter",
     "logout": "Déconnexion",
     "search_by_name": "Rechercher par nom...",
@@ -296,5 +297,10 @@ export const fr = {
     // Chart Keys
     "monthly_revenue_trend": "Tendance des Revenus Mensuels (6 Derniers Mois)",
     "revenue": "Revenu",
+    
+    // New Analytics Keys
+    "sales_analytics_title": "Analyse des Ventes",
+    "total_transactions_count": "Total des Transactions",
+    "all_time": "Depuis le début",
   }
 };
