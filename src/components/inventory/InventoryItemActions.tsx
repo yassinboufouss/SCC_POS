@@ -42,6 +42,11 @@ const InventoryItemActions: React.FC<InventoryItemActionsProps> = ({ item }) => 
           showError(t("delete_failed"));
       }
   };
+  
+  // FIX: Define handleOpenChange to manage the dialog state
+  const handleOpenChange = (open: boolean) => {
+      setIsDialogOpen(open);
+  };
 
   return (
     <>
