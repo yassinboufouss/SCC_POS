@@ -15,11 +15,12 @@ const navItems = [
   { nameKey: 'check_in', href: '/check-in', icon: QrCode, roles: ['owner', 'manager', 'cashier'] },
   { nameKey: 'members', href: '/members', icon: Users, roles: ['owner', 'manager'] },
   { nameKey: 'inventory', href: '/inventory', icon: Package, roles: ['owner', 'manager'] },
-  { nameKey: 'giveaways', href: '/manual-giveaways', icon: Gift, roles: ['owner', 'manager', 'cashier'] }, // UPDATED HREF
+  { nameKey: 'giveaways', href: '/manual-giveaways', icon: Gift, roles: ['owner', 'manager', 'cashier'] },
   { nameKey: 'membership_plans', href: '/plans', icon: Ticket, roles: ['owner', 'manager'] },
   { nameKey: 'transactions', href: '/transactions', icon: History, roles: ['owner', 'manager', 'cashier'] },
   { nameKey: 'analytics', href: '/analytics', icon: BarChart3, roles: ['owner', 'manager'] },
   { nameKey: 'role_management', href: '/roles', icon: Shield, roles: ['owner'] },
+  { nameKey: 'settings', href: '/settings', icon: Settings, roles: ['owner', 'manager', 'cashier'] }, // Added Settings
 ];
 
 const Sidebar: React.FC = () => {
@@ -77,21 +78,8 @@ const Sidebar: React.FC = () => {
       </nav>
       
       <div className="mt-auto pt-4 border-t border-sidebar-border space-y-2">
-        {/* Settings Link (for staff/owner) */}
-        {userRole !== 'member' && (
-            <Link
-              to="/settings"
-              className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                location.pathname === '/settings' ? "bg-sidebar-primary text-sidebar-primary-foreground font-semibold" : "text-sidebar-foreground"
-              )}
-            >
-              <Settings className="h-5 w-5" />
-              {t("settings")}
-            </Link>
-        )}
         
-        <ThemeToggle /> {/* Added Theme Toggle */}
+        <ThemeToggle />
         <LanguageSwitcher />
         <button
           onClick={handleLogout}
