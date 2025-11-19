@@ -39,7 +39,7 @@ const POSTransactionSummary: React.FC = () => {
       };
   }, [summary.dailyTransactions]);
 
-  const otherMetrics = [
+  const periodMetrics = [
     { 
       title: t("weekly_sales_total"), 
       value: formatCurrency(summary.weeklyTotal), 
@@ -89,7 +89,7 @@ const POSTransactionSummary: React.FC = () => {
         
         <Separator className="my-4" />
         
-        {/* 2. Other Metrics (Less Prominent) */}
+        {/* 2. Period Totals (Weekly/Monthly) */}
         <div className="space-y-3">
             <h4 className="font-semibold text-sm text-muted-foreground">{t("period_totals")}</h4>
             {isLoading ? (
@@ -97,7 +97,7 @@ const POSTransactionSummary: React.FC = () => {
                     {[...Array(2)].map((_, i) => <Skeleton key={i} className="h-8 w-full" />)}
                 </div>
             ) : (
-                otherMetrics.map((metric) => (
+                periodMetrics.map((metric) => (
                     <div key={metric.title} className="flex justify-between text-sm">
                         <span className="flex items-center gap-1 text-muted-foreground">
                             <metric.icon className="h-4 w-4" /> {metric.title}
@@ -108,16 +108,34 @@ const POSTransactionSummary: React.FC = () => {
             )}
         </div>
         
-        {/* 3. Payment Breakdown (Simplified) */}
+        {/* 3. Daily Breakdowns (Payment & Type) */}
         {!isLoading && dailyBreakdowns.count > 0 && (
-            <div className="mt-4 pt-4 border-t space-y-2">
-                <h5 className="font-semibold text-sm text-muted-foreground">{t("payment_method_breakdown")}</h5>
-                {Object.entries(dailyBreakdowns.paymentBreakdown).map(([method, total]) => (
-                    <div key={method} className="flex justify-between text-sm">
-                        <span>{t(method.toLowerCase())}</span>
-                        <span className="font-medium">{formatCurrency(total)}</span>
+            <div className="mt-4 pt-4 border-t space-y-3">
+                <h5 className="font-semibold text-sm text-muted-foreground">{t("daily_breakdowns")}</h5>
+                
+                <div className="grid grid-cols-2 gap-4">
+                    {/* Payment Breakdown */}
+                    <div className="space-y-1">
+                        <p className="text-xs font-medium text-muted-foreground">{t("payment_method_breakdown")}</p>
+                        {Object.entries(dailyBreakdowns.paymentBreakdown).map(([method, total]) => (
+                            <div key={method} className="flex justify-between text-sm">
+                                <span>{t(method.toLowerCase())}</span>
+                                <span className="font-medium">{formatCurrency(total)}</span>
+                            </div>
+                        ))}
                     </div>
-                ))}
+                    
+                    {/* Type Breakdown */}
+                    <div className="space-y-1">
+                        <p className="text-xs font-medium text-muted-foreground">{t("transaction_type_breakdown")}</p>
+                        {Object.entries(dailyBreakdowns.typeBreakdown).map(([type, total]) => (
+                            <div key={type} className="flex justify-between text-sm">
+                                <span>{t(type.replace(/\s/g, '_').toLowerCase())}</span>
+                                <span className="font-medium">{formatCurrency(total)}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
         )}
       </CardContent>

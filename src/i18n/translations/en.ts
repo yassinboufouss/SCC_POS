@@ -410,5 +410,6 @@ export const en = {
     "view_summary": "View Summary",
     "total_revenue": "Total Revenue",
     "period_totals": "Period Totals",
+    "daily_breakdowns": "Daily Breakdowns",
   }
 };

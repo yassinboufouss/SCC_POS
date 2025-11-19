@@ -402,8 +402,6 @@ export const ar = {
     "daily_transactions_list": "قائمة المعاملات اليومية",
     "and_more_transactions": "و {{count}} معاملات أخرى",
     "thank_you_for_using_pos": "شكرًا لاستخدامك SCC POS.",
-    
-    // NEW Invoice Keys
     "daily_sales_invoice": "فاتورة المبيعات اليومية",
     "items_sold_today": "العناصر المباعة اليوم",
     "raw_subtotal": "المجموع الفرعي الخام",
@@ -411,5 +409,7 @@ export const ar = {
     "no_sales_today": "لم يتم تسجيل مبيعات اليوم.",
     "view_summary": "عرض الملخص",
     "total_revenue": "إجمالي الإيرادات",
+    "period_totals": "إجماليات الفترة",
+    "daily_breakdowns": "التفاصيل اليومية",
   }
 };

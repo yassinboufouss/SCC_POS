@@ -410,5 +410,6 @@ export const fr = {
     "view_summary": "عرض الملخص",
     "total_revenue": "إجمالي الإيرادات",
     "period_totals": "إجماليات الفترة",
+    "daily_breakdowns": "التفاصيل اليومية",
   }
 };
