@@ -16,7 +16,7 @@ import MemberProfilePage from "./pages/MemberProfilePage";
 import RoleManagementPage from "./pages/RoleManagementPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
 import SettingsPage from "./pages/SettingsPage";
-import GiveawaysPage from "./pages/GiveawaysPage"; // Import GiveawaysPage
+import ManualGiveawaysPage from "./pages/ManualGiveawaysPage"; // Import renamed page
 import { SessionContextProvider } from "./components/auth/SessionContextProvider";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
@@ -46,7 +46,7 @@ const App = () => (
                 <Route path="/analytics" element={<AnalyticsPage />} />
                 <Route path="/roles" element={<RoleManagementPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
-                <Route path="/giveaways" element={<GiveawaysPage />} /> {/* NEW Route */}
+                <Route path="/manual-giveaways" element={<ManualGiveawaysPage />} /> {/* UPDATED Route */}
                 
                 {/* Member Route (Accessible only by members, staff/owner redirected away) */}
                 <Route path="/my-profile" element={<MemberProfilePage />} />

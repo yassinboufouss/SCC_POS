@@ -15,7 +15,7 @@ const navItems = [
   { nameKey: 'check_in', href: '/check-in', icon: QrCode, roles: ['owner', 'manager', 'cashier'] },
   { nameKey: 'members', href: '/members', icon: Users, roles: ['owner', 'manager'] },
   { nameKey: 'inventory', href: '/inventory', icon: Package, roles: ['owner', 'manager'] },
-  { nameKey: 'giveaways', href: '/giveaways', icon: Gift, roles: ['owner', 'manager', 'cashier'] }, // NEW
+  { nameKey: 'giveaways', href: '/manual-giveaways', icon: Gift, roles: ['owner', 'manager', 'cashier'] }, // UPDATED HREF
   { nameKey: 'membership_plans', href: '/plans', icon: Ticket, roles: ['owner', 'manager'] },
   { nameKey: 'transactions', href: '/transactions', icon: History, roles: ['owner', 'manager', 'cashier'] },
   { nameKey: 'analytics', href: '/analytics', icon: BarChart3, roles: ['owner', 'manager'] },

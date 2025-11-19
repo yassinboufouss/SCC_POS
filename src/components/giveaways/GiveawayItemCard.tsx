@@ -15,10 +15,11 @@ import { Badge } from '@/components/ui/badge';
 
 interface GiveawayItemCardProps {
   item: InventoryItem;
-  linkedPlans: MembershipPlan[];
+  // This is now optional, as we display all inventory items
+  linkedPlans?: MembershipPlan[]; 
 }
 
-const GiveawayItemCard: React.FC<GiveawayItemCardProps> = ({ item, linkedPlans }) => {
+const GiveawayItemCard: React.FC<GiveawayItemCardProps> = ({ item, linkedPlans = [] }) => {
   const { t } = useTranslation();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<Profile | null>(null);
@@ -61,7 +62,7 @@ const GiveawayItemCard: React.FC<GiveawayItemCardProps> = ({ item, linkedPlans }
     <Card className="shadow-lg flex flex-col">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-lg flex items-center gap-2">
-          <Gift className="h-5 w-5 text-green-600" /> {item.name}
+          <Package className="h-5 w-5 text-primary" /> {item.name}
         </CardTitle>
         <Badge variant={isOutOfStock ? 'destructive' : 'default'}>
           {t("stock")}: {item.stock}
@@ -80,9 +81,9 @@ const GiveawayItemCard: React.FC<GiveawayItemCardProps> = ({ item, linkedPlans }
             )}
         </div>
         
-        <p className="text-sm text-muted-foreground">{t("item_stock")}: {item.stock}</p>
         <p className="text-sm font-medium">{t("price")}: {formatCurrency(item.price)}</p>
         
+        {/* Display linked plans if any */}
         <div className="text-xs text-muted-foreground">
             <p className="font-semibold mb-1">{t("item_is_giveaway_for")}</p>
             {linkedPlans.length > 0 ? (
@@ -90,7 +91,7 @@ const GiveawayItemCard: React.FC<GiveawayItemCardProps> = ({ item, linkedPlans }
                     {linkedPlans.map(plan => <li key={plan.id}>{plan.name}</li>)}
                 </ul>
             ) : (
-                <p>N/A</p>
+                <p>{t("no_giveaway")}</p>
             )}
         </div>
 
@@ -101,7 +102,7 @@ const GiveawayItemCard: React.FC<GiveawayItemCardProps> = ({ item, linkedPlans }
                 className="w-full mt-3" 
                 disabled={isOutOfStock}
             >
-              <User className="h-4 w-4 mr-2" /> {t("issue_giveaway")}
+              <Gift className="h-4 w-4 mr-2" /> {t("issue_giveaway")}
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">

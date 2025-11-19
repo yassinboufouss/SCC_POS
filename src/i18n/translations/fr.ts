@@ -321,18 +321,18 @@ export const fr = {
     "copyright_text": "© {{year}} SCC PDV. Tous droits réservés. Développé par xD Manga.",
     
     // Giveaway Management (NEW)
-    "giveaways": "Cadeaux",
-    "giveaway_management": "Gestion des Cadeaux",
-    "giveaway_items_list": "Liste des Articles Cadeaux ({{count}})",
+    "giveaways": "Cadeaux Manuels", // Updated name
+    "giveaway_management": "Distribution Manuelle de Cadeaux", // Updated name
+    "giveaway_items_list": "Articles d'Inventaire ({{count}})", // Updated name
     "issue_giveaway": "Distribuer un Cadeau",
     "issue_giveaway_to_member": "Distribuer un Cadeau à un Membre",
     "select_member_to_issue": "Sélectionner le Membre pour le Cadeau",
     "giveaway_issued_success": "Cadeau {{item}} distribué avec succès à {{member}}.",
     "giveaway_issued_failed": "Échec de la distribution du cadeau.",
-    "no_giveaway_items": "Aucun article d'inventaire n'est actuellement désigné comme cadeau.",
+    "no_giveaway_items": "Aucun article d'inventaire trouvé correspondant à votre recherche.", // Updated message
     "select_item_to_issue": "Sélectionner l'Article à Distribuer",
     "item_stock": "Stock de l'Article",
-    "item_is_giveaway_for": "Cet article est un cadeau pour :",
+    "item_is_giveaway_for": "Lié aux Plans :", // Updated name
     "issue_item": "Distribuer l'Article",
     "item_not_in_stock": "L'article est en rupture de stock.",
   }

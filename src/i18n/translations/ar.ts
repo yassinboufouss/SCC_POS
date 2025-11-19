@@ -321,18 +321,18 @@ export const ar = {
     "copyright_text": "© {{year}} SCC POS. جميع الحقوق محفوظة. تطوير: xD Manga.",
     
     // Giveaway Management (NEW)
-    "giveaways": "الهدايا",
-    "giveaway_management": "إدارة الهدايا",
-    "giveaway_items_list": "قائمة عناصر الهدايا ({{count}})",
+    "giveaways": "الهدايا اليدوية", // Updated name
+    "giveaway_management": "إصدار الهدايا اليدوي", // Updated name
+    "giveaway_items_list": "عناصر المخزون ({{count}})", // Updated name
     "issue_giveaway": "إصدار هدية",
     "issue_giveaway_to_member": "إصدار هدية للعضو",
     "select_member_to_issue": "اختر العضو لإصدار الهدية",
     "giveaway_issued_success": "تم إصدار {{item}} بنجاح إلى {{member}}.",
     "giveaway_issued_failed": "فشل إصدار الهدية.",
-    "no_giveaway_items": "لا توجد عناصر مخزون مصنفة حاليًا كهدايا.",
+    "no_giveaway_items": "لم يتم العثور على عناصر مخزون مطابقة لبحثك.", // Updated message
     "select_item_to_issue": "اختر العنصر المراد إصداره",
     "item_stock": "مخزون العنصر",
-    "item_is_giveaway_for": "هذا العنصر هو هدية لـ:",
+    "item_is_giveaway_for": "مرتبط بالخطط:", // Updated name
     "issue_item": "إصدار العنصر",
     "item_not_in_stock": "العنصر نفد من المخزون.",
   }
