@@ -39,6 +39,7 @@ const Sidebar: React.FC = () => {
   };
   
   const userRole = role || 'member';
+  const currentYear = new Date().getFullYear();
 
   return (
     <div className="flex flex-col h-screen border-r bg-sidebar text-sidebar-foreground p-4 w-64 sticky top-0">
@@ -84,6 +85,11 @@ const Sidebar: React.FC = () => {
           <LogOut className="h-5 w-5" />
           {t("logout")}
         </button>
+        
+        {/* Copyright Notice */}
+        <p className="text-xs text-sidebar-foreground/70 pt-2 text-center">
+            {t("copyright_text", { year: currentYear })}
+        </p>
       </div>
     </div>
   );

@@ -308,5 +308,8 @@ export const fr = {
     "member_status_distribution": "Distribution du Statut des Membres",
     "count": "Compte",
     "percentage": "Pourcentage",
+    
+    // Copyright
+    "copyright_text": "© {{year}} SCC PDV. Tous droits réservés. Développé par xD Manga.",
   }
 };

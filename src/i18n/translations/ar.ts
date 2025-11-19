@@ -308,5 +308,8 @@ export const ar = {
     "member_status_distribution": "توزيع حالة الأعضاء",
     "count": "العدد",
     "percentage": "النسبة المئوية",
+    
+    // Copyright
+    "copyright_text": "© {{year}} SCC POS. جميع الحقوق محفوظة. تطوير: xD Manga.",
   }
 };

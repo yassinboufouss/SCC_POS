@@ -308,5 +308,8 @@ export const en = {
     "member_status_distribution": "Member Status Distribution",
     "count": "Count",
     "percentage": "Percentage",
+    
+    // Copyright
+    "copyright_text": "© {{year}} SCC POS. All rights reserved. Developed by xD Manga.",
   }
 };
