@@ -11,6 +11,7 @@ import { CartItem, PaymentMethod } from '@/types/pos.ts';
 import { useTranslation } from 'react-i18next';
 import { formatCurrency } from '@/utils/currency-utils';
 import { Profile } from '@/types/supabase';
+import { cn } from '@/lib/utils';
 
 interface POSCartAndCheckoutProps {
   cart: CartItem[];
@@ -28,7 +29,8 @@ interface POSCartAndCheckoutProps {
   tax: number;
   total: number;
   isProcessingSale: boolean;
-  onClearMember: () => void; // Added
+  onClearMember: () => void; 
+  className?: string;
 }
 
 const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
@@ -47,7 +49,8 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
   tax,
   total,
   isProcessingSale,
-  onClearMember, // Destructured new prop
+  onClearMember, 
+  className,
 }) => {
   const { t } = useTranslation();
   
@@ -63,7 +66,7 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
   };
 
   return (
-    <Card className="h-full flex flex-col">
+    <Card className={cn("h-full flex flex-col", className)}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <ShoppingCart className="h-5 w-5" /> {t("shopping_cart", { count: cart.length })}
@@ -72,7 +75,7 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
       <CardContent className="flex flex-col flex-1">
         
         {/* Member Selection Display */}
-        <div className="mb-4 text-sm text-muted-foreground p-2 border rounded-md flex items-center justify-between">
+        <div className="mb-4 text-sm text-muted-foreground p-2 border rounded-md flex items-center justify-between shrink-0">
             <div className="flex items-center">
                 {t("member_customer")}: 
                 <span className="font-medium text-foreground ml-1">
@@ -86,8 +89,8 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
             )}
         </div>
 
-        {/* Cart Items List */}
-        <div className="flex-1 overflow-y-auto space-y-3 pr-2 mb-4">
+        {/* Cart Items List - Scrollable area */}
+        <div className="flex-1 overflow-y-auto space-y-3 pr-2 mb-4 min-h-[50px]">
           {cart.length === 0 ? (
             <div className="text-center text-muted-foreground py-10">
               {t("cart_is_empty")}
@@ -104,8 +107,8 @@ const POSCartAndCheckout: React.FC<POSCartAndCheckoutProps> = ({
           )}
         </div>
 
-        {/* Totals and Checkout */}
-        <div className="mt-auto pt-4 border-t">
+        {/* Totals and Checkout - Fixed at the bottom */}
+        <div className="mt-auto pt-4 border-t shrink-0">
           <div className="space-y-1 text-sm">
             <div className="flex justify-between">
               <span>{t("subtotal")}</span>

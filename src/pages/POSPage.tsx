@@ -405,13 +405,13 @@ const POSPage = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen p-4 lg:p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="p-4 lg:p-6 h-screen overflow-hidden"> {/* Set fixed height and hide overflow */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full"> {/* h-full to fill parent */}
           
           {/* Left Column (2/3 width) - Product Selection / Registration Tabs */}
-          <div className="lg:col-span-2">
-            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'products' | 'register')}>
-                <TabsList className="grid w-full grid-cols-2 mb-4">
+          <div className="lg:col-span-2 h-full flex flex-col"> {/* Use flex-col to manage vertical space */}
+            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'products' | 'register')} className="flex flex-col flex-1 min-h-0">
+                <TabsList className="grid w-full grid-cols-2 mb-4 shrink-0">
                     <TabsTrigger value="products">
                         <Package className="h-4 w-4 mr-2" /> {t("pos_products_tab")}
                     </TabsTrigger>
@@ -420,7 +420,8 @@ const POSPage = () => {
                     </TabsTrigger>
                 </TabsList>
                 
-                <TabsContent value="products">
+                {/* Make content scrollable if needed */}
+                <TabsContent value="products" className="flex-1 min-h-0 overflow-y-auto pb-4">
                     <POSProductSelection
                       inventorySearchTerm={inventorySearchTerm}
                       setInventorySearchTerm={setInventorySearchTerm}
@@ -429,14 +430,14 @@ const POSPage = () => {
                     />
                 </TabsContent>
                 
-                <TabsContent value="register">
+                <TabsContent value="register" className="flex-1 min-h-0 overflow-y-auto pb-4">
                     <MemberRegistrationForm onSuccess={handleRegistrationSuccess} />
                 </TabsContent>
             </Tabs>
           </div>
 
           {/* Right Column (1/3 width) - Cart & Checkout */}
-          <div className="lg:col-span-1 flex flex-col space-y-6">
+          <div className="lg:col-span-1 flex flex-col space-y-4 h-full"> {/* Changed space-y-6 to space-y-4 */}
               <POSTransactionSummary />
               
               {/* Updated Check-In Scanner */}
@@ -448,6 +449,7 @@ const POSPage = () => {
                 onClearMember={handleClearMember}
               />
               
+              {/* Make this component take up remaining space */}
               <POSCartAndCheckout
                   cart={cart}
                   selectedMember={selectedMember}
@@ -465,6 +467,7 @@ const POSPage = () => {
                   total={total}
                   isProcessingSale={isProcessingSale}
                   onClearMember={handleClearMember}
+                  className="flex-1"
               />
           </div>
         </div>
