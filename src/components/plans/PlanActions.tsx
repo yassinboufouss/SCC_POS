@@ -58,7 +58,7 @@ const PlanActions: React.FC<PlanActionsProps> = ({ plan }) => {
       duration_days: values.duration_days,
       price: values.price,
       description: values.description,
-      giveaway_item_id: values.giveaway_item_id || null,
+      giveaway_item_id: values.giveaway_item_id === 'none' ? null : values.giveaway_item_id || null,
     };
     
     try {
@@ -170,14 +170,18 @@ const PlanActions: React.FC<PlanActionsProps> = ({ plan }) => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center gap-1"><Gift className="h-4 w-4 text-green-600" /> {t("free_giveaway_item")}</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value || ''} disabled={isLoadingInventory || !isOwner}>
+                      <Select 
+                          onValueChange={(value) => field.onChange(value === 'none' ? null : value)} 
+                          value={field.value || 'none'} 
+                          disabled={isLoadingInventory || !isOwner}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder={t("select_optional_item")} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">{t("no_giveaway")}</SelectItem>
+                          <SelectItem value="none">{t("no_giveaway")}</SelectItem>
                           {inventoryItems?.map(item => (
                             <SelectItem key={item.id} value={item.id}>
                               {item.name} ({item.stock} {t("in_stock")})
