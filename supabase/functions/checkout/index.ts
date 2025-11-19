@@ -177,6 +177,16 @@ serve(async (req) => {
     // 3. Server-Side Validation (Price, Stock, Canonical Data)
     const canonicalPrices = await validateAndFetchCanonicalData(cart);
     
+    // CRITICAL SECURITY CHECK: Check for manual price overrides by Cashiers
+    const hasManualPriceOverride = cart.some(item => 
+        !item.isGiveaway && 
+        Math.abs(item.price - item.originalPrice) > PRICE_TOLERANCE
+    );
+    
+    if (hasManualPriceOverride && userRole === 'cashier') {
+        throw new Error("Forbidden: Cashiers are not authorized to apply manual price overrides.");
+    }
+    
     // 4. Secure Calculation of Final Total
     const { total } = calculateSecureTotals(cart, discountPercent);
     
