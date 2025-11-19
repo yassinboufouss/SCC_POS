@@ -8,14 +8,10 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import POSReceipt from './POSReceipt';
 import { Transaction } from '@/types/supabase';
+import { SalesSummary } from '@/utils/transaction-utils';
 
 interface POSSalesSummaryDialogProps {
-  summary: {
-    dailyTotal: number;
-    weeklyTotal: number;
-    monthlyTotal: number;
-    dailyTransactions: Transaction[];
-  };
+  summary: SalesSummary;
   dailyBreakdowns: {
     count: number;
     paymentBreakdown: Record<string, number>;
@@ -116,7 +112,7 @@ const POSSalesSummaryDialog: React.FC<POSSalesSummaryDialogProps> = ({ summary, 
         <div className="p-6 max-h-[70vh] overflow-y-auto">
             <div ref={receiptRef}>
                 <POSReceipt 
-                    summary={summary} 
+                    summary={summary}
                     dailyBreakdowns={dailyBreakdowns} 
                     className="shadow-none border-0 p-0" // Remove extra styling for dialog display
                 />

@@ -18,6 +18,9 @@ export interface DashboardMetrics {
   recentTransactions: Transaction[];
   allTransactions: Transaction[]; // NEW: Expose all transactions for charting
   memberStatusDistribution: { active: number, expired: number, pending: number }; 
+  // NEW: Monthly Sales Breakdowns
+  monthlyInventorySales: number;
+  monthlyMembershipSales: number;
 }
 
 const fetchDashboardData = async (): Promise<{ profiles: Profile[], inventory: InventoryItem[], transactions: Transaction[] }> => {
@@ -74,8 +77,12 @@ const calculateMetrics = (profiles: Profile[], inventory: InventoryItem[], trans
     // FIX: Define activeMembers based on the processed list
     const activeMembers = processedProfiles.filter(p => p.status === 'Active');
 
-    // 2. Monthly Revenue (MTD)
-    const { monthlyTotal: monthlyRevenue } = calculateSalesSummary(transactions);
+    // 2. Monthly Revenue (MTD) and Sales Breakdowns
+    const { 
+        monthlyTotal: monthlyRevenue, 
+        monthlyInventorySales, 
+        monthlyMembershipSales 
+    } = calculateSalesSummary(transactions);
 
     // 3. Daily Check-ins
     const dailyCheckIns = profiles.filter(m => {
@@ -120,6 +127,8 @@ const calculateMetrics = (profiles: Profile[], inventory: InventoryItem[], trans
         recentTransactions,
         allTransactions: transactions, // Return the full list
         memberStatusDistribution: { active: activeCount, expired: expiredCount, pending: pendingCount },
+        monthlyInventorySales,
+        monthlyMembershipSales,
     };
 };
 

@@ -411,5 +411,9 @@ export const en = {
     "total_revenue": "Total Revenue",
     "period_totals": "Period Totals",
     "daily_breakdowns": "Daily Breakdowns",
+    "monthly_breakdowns": "Monthly Breakdowns",
+    "monthly_inventory_sales": "Inventory Sales (MTD)",
+    "monthly_membership_sales": "Membership Sales (MTD)",
+    "today": "Today",
   }
 };

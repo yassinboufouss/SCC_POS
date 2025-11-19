@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, Calendar, Clock, TrendingUp, History } from 'lucide-react';
+import { DollarSign, Calendar, Clock, TrendingUp, History, Package, Ticket } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { calculateSalesSummary } from '@/utils/transaction-utils';
 import { formatCurrency } from '@/utils/currency-utils';
@@ -15,7 +15,14 @@ const POSTransactionSummary: React.FC = () => {
   // Fetch all transactions (required for calculating daily/weekly/monthly totals)
   const { data: transactions, isLoading } = useTransactions();
   
-  const summary = transactions ? calculateSalesSummary(transactions) : { dailyTotal: 0, weeklyTotal: 0, monthlyTotal: 0, dailyTransactions: [] };
+  const summary = transactions ? calculateSalesSummary(transactions) : { 
+      dailyTotal: 0, 
+      weeklyTotal: 0, 
+      monthlyTotal: 0, 
+      dailyTransactions: [],
+      monthlyInventorySales: 0, // Default new fields
+      monthlyMembershipSales: 0, // Default new fields
+  };
 
   // Calculate daily breakdowns
   const dailyBreakdowns = useMemo(() => {
@@ -50,6 +57,21 @@ const POSTransactionSummary: React.FC = () => {
       value: formatCurrency(summary.monthlyTotal), 
       icon: TrendingUp, 
     },
+  ];
+  
+  const monthlyBreakdowns = [
+      {
+          title: t("monthly_inventory_sales"),
+          value: formatCurrency(summary.monthlyInventorySales),
+          icon: Package,
+          color: 'text-red-500',
+      },
+      {
+          title: t("monthly_membership_sales"),
+          value: formatCurrency(summary.monthlyMembershipSales),
+          icon: Ticket,
+          color: 'text-blue-500',
+      }
   ];
 
   return (
@@ -89,7 +111,28 @@ const POSTransactionSummary: React.FC = () => {
         
         <Separator className="my-4" />
         
-        {/* 2. Period Totals (Weekly/Monthly) */}
+        {/* 2. Monthly Breakdowns */}
+        <div className="space-y-3">
+            <h4 className="font-semibold text-sm text-muted-foreground">{t("monthly_breakdowns")}</h4>
+            {isLoading ? (
+                <div className="space-y-2">
+                    {[...Array(2)].map((_, i) => <Skeleton key={i} className="h-8 w-full" />)}
+                </div>
+            ) : (
+                monthlyBreakdowns.map((metric) => (
+                    <div key={metric.title} className="flex justify-between text-sm">
+                        <span className={`flex items-center gap-1 ${metric.color}`}>
+                            <metric.icon className="h-4 w-4" /> {metric.title}
+                        </span>
+                        <span className="font-bold">{metric.value}</span>
+                    </div>
+                ))
+            )}
+        </div>
+        
+        <Separator className="my-4" />
+        
+        {/* 3. Period Totals (Weekly/Monthly) */}
         <div className="space-y-3">
             <h4 className="font-semibold text-sm text-muted-foreground">{t("period_totals")}</h4>
             {isLoading ? (
@@ -108,7 +151,7 @@ const POSTransactionSummary: React.FC = () => {
             )}
         </div>
         
-        {/* 3. Daily Breakdowns (Payment & Type) */}
+        {/* 4. Daily Breakdowns (Payment & Type) */}
         {!isLoading && dailyBreakdowns.count > 0 && (
             <div className="mt-4 pt-4 border-t space-y-3">
                 <h5 className="font-semibold text-sm text-muted-foreground">{t("daily_breakdowns")}</h5>

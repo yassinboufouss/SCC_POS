@@ -411,5 +411,9 @@ export const fr = {
     "total_revenue": "إجمالي الإيرادات",
     "period_totals": "إجماليات الفترة",
     "daily_breakdowns": "التفاصيل اليومية",
+    "monthly_breakdowns": "التفاصيل الشهرية",
+    "monthly_inventory_sales": "مبيعات المخزون (شهريًا)",
+    "monthly_membership_sales": "مبيعات العضوية (شهريًا)",
+    "today": "اليوم",
   }
 };

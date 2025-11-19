@@ -89,6 +89,8 @@ export interface SalesSummary {
     weeklyTotal: number;
     monthlyTotal: number;
     dailyTransactions: Transaction[];
+    monthlyInventorySales: number;
+    monthlyMembershipSales: number;
 }
 
 // Utility to calculate sales summary from a list of transactions
@@ -101,12 +103,60 @@ export const calculateSalesSummary = (transactions: Transaction[]): SalesSummary
     const dailyTotal = dailyTransactions.reduce((sum, tx) => sum + tx.amount, 0);
     const weeklyTotal = weeklyTransactions.reduce((sum, tx) => sum + tx.amount, 0);
     const monthlyTotal = monthlyTransactions.reduce((sum, tx) => sum + tx.amount, 0);
+    
+    // NEW: Calculate monthly breakdowns by item type
+    let monthlyInventorySales = 0;
+    let monthlyMembershipSales = 0;
+    
+    monthlyTransactions.forEach(tx => {
+        if (tx.items_data) {
+            // Calculate the raw subtotal for the transaction (excluding giveaways, which have price 0)
+            const payableItems = tx.items_data.filter(item => !item.isGiveaway && item.price > 0);
+            const rawTxSubtotal = payableItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+            
+            // If the transaction amount is 0 (e.g., pure giveaway sale), skip proportional calculation.
+            if (rawTxSubtotal === 0) {
+                return;
+            }
+            
+            // Distribute the final transaction amount (tx.amount) proportionally
+            payableItems.forEach(item => {
+                const itemRawValue = item.price * item.quantity;
+                // Proportional revenue calculation: (Item's raw value / Total raw subtotal) * Final transaction amount
+                const proportionalRevenue = (itemRawValue / rawTxSubtotal) * tx.amount;
+                
+                if (item.type === 'membership') {
+                    monthlyMembershipSales += proportionalRevenue;
+                } else if (item.type === 'inventory') {
+                    monthlyInventorySales += proportionalRevenue;
+                }
+            });
+        } else {
+            // Fallback for transactions without items_data (less accurate)
+            if (tx.type === 'Membership') {
+                monthlyMembershipSales += tx.amount;
+            } else if (tx.type === 'POS Sale') {
+                monthlyInventorySales += tx.amount;
+            } else if (tx.type === 'Mixed Sale') {
+                // Split 50/50 as a guess for mixed sales without detailed data
+                monthlyMembershipSales += tx.amount / 2;
+                monthlyInventorySales += tx.amount / 2;
+            }
+        }
+    });
+    
+    // Round to 2 decimal places
+    monthlyInventorySales = parseFloat(monthlyInventorySales.toFixed(2));
+    monthlyMembershipSales = parseFloat(monthlyMembershipSales.toFixed(2));
+
 
     return {
         dailyTotal,
         weeklyTotal,
         monthlyTotal,
         dailyTransactions, // Return the list
+        monthlyInventorySales,
+        monthlyMembershipSales,
     };
 };
 

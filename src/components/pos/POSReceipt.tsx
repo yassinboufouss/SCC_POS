@@ -12,6 +12,8 @@ interface POSReceiptProps {
     weeklyTotal: number;
     monthlyTotal: number;
     dailyTransactions: Transaction[];
+    monthlyInventorySales: number; // NEW
+    monthlyMembershipSales: number; // NEW
   };
   dailyBreakdowns: {
     count: number;
@@ -43,7 +45,7 @@ const POSReceipt: React.FC<POSReceiptProps> = ({ summary, dailyBreakdowns, class
         <h2 className="text-lg font-bold mb-2">{t("sales_summary")}</h2>
         
         <div className="flex justify-between text-xl font-extrabold pt-2 border-t border-dashed">
-          <span>{t("total_revenue")}</span>
+          <span>{t("total_revenue")} ({t("today")})</span>
           <span className="text-green-600">{formatCurrency(summary.dailyTotal)}</span>
         </div>
         
@@ -52,6 +54,27 @@ const POSReceipt: React.FC<POSReceiptProps> = ({ summary, dailyBreakdowns, class
           <span className="font-bold">{dailyBreakdowns.count}</span>
         </div>
       </div>
+      
+      {/* 1.5 Monthly Breakdowns */}
+      <div className="space-y-2 mb-6 border-b pb-4">
+        <h2 className="text-lg font-bold mb-2">{t("monthly_breakdowns")}</h2>
+        
+        <div className="flex justify-between text-sm">
+          <span className="font-medium text-gray-600">{t("monthly_inventory_sales")}</span>
+          <span className="font-bold">{formatCurrency(summary.monthlyInventorySales)}</span>
+        </div>
+        
+        <div className="flex justify-between text-sm">
+          <span className="font-medium text-gray-600">{t("monthly_membership_sales")}</span>
+          <span className="font-bold">{formatCurrency(summary.monthlyMembershipSales)}</span>
+        </div>
+        
+        <div className="flex justify-between text-sm font-bold border-t pt-2 border-dashed">
+          <span className="text-gray-700">{t("total_revenue")} ({t("this_month")})</span>
+          <span className="text-gray-900">{formatCurrency(summary.monthlyTotal)}</span>
+        </div>
+      </div>
+
 
       {/* 2. Detailed Breakdowns (Payment/Type) */}
       {dailyBreakdowns.count > 0 && (
