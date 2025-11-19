@@ -3,26 +3,16 @@ import { Profile } from '@/types/supabase';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { User, Mail, Phone, Calendar, Clock, DollarSign, Edit, RefreshCw, History, Save, QrCode } from 'lucide-react';
+import { User, Edit } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import MemberRenewalForm from './MemberRenewalForm';
-import MemberStatusActions from './MemberStatusActions';
-import MemberDetailsCard from './MemberDetailsCard';
-import MemberBasicInfoForm from './MemberBasicInfoForm';
-import MemberTransactionHistory from './MemberTransactionHistory';
-import MemberCheckInButton from './MemberCheckInButton';
 import { useMember } from '@/integrations/supabase/data/use-members.ts';
 import { useMemberTransactions } from '@/integrations/supabase/data/use-transactions.ts';
-import { showSuccess, showError } from '@/utils/toast';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { formatCurrency } from '@/utils/currency-utils';
 import { Skeleton } from '@/components/ui/skeleton';
-import { format } from 'date-fns';
-import { useUserRole } from '@/hooks/use-user-role'; // Import useUserRole
+import { useUserRole } from '@/hooks/use-user-role';
+import MemberProfileTab from './MemberProfileTab'; // NEW
+import MemberRenewalTab from './MemberRenewalTab'; // NEW
+import MemberHistoryTab from './MemberHistoryTab'; // NEW
 
 interface MemberProfileDialogProps {
   member: Profile; // Initial member data from the list
@@ -41,8 +31,7 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member, canEd
   const setIsDialogOpen = isControlled ? setExternalOpen : setInternalOpen;
   
   const [activeTab, setActiveTab] = useState('profile'); 
-  const [isEditing, setIsEditing] = useState(false);
-  const { isOwner, isStaff } = useUserRole(); // Use role hook to determine renewal/check-in access
+  const { isOwner, isStaff } = useUserRole(); 
   
   // Fetch the freshest member data when the dialog is open
   const { data: currentMember, isLoading: isLoadingMember } = useMember(member.id);
@@ -52,32 +41,27 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member, canEd
 
   const { data: transactions, isLoading: isLoadingTransactions } = useMemberTransactions(displayMember.id);
 
-  const handleOpenChange = (open: boolean) => {
-      setIsDialogOpen(open);
-      if (open) {
-          // If membership is inactive, default to the renewal tab
-          if (displayMember.status !== 'Active') {
-              setActiveTab('renewal');
-          } else {
-              setActiveTab('profile');
-          }
-      } else {
-          // Reset tab and editing state when closing
-          setActiveTab('profile');
-          setIsEditing(false);
-      }
-  };
-
-  const handleSaveBasicDetailsSuccess = () => {
-      setIsEditing(false);
-  };
-  
   // Staff (and Owner) should be able to renew members
   const canRenew = isOwner || isStaff; 
   // Staff (and Owner) should be able to check members in
   const canCheckIn = isOwner || isStaff; 
   // Only Owner can perform status actions (Freeze/Cancel)
   const canChangeStatus = isOwner; 
+  
+  const handleOpenChange = (open: boolean) => {
+      setIsDialogOpen(open);
+      if (open) {
+          // If membership is inactive, default to the renewal tab
+          if (displayMember.status !== 'Active' && canRenew) {
+              setActiveTab('renewal');
+          } else {
+              setActiveTab('profile');
+          }
+      } else {
+          // Reset tab state when closing
+          setActiveTab('profile');
+      }
+  };
   
   const getRoleVariant = (role: Profile['role']) => {
     switch (role) {
@@ -141,90 +125,30 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member, canEd
             <TabsTrigger value="history">{t("activity_history")}</TabsTrigger>
           </TabsList>
           
-          {/* Profile Tab */}
-          <TabsContent value="profile" className="space-y-4 mt-4">
-            <Card className="shadow-sm">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-lg">{t("contact_information")}</CardTitle>
-                <Button variant="ghost" size="sm" onClick={() => setIsEditing(!isEditing)} disabled={!canEdit}>
-                    <Edit className="h-4 w-4 mr-2" /> {isEditing ? t("close") : t("edit_item_details")}
-                </Button>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {isEditing ? (
-                    <MemberBasicInfoForm member={displayMember} onSuccess={handleSaveBasicDetailsSuccess} canEdit={canEdit} />
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                        <p className="flex items-center gap-2"><User className="h-4 w-4 text-muted-foreground" /> {displayMember.first_name} {displayMember.last_name}</p>
-                        <p className="flex items-center gap-2"><Mail className="h-4 w-4 text-muted-foreground" /> {displayMember.email || 'N/A'}</p>
-                        <p className="flex items-center gap-2"><Phone className="h-4 w-4 text-muted-foreground" /> {displayMember.phone || 'N/A'}</p>
-                        <p className="flex items-center gap-2"><Calendar className="h-4 w-4 text-muted-foreground" /> {displayMember.dob || 'N/A'}</p>
-                        <p className="flex items-center gap-2"><QrCode className="h-4 w-4 text-muted-foreground" /> {t("member_code")}: <span className="font-medium">{displayMember.member_code || 'N/A'}</span></p>
-                    </div>
-                )}
-              </CardContent>
-            </Card>
-            
-            <MemberDetailsCard 
-                member={displayMember} 
-                onRenewClick={() => setActiveTab('renewal')} 
-                canRenew={canRenew} // Pass canRenew to disable the button inside
+          {/* Profile Tab Content */}
+          <TabsContent value="profile" className="mt-4">
+            <MemberProfileTab 
+                member={displayMember}
+                canEdit={canEdit}
+                canRenew={canRenew}
+                canCheckIn={canCheckIn}
+                canChangeStatus={canChangeStatus}
+                onRenewClick={() => setActiveTab('renewal')}
             />
-            
-            {canCheckIn && <MemberCheckInButton member={displayMember} onCheckInSuccess={(updatedMember) => { /* No need to update local state here, handled by query invalidation */ }} />}
-            
-            {canChangeStatus && <MemberStatusActions member={displayMember} />}
           </TabsContent>
           
-          {/* Renewal Tab */}
+          {/* Renewal Tab Content */}
           <TabsContent value="renewal" className="mt-4">
-            <Card className="shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-lg">{t("renew_membership_for", { name: `${displayMember.first_name} ${displayMember.last_name}` })}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <MemberRenewalForm member={displayMember} canRenew={canRenew} />
-              </CardContent>
-            </Card>
+            <MemberRenewalTab member={displayMember} canRenew={canRenew} />
           </TabsContent>
           
-          {/* History Tab */}
+          {/* History Tab Content */}
           <TabsContent value="history" className="mt-4">
-            <Card className="shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                    <History className="h-5 w-5" /> {t("activity_history")}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                    {/* Check-in Metrics */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <Card className="p-3 text-center shadow-sm">
-                            <p className="text-xs text-muted-foreground">{t("total_check_ins")}</p>
-                            <p className="text-2xl font-bold text-primary">{displayMember.total_check_ins || 0}</p>
-                        </Card>
-                        <Card className="p-3 text-center md:col-span-3 shadow-sm">
-                            <p className="text-xs text-muted-foreground">{t("last_check_in")}</p>
-                            <p className="text-lg font-bold text-primary mt-1">
-                                {displayMember.last_check_in ? format(new Date(displayMember.last_check_in), 'yyyy-MM-dd hh:mm a') : 'N/A'}
-                            </p>
-                        </Card>
-                    </div>
-                    
-                    <Separator className="my-2" />
-                    
-                    {/* Transaction History Table */}
-                    <h4 className="font-semibold text-lg flex items-center gap-2">
-                        <DollarSign className="h-4 w-4" /> {t("transaction_history", { count: transactions?.length || 0 })}
-                    </h4>
-                    <MemberTransactionHistory 
-                        transactions={transactions || []} 
-                        isLoading={isLoadingTransactions} 
-                    />
-                </div>
-              </CardContent>
-            </Card>
+            <MemberHistoryTab 
+                member={displayMember} 
+                transactions={transactions} 
+                isLoadingTransactions={isLoadingTransactions} 
+            />
           </TabsContent>
         </Tabs>
       </DialogContent>
