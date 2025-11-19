@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DollarSign, Printer, Calendar, Clock, TrendingUp } from 'lucide-react';
@@ -17,7 +17,29 @@ const POSTransactionSummary: React.FC = () => {
   
   const { data: transactions, isLoading } = useTransactions();
   
-  const summary = transactions ? calculateSalesSummary(transactions) : { dailyTotal: 0, weeklyTotal: 0, monthlyTotal: 0 };
+  const summary = transactions ? calculateSalesSummary(transactions) : { dailyTotal: 0, weeklyTotal: 0, monthlyTotal: 0, dailyTransactions: [] };
+
+  // NEW: Calculate daily breakdowns
+  const dailyBreakdowns = useMemo(() => {
+      const paymentBreakdown: Record<string, number> = {};
+      const typeBreakdown: Record<string, number> = {};
+      
+      summary.dailyTransactions.forEach(tx => {
+          // Payment Method Breakdown
+          const method = tx.payment_method;
+          paymentBreakdown[method] = (paymentBreakdown[method] || 0) + tx.amount;
+          
+          // Transaction Type Breakdown
+          const type = tx.type;
+          typeBreakdown[type] = (typeBreakdown[type] || 0) + tx.amount;
+      });
+      
+      return {
+          count: summary.dailyTransactions.length,
+          paymentBreakdown,
+          typeBreakdown,
+      };
+  }, [summary.dailyTransactions]);
 
   const handlePrint = async () => {
     if (!summaryRef.current) {
@@ -91,6 +113,13 @@ const POSTransactionSummary: React.FC = () => {
         {/* Content to be captured by PDF generator */}
         <div ref={summaryRef} className="p-2"> 
             <h4 className="text-lg font-bold mb-3">{t("sales_summary")} - {t("today_so_far")}</h4>
+            
+            {/* NEW: Daily Transaction Count */}
+            <div className="mb-4 p-2 border rounded-md bg-secondary/50 text-center">
+                <p className="text-xs font-medium text-muted-foreground">{t("daily_transaction_count")}</p>
+                <p className="text-xl font-bold mt-0.5 text-primary">{dailyBreakdowns.count}</p>
+            </div>
+            
             {isLoading ? (
                 <div className="grid grid-cols-3 gap-3">
                     {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-16 w-full" />)}
@@ -106,6 +135,34 @@ const POSTransactionSummary: React.FC = () => {
                   ))}
                 </div>
             )}
+            
+            {/* NEW: Detailed Breakdowns (Daily) */}
+            {!isLoading && dailyBreakdowns.count > 0 && (
+                <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Payment Breakdown */}
+                    <div className="space-y-2 p-3 border rounded-md">
+                        <h5 className="font-semibold text-sm border-b pb-1">{t("payment_method_breakdown")}</h5>
+                        {Object.entries(dailyBreakdowns.paymentBreakdown).map(([method, total]) => (
+                            <div key={method} className="flex justify-between text-sm">
+                                <span>{t(method.toLowerCase())}</span>
+                                <span className="font-medium">{formatCurrency(total)}</span>
+                            </div>
+                        ))}
+                    </div>
+                    
+                    {/* Type Breakdown */}
+                    <div className="space-y-2 p-3 border rounded-md">
+                        <h5 className="font-semibold text-sm border-b pb-1">{t("transaction_type_breakdown")}</h5>
+                        {Object.entries(dailyBreakdowns.typeBreakdown).map(([type, total]) => (
+                            <div key={type} className="flex justify-between text-sm">
+                                <span>{t(type.replace(/\s/g, '_').toLowerCase())}</span>
+                                <span className="font-medium">{formatCurrency(total)}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+            
         </div>
       </CardContent>
     </Card>

@@ -88,6 +88,7 @@ export interface SalesSummary {
     dailyTotal: number;
     weeklyTotal: number;
     monthlyTotal: number;
+    dailyTransactions: Transaction[];
 }
 
 // Utility to calculate sales summary from a list of transactions
@@ -105,6 +106,7 @@ export const calculateSalesSummary = (transactions: Transaction[]): SalesSummary
         dailyTotal,
         weeklyTotal,
         monthlyTotal,
+        dailyTransactions, // Return the list
     };
 };
 

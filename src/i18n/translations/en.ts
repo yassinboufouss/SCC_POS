@@ -394,5 +394,10 @@ export const en = {
     
     // NEW Video Fallback
     "video_not_supported": "Your browser does not support the video tag.",
+    
+    // NEW Sales Summary Details
+    "daily_transaction_count": "Daily Transaction Count",
+    "payment_method_breakdown": "Payment Method Breakdown (Daily)",
+    "transaction_type_breakdown": "Transaction Type Breakdown (Daily)",
   }
 };

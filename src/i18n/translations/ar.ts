@@ -394,5 +394,10 @@ export const ar = {
     
     // NEW Video Fallback
     "video_not_supported": "متصفحك لا يدعم علامة الفيديو.",
+    
+    // NEW Sales Summary Details
+    "daily_transaction_count": "عدد المعاملات اليومية",
+    "payment_method_breakdown": "توزيع طريقة الدفع (يومي)",
+    "transaction_type_breakdown": "توزيع نوع المعاملة (يومي)",
   }
 };

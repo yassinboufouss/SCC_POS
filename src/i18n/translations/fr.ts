@@ -394,5 +394,10 @@ export const fr = {
     
     // NEW Video Fallback
     "video_not_supported": "Votre navigateur ne supporte pas la balise vidéo.",
+    
+    // NEW Sales Summary Details
+    "daily_transaction_count": "Nombre de Transactions Quotidiennes",
+    "payment_method_breakdown": "Répartition par Mode de Paiement (Quotidien)",
+    "transaction_type_breakdown": "Répartition par Type de Transaction (Quotidien)",
   }
 };
