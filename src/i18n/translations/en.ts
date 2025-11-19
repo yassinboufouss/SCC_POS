@@ -1,6 +1,6 @@
 export const en = {
   translation: {
-    "app_title": "FitFlow POS",
+    "app_title": "SCC POS",
     "dashboard": "Dashboard",
     "members": "Members",
     "check_in": "Check-In",

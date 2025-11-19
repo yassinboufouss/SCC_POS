@@ -1,6 +1,6 @@
 export const ar = {
   translation: {
-    "app_title": "FitFlow POS",
+    "app_title": "SCC POS",
     "dashboard": "لوحة القيادة",
     "members": "الأعضاء",
     "check_in": "تسجيل الدخول",
