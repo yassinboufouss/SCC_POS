@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useTranslation } from 'react-i18next';
-import { Mail } from 'lucide-react';
+import { Chrome } from 'lucide-react'; // Changed from Mail
 import { showError } from '@/utils/toast';
 
 const SocialAuthButtons: React.FC = () => {
@@ -33,7 +33,7 @@ const SocialAuthButtons: React.FC = () => {
         className="w-full h-12 text-base font-medium rounded-xl border-[#E5E7EB] dark:border-muted-foreground/50"
         onClick={handleGoogleSignIn}
       >
-        <Mail className="h-5 w-5 mr-3 text-red-500" /> 
+        <Chrome className="h-5 w-5 mr-3 text-red-500" /> 
         {t("continue_with_google")}
       </Button>
     </div>
