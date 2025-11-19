@@ -2,23 +2,23 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useTranslation } from 'react-i18next';
-import { Github, Mail } from 'lucide-react';
+import { Mail } from 'lucide-react';
 import { showError } from '@/utils/toast';
 
 const SocialAuthButtons: React.FC = () => {
   const { t } = useTranslation();
 
-  const handleOAuthSignIn = async (provider: 'google' | 'github') => {
+  const handleGoogleSignIn = async () => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
-        provider,
+        provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/dashboard`, // Redirect to dashboard after successful login
         },
       });
 
       if (error) {
-        console.error(`OAuth sign in failed for ${provider}:`, error);
+        console.error(`OAuth sign in failed for Google:`, error);
         showError(t("login_failed_error", { error: error.message }));
       }
     } catch (error) {
@@ -31,20 +31,10 @@ const SocialAuthButtons: React.FC = () => {
       <Button 
         variant="outline" 
         className="w-full h-12 text-base font-medium rounded-xl border-[#E5E7EB] dark:border-muted-foreground/50"
-        onClick={() => handleOAuthSignIn('google')}
+        onClick={handleGoogleSignIn}
       >
-        {/* Using Mail icon as a placeholder for Google */}
         <Mail className="h-5 w-5 mr-3 text-red-500" /> 
         {t("continue_with_google")}
-      </Button>
-      
-      <Button 
-        variant="outline" 
-        className="w-full h-12 text-base font-medium rounded-xl border-[#E5E7EB] dark:border-muted-foreground/50"
-        onClick={() => handleOAuthSignIn('github')}
-      >
-        <Github className="h-5 w-5 mr-3" />
-        {t("continue_with_github")}
       </Button>
     </div>
   );
