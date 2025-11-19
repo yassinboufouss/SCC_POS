@@ -11,6 +11,7 @@ import { useDashboardMetrics } from '@/integrations/supabase/data/use-dashboard-
 import { formatCurrency } from '@/utils/currency-utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { aggregateMonthlySales } from '@/utils/transaction-utils';
+import { cn } from '@/lib/utils'; // Import cn utility
 
 const DashboardPage: React.FC = () => {
   const { t } = useTranslation();
@@ -44,19 +45,21 @@ const DashboardPage: React.FC = () => {
   const monthlySalesData = currentMetrics.allTransactions ? aggregateMonthlySales(currentMetrics.allTransactions) : [];
 
 
-  const renderMetricCard = (titleKey: string, value: React.ReactNode, icon: LucideIcon, descriptionKey: string, isAlert = false) => (
-    <DashboardMetricCard
-      title={t(titleKey)}
-      value={isLoading ? <Skeleton className="h-8 w-20" /> : value}
-      icon={icon}
-      description={t(descriptionKey)}
-      className={isAlert && currentMetrics.lowStockCount > 0 ? "border-red-500 shadow-md" : ""}
-    />
+  const renderMetricCard = (titleKey: string, value: React.ReactNode, icon: LucideIcon, descriptionKey: string, isAlert = false, delay: number) => (
+    <div className={cn("animate-fade-in-up")} style={{ animationDelay: `${delay * 100}ms` }}>
+        <DashboardMetricCard
+          title={t(titleKey)}
+          value={isLoading ? <Skeleton className="h-8 w-20" /> : value}
+          icon={icon}
+          description={t(descriptionKey)}
+          className={isAlert && currentMetrics.lowStockCount > 0 ? "border-red-500 shadow-md" : ""}
+        />
+    </div>
   );
 
   return (
     <Layout>
-      <div className="p-4 lg:p-6 space-y-6">
+      <div className="p-4 lg:p-6 space-y-8"> {/* Increased vertical spacing */}
         <h1 className="text-3xl font-bold">{t("dashboard")}</h1>
         
         {/* Metric Cards */}
@@ -65,26 +68,33 @@ const DashboardPage: React.FC = () => {
             "total_active_memberships",
             currentMetrics.totalActiveMembers,
             Users,
-            "today_so_far"
+            "current_status",
+            false,
+            0
           )}
           {renderMetricCard(
             "total_revenue_mtd",
             formatCurrency(currentMetrics.monthlyRevenue),
             DollarSign,
-            "this_months_sales"
+            "this_months_sales",
+            false,
+            1
           )}
           {renderMetricCard(
             "daily_checkins",
             currentMetrics.dailyCheckIns,
             QrCode,
-            "today_so_far"
+            "today_so_far",
+            false,
+            2
           )}
           {renderMetricCard(
             "low_stock_items",
             currentMetrics.lowStockCount,
             Package,
             "needs_reordering",
-            true
+            true,
+            3
           )}
         </div>
         
