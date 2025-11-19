@@ -1,9 +1,12 @@
+/// <reference types="https://deno.land/std@0.190.0/http/server.ts" />
+/// <reference types="https://esm.sh/@supabase/supabase-js@2.45.0" />
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 
 // Define types for the request body (must match client payload)
 interface CartItemPayload {
     sourceId: string;
+    name: string; // Added name property
     quantity: number;
     type: 'inventory' | 'membership';
     price: number; // Price paid (for discount tracking)
@@ -191,11 +194,11 @@ serve(async (req) => {
     const { total } = calculateSecureTotals(cart, discountPercent);
     
     // 5. Fetch Member Details (if applicable)
-    let memberProfile: { id: string, member_code: string | null, first_name: string | null, last_name: string | null } | null = null;
+    let memberProfile: { id: string, member_code: string | null, first_name: string | null, last_name: string | null, role: string | null } | null = null;
     if (memberId) {
         const { data: memberData, error: memberError } = await supabaseAdmin
             .from('profiles')
-            .select('id, member_code, first_name, last_name')
+            .select('id, member_code, first_name, last_name, role') // Fetch role
             .eq('id', memberId)
             .single();
             
@@ -208,10 +211,21 @@ serve(async (req) => {
     const finalMemberId = memberProfile?.member_code || memberProfile?.id || 'GUEST';
     const finalMemberName = memberProfile ? `${memberProfile.first_name} ${memberProfile.last_name}` : 'Guest Customer';
     
-    // 6. Transaction Type and Description
+    // 7. Transaction Type and Description (Moved up for scope fix)
     const hasMembership = cart.some(item => item.type === 'membership');
     const hasInventory = cart.some(item => item.type === 'inventory');
     
+    // 6. CRITICAL SECURITY CHECK: Authorization for Renewal Target
+    if (memberProfile && hasMembership && !isInitialRegistration) {
+        const targetRole = memberProfile.role;
+        const isTargetStaff = targetRole === 'owner' || targetRole === 'manager' || targetRole === 'cashier';
+        
+        if (isTargetStaff && userRole !== 'owner') {
+            throw new Error(`Forbidden: Only the Owner can renew staff memberships (Target role: ${targetRole}).`);
+        }
+    }
+    
+    // 7. Transaction Type and Description (Rest of logic)
     let transactionType: 'Membership' | 'POS Sale' | 'Mixed Sale';
     if (hasMembership && hasInventory) {
         transactionType = 'Mixed Sale';
@@ -223,7 +237,7 @@ serve(async (req) => {
     
     const itemDescription = cart.map(item => `${item.name} x${item.quantity}`).join(', ');
     
-    // 7. Perform Inventory Stock Reduction (using RPC for safety)
+    // 8. Perform Inventory Stock Reduction (using RPC for safety)
     const inventoryItemsToReduce = cart.filter(item => item.type === 'inventory' && item.quantity > 0 && canonicalPrices.get(item.sourceId)?.stock !== undefined);
     
     await Promise.all(inventoryItemsToReduce.map(async item => {
@@ -238,7 +252,7 @@ serve(async (req) => {
         }
     }));
     
-    // 8. Perform Membership Renewal (if applicable and not initial registration)
+    // 9. Perform Membership Renewal (if applicable and not initial registration)
     if (memberProfile && hasMembership && !isInitialRegistration) {
         const membershipItems = cart.filter(item => item.type === 'membership');
         
@@ -259,7 +273,7 @@ serve(async (req) => {
         }
     }
     
-    // 9. Record Transaction
+    // 10. Record Transaction
     const transactionRecord = {
         member_id: finalMemberId,
         member_name: finalMemberName,
@@ -282,7 +296,7 @@ serve(async (req) => {
         throw new Error("Failed to record final transaction.");
     }
 
-    // 10. Success Response
+    // 11. Success Response
     return new Response(JSON.stringify({ 
         transactionId: txData.id, 
         total: total,
