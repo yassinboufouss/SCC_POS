@@ -51,7 +51,7 @@ const POSSalesSummaryDialog: React.FC<POSSalesSummaryDialogProps> = ({ summary, 
         const pdf = new jsPDF({
             orientation: 'portrait',
             unit: 'mm',
-            format: 'a4',
+            format: 'a3', // Changed from 'a4' to 'a3'
         });
 
         const imgProps = pdf.getImageProperties(imgData);
