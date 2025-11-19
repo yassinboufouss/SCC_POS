@@ -6,7 +6,7 @@ import { useSession } from '@/components/auth/SessionContextProvider';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Dumbbell, LogIn } from 'lucide-react';
+import { Dumbbell } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { cn } from '@/lib/utils';
@@ -39,10 +39,10 @@ const LoginPage: React.FC = () => {
       )}
       style={{ backgroundImage: "url('/gym-background.jpg')" }}
     >
-      {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+      {/* Dark Overlay (Removed blur for cleaner look) */}
+      <div className="absolute inset-0 bg-black/70"></div>
       
-      <Card className="w-full max-w-md z-10 shadow-2xl border-primary/20 bg-card/95 backdrop-blur-sm">
+      <Card className="w-full max-w-md z-10 shadow-2xl border-primary/20 bg-card/90">
         <CardHeader className="text-center pt-8 pb-4">
           <CardTitle className="text-4xl font-extrabold flex items-center justify-center gap-3 text-primary animate-fade-in-up">
             <Dumbbell className="h-8 w-8" /> {t("app_title")}
