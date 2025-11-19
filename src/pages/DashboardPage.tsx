@@ -104,8 +104,8 @@ const DashboardPage: React.FC = () => {
             {/* Chart Column (2/3 width) */}
             <MonthlySalesChart data={monthlySalesData} isLoading={isLoading} />
             
-            {/* Alerts Column (1/3 width) */}
-            <div className="lg:col-span-1 space-y-6">
+            {/* Alerts Column (1/3 width) - Set fixed height and use flex to distribute space */}
+            <div className="lg:col-span-1 h-[400px] flex flex-col justify-between space-y-4">
                 <ExpiringMemberships members={currentMetrics.expiringMemberships} isLoading={isLoading} />
                 <LowStockAlerts items={currentMetrics.lowStockItems} isLoading={isLoading} />
             </div>

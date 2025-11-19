@@ -28,17 +28,17 @@ const MonthlySalesChart: React.FC<MonthlySalesChartProps> = ({ data, isLoading }
   const { t } = useTranslation();
 
   return (
-    <Card className="lg:col-span-2">
+    <Card className="lg:col-span-2 h-[400px] flex flex-col">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
           <TrendingUp className="h-5 w-5 text-blue-500" /> {t("monthly_revenue_trend")}
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex-1">
         {isLoading ? (
-            <Skeleton className="h-[300px] w-full" />
+            <Skeleton className="h-full w-full" />
         ) : (
-            <div className="h-[300px] w-full">
+            <div className="h-full w-full">
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={data} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted))" />
