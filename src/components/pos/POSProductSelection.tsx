@@ -83,7 +83,8 @@ const POSProductSelection: React.FC<POSProductSelectionProps> = ({
                 {[...Array(8)].map((_, i) => <Skeleton key={i} className="h-40 w-full" />)}
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-y-auto pr-2">
+            // Added max-h-[60vh] to ensure the inventory list scrolls independently if it gets too long
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-[60vh] overflow-y-auto pr-2">
               {inventoryItems?.map((item) => (
                 <div 
                   key={item.id} 
