@@ -302,7 +302,8 @@ export const usePOSCart = () => {
         const result: CheckoutResponse | { error: string } = await response.json();
 
         if (!response.ok || isErrorResponse(result)) {
-            throw new Error(result.error || t("checkout_failed"));
+            const errorMessage = isErrorResponse(result) ? result.error : t("checkout_failed");
+            throw new Error(errorMessage);
         }
 
         // 1. Invalidate relevant queries after successful server-side processing
