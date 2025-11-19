@@ -38,12 +38,23 @@ export type InventoryItem = {
   created_at: string | null;
 };
 
+// NEW: Structured data for items in a transaction
+export type TransactionItemData = {
+    sourceId: string; // Inventory ID or Plan ID
+    name: string;
+    quantity: number;
+    price: number; // Price paid per unit
+    type: 'inventory' | 'membership';
+    isGiveaway?: boolean;
+};
+
 export type Transaction = {
   id: string; // UUID
   member_id: string; // 'GUEST' or member_code
   member_name: string;
   type: 'Membership' | 'POS Sale' | 'Mixed Sale';
-  item_description: string | null;
+  item_description: string | null; // Legacy/Display field
+  items_data: TransactionItemData[] | null; // NEW: Structured data for reversal
   amount: number;
   payment_method: 'Card' | 'Cash' | 'Transfer';
   transaction_date: string | null; // Date string

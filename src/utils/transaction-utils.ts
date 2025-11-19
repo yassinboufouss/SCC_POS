@@ -1,10 +1,10 @@
-import { Transaction } from "@/types/supabase";
+import { Transaction, TransactionItemData } from "@/types/supabase";
 import { supabase } from "@/integrations/supabase/client";
 import { format, isToday, isThisWeek, isThisMonth, parseISO, startOfMonth, subMonths } from "date-fns";
 import { incrementInventoryStock } from "./inventory-utils"; // Import stock increment utility
 
 // Utility to simulate adding a new transaction
-export const addTransaction = async (newTransaction: Omit<Transaction, 'id' | 'created_at' | 'transaction_date'>): Promise<Transaction | null> => {
+export const addTransaction = async (newTransaction: Omit<Transaction, 'id' | 'created_at' | 'transaction_date' | 'items_data'> & { items_data: TransactionItemData[] }): Promise<Transaction | null> => {
     const transactionData = {
         ...newTransaction,
         transaction_date: format(new Date(), 'yyyy-MM-dd'), // Ensure date is current
@@ -29,7 +29,7 @@ export const getTransactionsByMemberId = async (memberId: string): Promise<Trans
         .from('transactions')
         .select('*')
         .eq('member_id', memberId)
-        .order('transaction_date', { ascending: false });
+        .order('created_at', { ascending: false });
 
     if (error) {
         console.error("Supabase getTransactionsByMemberId error:", error);
@@ -38,37 +38,14 @@ export const getTransactionsByMemberId = async (memberId: string): Promise<Trans
     return data || [];
 };
 
-// Helper to parse item description (Name x Quantity)
-const parseInventoryItemsFromDescription = (description: string): { name: string, quantity: number }[] => {
-    if (!description) return [];
-    const items = description.split(',').map(item => item.trim());
-    const inventoryItems: { name: string, quantity: number }[] = [];
-
-    items.forEach(itemString => {
-        // Match "Item Name xQuantity"
-        const match = itemString.match(/(.*)\sx(\d+)$/);
-        if (match) {
-            const name = match[1].trim();
-            const quantity = parseInt(match[2], 10);
-            
-            // Exclude membership plans from stock reversal logic (they contain 'days)')
-            if (!name.includes('days)')) {
-                inventoryItems.push({ name, quantity });
-            }
-        }
-    });
-    return inventoryItems;
-};
-
 /**
  * Voids a transaction, reverses inventory stock changes, and handles membership reversal (if applicable).
- * NOTE: Membership reversal is currently NOT implemented due to complexity.
  */
 export const voidTransaction = async (transactionId: string): Promise<void> => {
     // 1. Fetch the transaction details before deletion
     const { data: tx, error: fetchError } = await supabase
         .from('transactions')
-        .select('item_description, type')
+        .select('item_description, type, items_data') // Fetch items_data
         .eq('id', transactionId)
         .single();
 
@@ -77,32 +54,15 @@ export const voidTransaction = async (transactionId: string): Promise<void> => {
         throw new Error("Transaction not found or failed to fetch.");
     }
     
-    // 2. Attempt Inventory Reversal (Best Effort: Match by Name)
-    if (tx.item_description && (tx.type === 'POS Sale' || tx.type === 'Mixed Sale')) {
-        const itemsToReverse = parseInventoryItemsFromDescription(tx.item_description);
+    // 2. Attempt Inventory Reversal (Robust: Use items_data)
+    if (tx.items_data && (tx.type === 'POS Sale' || tx.type === 'Mixed Sale')) {
+        const inventoryItemsToReverse = tx.items_data.filter(item => item.type === 'inventory' && item.quantity > 0);
         
-        if (itemsToReverse.length > 0) {
-            // Fetch all inventory items to map names to IDs
-            const { data: inventory, error: inventoryError } = await supabase
-                .from('inventory_items')
-                .select('id, name');
-                
-            if (inventoryError) {
-                console.error("Supabase inventory fetch error during void:", inventoryError);
-                // We proceed with deletion even if inventory reversal fails, but log the error.
-            } else {
-                const inventoryMap = new Map(inventory.map(item => [item.name, item.id]));
-                
-                await Promise.all(itemsToReverse.map(async item => {
-                    const itemId = inventoryMap.get(item.name);
-                    if (itemId) {
-                        // Reverse stock using RPC
-                        await incrementInventoryStock(itemId, item.quantity);
-                    } else {
-                        console.warn(`Inventory item name '${item.name}' not found for stock reversal during void.`);
-                    }
-                }));
-            }
+        if (inventoryItemsToReverse.length > 0) {
+            await Promise.all(inventoryItemsToReverse.map(async item => {
+                // Use sourceId (Inventory ID) for accurate reversal
+                await incrementInventoryStock(item.sourceId, item.quantity);
+            }));
         }
     }
     

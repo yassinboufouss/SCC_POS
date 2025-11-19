@@ -13,7 +13,7 @@ import { CartItem, PaymentMethod } from '@/types/pos';
 import { useTranslation } from 'react-i18next';
 import Layout from '@/components/Layout';
 import { formatCurrency } from '@/utils/currency-utils';
-import { Profile, InventoryItem, MembershipPlan } from '@/types/supabase';
+import { Profile, InventoryItem, MembershipPlan, TransactionItemData } from '@/types/supabase';
 import { useQueryClient } from '@tanstack/react-query';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Package, UserPlus } from 'lucide-react';
@@ -372,19 +372,31 @@ const POSPage = () => {
             transactionType = 'POS Sale';
         }
         
+        // Generate item description (legacy field)
         const itemDescription = cart.map(item => `${item.name} x${item.quantity}`).join(', ');
+        
+        // Generate structured item data (NEW field)
+        const itemsData: TransactionItemData[] = cart.map(item => ({
+            sourceId: item.sourceId,
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price,
+            type: item.type,
+            isGiveaway: item.isGiveaway,
+        }));
         
         // Use selected member details or default to Guest
         const memberId = selectedMember?.member_code || selectedMember?.id || 'GUEST';
         const memberName = selectedMember ? `${selectedMember.first_name} ${selectedMember.last_name}` : t('guest_customer');
         
-        // Only record a transaction if the total is greater than zero
-        if (total > 0) {
+        // Only record a transaction if the total is greater than zero OR if it contains a giveaway item (which has price 0 but needs tracking)
+        if (total > 0 || cart.some(item => item.isGiveaway)) {
             const newTransaction = {
                 member_id: memberId,
                 member_name: memberName,
                 type: transactionType,
                 item_description: itemDescription,
+                items_data: itemsData, // Include structured data
                 amount: total,
                 payment_method: paymentMethod,
             };

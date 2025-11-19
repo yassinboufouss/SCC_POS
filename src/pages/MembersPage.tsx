@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import MemberRegistrationForm from '@/components/members/MemberRegistrationForm';
 import MemberProfileDialog from '@/components/members/MemberProfileDialog';
 import { useMembers } from '@/integrations/supabase/data/use-members.ts';
-import { Profile, MembershipPlan } from '@/types/supabase';
+import { Profile, MembershipPlan, TransactionItemData } from '@/types/supabase';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -54,6 +54,13 @@ const MembersPage: React.FC = () => {
             item_description: `${plan.name} (${plan.duration_days} days)`,
             amount: plan.price,
             payment_method: paymentMethod,
+            items_data: [{
+                sourceId: plan.id,
+                name: plan.name,
+                quantity: 1,
+                price: plan.price,
+                type: 'membership',
+            }]
         });
         
         setIsRegistrationOpen(false);

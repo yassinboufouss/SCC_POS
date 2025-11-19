@@ -1,4 +1,4 @@
-import { InventoryItem } from "@/types/supabase";
+import { InventoryItem, TransactionItemData } from "@/types/supabase";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { NewInventoryItemInput } from "@/types/pos";
@@ -112,6 +112,15 @@ export const issueManualGiveaway = async (itemId: string, memberId: string, memb
     // 1. Reduce stock by 1 (using RPC for safety)
     await reduceInventoryStock(itemId, 1);
     
+    const itemsData: TransactionItemData[] = [{
+        sourceId: itemId,
+        name: itemName,
+        quantity: 1,
+        price: 0,
+        type: 'inventory',
+        isGiveaway: true,
+    }];
+    
     // 2. Record a zero-amount transaction
     await addTransaction({
         member_id: memberId,
@@ -120,5 +129,6 @@ export const issueManualGiveaway = async (itemId: string, memberId: string, memb
         item_description: `${itemName} (Manual Giveaway)`,
         amount: 0,
         payment_method: 'Cash', // Payment method is irrelevant for $0, default to Cash
+        items_data: itemsData,
     });
 };

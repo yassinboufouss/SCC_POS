@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Transaction } from '@/types/supabase';
+import { Transaction, TransactionItemData } from '@/types/supabase';
 import { queryKeys } from './query-keys.ts';
 import { addTransaction, voidTransaction } from '@/utils/transaction-utils';
 import { PaymentMethod } from '@/types/pos';
@@ -86,7 +86,7 @@ export const useMemberTransactions = (memberId: string) => {
 export const useAddTransaction = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (newTransaction: Omit<Transaction, 'id' | 'created_at' | 'transaction_date'>) => addTransaction(newTransaction),
+    mutationFn: (newTransaction: Omit<Transaction, 'id' | 'created_at' | 'transaction_date' | 'items_data'> & { items_data: TransactionItemData[] }) => addTransaction(newTransaction),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.metrics });

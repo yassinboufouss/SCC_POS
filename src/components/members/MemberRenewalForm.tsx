@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { Profile } from '@/types/supabase';
+import { Profile, MembershipPlan, TransactionItemData } from '@/types/supabase';
 import { usePlans } from '@/integrations/supabase/data/use-plans.ts';
 import { useRenewMemberPlan } from '@/integrations/supabase/data/use-members.ts';
 import { useAddTransaction } from '@/integrations/supabase/data/use-transactions.ts'; // Import transaction hook
@@ -91,6 +91,13 @@ const MemberRenewalForm: React.FC<MemberRenewalFormProps> = ({ member, canRenew 
                 item_description: `${selectedPlan.name} Renewal (${selectedPlan.duration_days} days)`,
                 amount: selectedPlan.price,
                 payment_method: values.paymentMethod as PaymentMethod,
+                items_data: [{
+                    sourceId: selectedPlan.id,
+                    name: selectedPlan.name,
+                    quantity: 1,
+                    price: selectedPlan.price,
+                    type: 'membership',
+                }]
             });
             
             showSuccess(t("renewal_success", { name: `${updatedProfile.first_name} ${updatedProfile.last_name}`, date: updatedProfile.expiration_date }));
