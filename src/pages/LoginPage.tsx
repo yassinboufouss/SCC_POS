@@ -37,7 +37,7 @@ const LoginPage: React.FC = () => {
         "flex items-center justify-center min-h-screen p-4",
         "bg-cover bg-center relative"
       )}
-      style={{ backgroundImage: "url('/gym-background.jpg')" }}
+      style={{ backgroundImage: "url('/gym-background-2.jpg')" }}
     >
       {/* Dark Overlay (Removed blur for cleaner look) */}
       <div className="absolute inset-0 bg-black/70"></div>
