@@ -111,6 +111,7 @@ export const usePOSCart = () => {
             planAdded = true;
         }
         
+        // Use plan.giveaway_item_id which is now available from the registration response
         if (plan.giveaway_item_id) {
             const giveawayItem = liveInventoryItems?.find(i => i.id === plan.giveaway_item_id);
             
@@ -232,7 +233,10 @@ export const usePOSCart = () => {
     setSelectedMember(member);
     setPaymentMethod(paymentMethod);
     setJustRegisteredMemberId(member.id); 
+    
+    // Ensure the plan object passed to addMembershipToCart includes giveaway_item_id
     addMembershipToCart(plan as MembershipPlan); 
+    
     showSuccess(t("registration_and_cart_success", { name: `${member.first_name} ${member.last_name}` }));
     return member; 
   };
@@ -278,6 +282,7 @@ export const usePOSCart = () => {
         const checkoutPayload: CheckoutPayload = {
             cart: cart.map(item => ({
                 sourceId: item.sourceId,
+                name: item.name, // Include name for server logging/description
                 quantity: item.quantity,
                 type: item.type,
                 price: item.price,

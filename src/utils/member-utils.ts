@@ -15,6 +15,12 @@ export type NewMemberInput = {
   paymentMethod: PaymentMethod;
 };
 
+// Define the response structure from the Edge Function
+interface RegistrationResponse {
+    profile: Profile;
+    plan: Pick<MembershipPlan, 'id' | 'name' | 'duration_days' | 'price' | 'giveaway_item_id'>;
+}
+
 // Utility to update member data (used internally by other utils)
 export const updateProfile = async (updatedProfile: Partial<Profile> & { id: string }): Promise<Profile | null> => {
   const { data, error } = await supabase
@@ -44,92 +50,37 @@ export const updateMemberRole = async (profileId: string, newRole: Profile['role
     return updateProfile({ id: profileId, role: newRole, updated_at: new Date().toISOString() });
 };
 
-// Utility to simulate adding a new member (Auth + Profile creation/activation)
-// NOTE: This utility handles Auth and Profile creation/activation but DOES NOT record the transaction.
-export const registerNewUserAndProfile = async (newMemberData: Omit<NewMemberInput, 'paymentMethod'>): Promise<{ profile: Profile, plan: Pick<MembershipPlan, 'id' | 'name' | 'duration_days' | 'price'> } | null> => {
-  const { planId, ...memberDetails } = newMemberData;
-  
-  // 1. Fetch plan details
-  const { data: planData, error: planError } = await supabase
-    .from('membership_plans')
-    .select('id, name, duration_days, price')
-    .eq('id', planId)
-    .single();
+// NEW: Utility to register a new user and profile via Edge Function
+export const registerNewUserAndProfile = async (newMemberData: Omit<NewMemberInput, 'paymentMethod'>): Promise<RegistrationResponse | null> => {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+        throw new Error("User must be authenticated to register a new member.");
+    }
+    
+    const REGISTER_FUNCTION_URL = "https://izbuyhpftsehzwnhhjrc.supabase.co/functions/v1/register_member";
 
-  if (planError || !planData) {
-    console.error("Plan not found for new member registration:", planError);
-    throw new Error("Plan not found.");
-  }
-  
-  // Generate a secure random password (UUID is long and complex enough)
-  const secureRandomPassword = uuidv4();
-  
-  // 2. Sign up the user via Auth
-  const { data: authData, error: authError } = await supabase.auth.signUp({
-      email: memberDetails.email,
-      password: secureRandomPassword, // Use secure random password
-      options: {
-          data: {
-              first_name: memberDetails.first_name,
-              last_name: memberDetails.last_name,
-          }
-      }
-  });
-  
-  if (authError || !authData.user) {
-      console.error("Supabase Auth Signup Error:", authError?.message || "Unknown Auth Error");
-      throw new Error(authError?.message || "Failed to create user account.");
-  }
-  
-  const userId = authData.user.id;
-  
-  // 3. Immediately trigger a password reset email for the new user
-  const { error: resetError } = await supabase.auth.resetPasswordForEmail(memberDetails.email, {
-      redirectTo: `${window.location.origin}/`, // Redirect to login page after reset
-  });
-  
-  if (resetError) {
-      console.warn("Failed to send initial password reset email:", resetError);
-      // We proceed, but warn staff that the member needs manual password reset
-  }
-  
-  const startDate = new Date();
-  const expirationDate = addDays(startDate, planData.duration_days);
-  
-  // 4. Update the profile created by the trigger (handle_new_user) with membership details.
-  const newProfileData = {
-    id: userId,
-    first_name: memberDetails.first_name,
-    last_name: memberDetails.last_name,
-    phone: memberDetails.phone,
-    dob: memberDetails.dob,
-    plan_name: planData.name,
-    status: "Active" as const,
-    start_date: format(startDate, 'yyyy-MM-dd'),
-    expiration_date: format(expirationDate, 'yyyy-MM-dd'),
-    updated_at: new Date().toISOString(),
-    // Role is defaulted to 'member' by the database trigger/schema default.
-  };
+    const response = await fetch(REGISTER_FUNCTION_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify(newMemberData),
+    });
+    
+    const result = await response.json();
 
-  const { data: profile, error: profileError } = await supabase
-    .from('profiles')
-    .update(newProfileData)
-    .eq('id', userId)
-    .select()
-    .single();
-
-  if (profileError || !profile) {
-    console.error("Supabase Profile Update Error:", profileError);
-    throw new Error(profileError?.message || "Failed to finalize member registration: Profile update failed.");
-  }
-  
-  // Merge email back into the profile object for client-side consistency
-  return { profile: { ...profile, email: memberDetails.email } as Profile, plan: planData };
+    if (!response.ok || result.error) {
+        console.error("Edge Function Registration Error:", result.error);
+        throw new Error(result.error || "Failed to register new member via server.");
+    }
+    
+    return result as RegistrationResponse;
 };
 
 
-// Utility to simulate renewing a member's plan (Used by POS checkout and Member Profile Renewal Form)
-// NOTE: This utility is now only used by MemberRenewalForm. POS checkout uses the Edge Function.
+// Utility to simulate renewing a member's plan (Used by Member Profile Renewal Form)
 export const renewMemberPlan = async (profileId: string, planId: string): Promise<{ profile: Profile, plan: Pick<MembershipPlan, 'id' | 'name' | 'duration_days' | 'price'> } | null> => {
   // 1. Fetch current profile and plan details
   const [{ data: profile, error: profileError }, { data: planData, error: planError }] = await Promise.all([

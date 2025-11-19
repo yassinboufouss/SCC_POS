@@ -20,7 +20,7 @@ import { PaymentMethod } from '@/types/pos'; // Import PaymentMethod type
 
 interface MemberRegistrationFormProps {
   // Updated onSuccess signature to return registration result for parent to handle transaction
-  onSuccess: (result: { member: Profile, plan: Pick<MembershipPlan, 'id' | 'name' | 'duration_days' | 'price'>, paymentMethod: PaymentMethod }) => void;
+  onSuccess: (result: { member: Profile, plan: Pick<MembershipPlan, 'id' | 'name' | 'duration_days' | 'price' | 'giveaway_item_id'>, paymentMethod: PaymentMethod }) => void;
 }
 
 const formSchema = z.object({
@@ -64,7 +64,7 @@ const MemberRegistrationForm: React.FC<MemberRegistrationFormProps> = ({ onSucce
     };
 
     try {
-        // 1. Register the user and activate the plan (no transaction recorded yet)
+        // 1. Register the user and activate the plan via Edge Function
         const result = await registerMember(registrationData);
 
         if (!result || !result.profile) {
@@ -75,6 +75,7 @@ const MemberRegistrationForm: React.FC<MemberRegistrationFormProps> = ({ onSucce
         const { profile: newMember, plan: selectedPlan } = result;
 
         // 2. Pass data back to parent for transaction handling/cart addition
+        // The plan object now includes giveaway_item_id from the Edge Function response
         onSuccess({ member: newMember, plan: selectedPlan, paymentMethod }); 
         
         // Reset form fields
