@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSession } from '@/components/auth/SessionContextProvider';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { User, History, QrCode, Mail, Phone, Calendar, Edit, Save } from 'lucide-react';
+import { User, History, QrCode, Mail, Phone, Calendar, Edit, Save, RefreshCw } from 'lucide-react';
 import MemberDetailsCard from '@/components/members/MemberDetailsCard';
 import MemberTransactionHistory from '@/components/members/MemberTransactionHistory';
 import { useMemberTransactions } from '@/integrations/supabase/data/use-transactions.ts';
@@ -11,6 +11,7 @@ import { format } from 'date-fns';
 import MemberLogoutButton from '@/components/members/MemberLogoutButton';
 import { Button } from '@/components/ui/button';
 import MemberBasicInfoForm from '@/components/members/MemberBasicInfoForm'; // Import form
+import MemberRenewalForm from '@/components/members/MemberRenewalForm'; // Import renewal form
 
 const MemberProfilePage: React.FC = () => {
   const { t } = useTranslation();
@@ -39,6 +40,9 @@ const MemberProfilePage: React.FC = () => {
   const handleSaveSuccess = () => {
       setIsEditing(false);
   };
+  
+  // Determine if the member needs renewal (Expired or Pending)
+  const needsRenewal = profile.status !== 'Active';
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 lg:p-8">
@@ -92,6 +96,20 @@ const MemberProfilePage: React.FC = () => {
             onRenewClick={() => { /* Read-only, no action */ }} 
             canRenew={false} 
         />
+        
+        {/* Conditional Renewal Form */}
+        {needsRenewal && (
+            <Card>
+                <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2 text-green-600">
+                        <RefreshCw className="h-5 w-5" /> {t("renew_membership")}
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <MemberRenewalForm member={profile} canRenew={true} />
+                </CardContent>
+            </Card>
+        )}
         
         {/* Check-in Status Card */}
         <Card>
