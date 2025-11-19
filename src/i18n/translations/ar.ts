@@ -209,7 +209,7 @@ export const ar = {
     "save_plan_changes": "حفظ تغييرات الخطة",
     "plan_updated_success": "تم تحديث خطة العضوية '{{name}}' بنجاح.",
     "associated_members_placeholder": "ستظهر هنا قائمة الأعضاء المرتبطين وإحصائيات الاستخدام.",
-    "currency_symbol": "د.م.",
+    "currency_symbol": "MAD",
     "daily_sales_total": "إجمالي المبيعات اليومية",
     "weekly_sales_total": "إجمالي المبيعات الأسبوعية",
     "monthly_sales_total": "إجمالي المبيعات الشهرية",
@@ -402,5 +402,12 @@ export const ar = {
     "daily_transactions_list": "قائمة المعاملات اليومية",
     "and_more_transactions": "و {{count}} معاملات أخرى",
     "thank_you_for_using_pos": "شكرًا لاستخدامك SCC POS.",
+    
+    // NEW Invoice Keys
+    "daily_sales_invoice": "فاتورة المبيعات اليومية",
+    "items_sold_today": "العناصر المباعة اليوم",
+    "raw_subtotal": "المجموع الفرعي الخام",
+    "adjustments_tax": "التعديلات/الضريبة",
+    "no_sales_today": "لم يتم تسجيل مبيعات اليوم.",
   }
 };

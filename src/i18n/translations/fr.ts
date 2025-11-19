@@ -402,5 +402,12 @@ export const fr = {
     "daily_transactions_list": "Liste des Transactions Quotidiennes",
     "and_more_transactions": "et {{count}} transactions supplémentaires",
     "thank_you_for_using_pos": "Merci d'utiliser SCC PDV.",
+    
+    // NEW Invoice Keys
+    "daily_sales_invoice": "Facture de Ventes Quotidiennes",
+    "items_sold_today": "Articles Vendus Aujourd'hui",
+    "raw_subtotal": "Sous-total Brut",
+    "adjustments_tax": "Ajustements/Taxe",
+    "no_sales_today": "Aucune vente enregistrée aujourd'hui.",
   }
 };

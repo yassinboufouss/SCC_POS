@@ -402,5 +402,12 @@ export const en = {
     "daily_transactions_list": "Daily Transactions List",
     "and_more_transactions": "and {{count}} more transactions",
     "thank_you_for_using_pos": "Thank you for using SCC POS.",
+    
+    // NEW Invoice Keys
+    "daily_sales_invoice": "Daily Sales Invoice",
+    "items_sold_today": "Items Sold Today",
+    "raw_subtotal": "Raw Subtotal",
+    "adjustments_tax": "Adjustments/Tax",
+    "no_sales_today": "No sales recorded today.",
   }
 };
