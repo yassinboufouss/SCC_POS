@@ -367,5 +367,17 @@ export const fr = {
     "quantity": "Quantité",
     "add_to_cart": "Ajouter au Panier",
     "item_added_to_cart": "{{name}} ajouté au panier.",
+    
+    // NEW Login UI Keys
+    "welcome_back": "Bienvenue de Retour",
+    "please_enter_credentials": "Veuillez entrer vos identifiants pour continuer",
+    "create_account": "Créer un Compte",
+    "enter_details_to_sign_up": "Entrez vos détails pour vous inscrire",
+    "remember_me": "Se Souvenir de Moi",
+    "or_continue_with": "OU CONTINUER AVEC",
+    "social_login_placeholder": "Options de connexion sociale bientôt disponibles.",
+    "invalid_email_address": "Adresse e-mail invalide.",
+    "password_min_length": "Le mot de passe doit contenir au moins 6 caractères.",
+    "login_failed_error": "Échec de la connexion : {{error}}",
   }
 };

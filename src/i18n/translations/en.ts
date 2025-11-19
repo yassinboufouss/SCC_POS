@@ -222,7 +222,7 @@ export const en = {
     "logging_in": "Logging in...",
     "signing_up": "Signing up...",
     "already_have_an_account_sign_in": "Already have an account? Sign In",
-    "dont_have_an_account_sign_up": "Don't have an account? Sign Up",
+    "dont_have_an_account_sign_up": "Don’t have an account? Sign Up",
     "forgot_your_password": "Forgot your password?",
     "loading": "Loading",
     "logout_failed": "Logout failed. Please try again.",
@@ -367,5 +367,17 @@ export const en = {
     "quantity": "Quantity",
     "add_to_cart": "Add to Cart",
     "item_added_to_cart": "{{name}} added to cart.",
+    
+    // NEW Login UI Keys
+    "welcome_back": "Welcome Back",
+    "please_enter_credentials": "Please enter your credentials to continue",
+    "create_account": "Create Account",
+    "enter_details_to_sign_up": "Enter your details to sign up",
+    "remember_me": "Remember Me",
+    "or_continue_with": "OR CONTINUE WITH",
+    "social_login_placeholder": "Social login options coming soon.",
+    "invalid_email_address": "Invalid email address.",
+    "password_min_length": "Password must be at least 6 characters.",
+    "login_failed_error": "Login failed: {{error}}",
   }
 };

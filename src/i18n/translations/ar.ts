@@ -367,5 +367,17 @@ export const ar = {
     "quantity": "الكمية",
     "add_to_cart": "أضف إلى العربة",
     "item_added_to_cart": "تمت إضافة {{name}} إلى العربة.",
+    
+    // NEW Login UI Keys
+    "welcome_back": "مرحبًا بعودتك",
+    "please_enter_credentials": "الرجاء إدخال بيانات الاعتماد الخاصة بك للمتابعة",
+    "create_account": "إنشاء حساب",
+    "enter_details_to_sign_up": "أدخل التفاصيل الخاصة بك للتسجيل",
+    "remember_me": "تذكرني",
+    "or_continue_with": "أو المتابعة باستخدام",
+    "social_login_placeholder": "خيارات تسجيل الدخول الاجتماعي قريبا.",
+    "invalid_email_address": "عنوان بريد إلكتروني غير صالح.",
+    "password_min_length": "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل.",
+    "login_failed_error": "فشل تسجيل الدخول: {{error}}",
   }
 };
