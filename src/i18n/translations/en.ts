@@ -315,6 +315,7 @@ export const en = {
     "security_settings": "Security Settings",
     "security_settings_placeholder": "Password change and two-factor authentication settings will be managed here.",
     "save_changes": "Save Changes",
+    "close_editing": "Close Editing",
     
     // Copyright
     "copyright_text": "© {{year}} SCC POS. All rights reserved. Developed by xD Manga.",

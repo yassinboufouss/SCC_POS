@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSession } from '@/components/auth/SessionContextProvider';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { User, History, QrCode, Mail, Phone, Calendar, Edit, Save, RefreshCw } from 'lucide-react';
+import { User, History, QrCode, Mail, Phone, Calendar, Edit, RefreshCw, X } from 'lucide-react';
 import MemberDetailsCard from '@/components/members/MemberDetailsCard';
 import MemberTransactionHistory from '@/components/members/MemberTransactionHistory';
 import { useMemberTransactions } from '@/integrations/supabase/data/use-transactions.ts';
@@ -58,8 +58,8 @@ const MemberProfilePage: React.FC = () => {
                     variant="outline" 
                     onClick={() => setIsEditing(!isEditing)}
                 >
-                    {isEditing ? <Save className="h-4 w-4 mr-2" /> : <Edit className="h-4 w-4 mr-2" />}
-                    {isEditing ? t("save_member_changes") : t("edit_profile")}
+                    {isEditing ? <X className="h-4 w-4 mr-2" /> : <Edit className="h-4 w-4 mr-2" />}
+                    {isEditing ? t("close_editing") : t("edit_profile")}
                 </Button>
                 <MemberLogoutButton />
             </div>

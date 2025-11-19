@@ -297,24 +297,13 @@ export const ar = {
     "plan_deleted_success": "تم حذف خطة العضوية '{{name}}' بنجاح.",
     "cancel": "إلغاء",
     
-    // Chart Keys
-    "monthly_revenue_trend": "اتجاه الإيرادات الشهرية (آخر 6 أشهر)",
-    "revenue": "الإيرادات",
-    
-    // New Analytics Keys
-    "sales_analytics_title": "تحليلات المبيعات",
-    "total_transactions_count": "إجمالي المعاملات",
-    "all_time": "منذ البداية",
-    "member_status_distribution": "توزيع حالة الأعضاء",
-    "count": "العدد",
-    "percentage": "النسبة المئوية",
-    
     // New Settings Keys
     "settings": "الإعدادات",
     "my_profile": "ملفي الشخصي",
     "security_settings": "إعدادات الأمان",
     "security_settings_placeholder": "سيتم إدارة تغيير كلمة المرور وإعدادات المصادقة الثنائية هنا.",
     "save_changes": "حفظ التغييرات",
+    "close_editing": "إغلاق التعديل",
     
     // Copyright
     "copyright_text": "© {{year}} SCC POS. جميع الحقوق محفوظة. تطوير: xD Manga.",

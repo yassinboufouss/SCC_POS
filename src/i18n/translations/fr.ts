@@ -297,24 +297,13 @@ export const fr = {
     "plan_deleted_success": "Plan d'adhésion '{{name}}' supprimé avec succès.",
     "cancel": "Annuler",
     
-    // Chart Keys
-    "monthly_revenue_trend": "Tendance des Revenus Mensuels (6 Derniers Mois)",
-    "revenue": "Revenu",
-    
-    // New Analytics Keys
-    "sales_analytics_title": "Analyse des Ventes",
-    "total_transactions_count": "Total des Transactions",
-    "all_time": "Depuis le début",
-    "member_status_distribution": "Distribution du Statut des Membres",
-    "count": "Compte",
-    "percentage": "Pourcentage",
-    
     // New Settings Keys
     "settings": "Paramètres",
     "my_profile": "Mon Profil",
     "security_settings": "Paramètres de Sécurité",
     "security_settings_placeholder": "La modification du mot de passe et les paramètres d'authentification à deux facteurs seront gérés ici.",
     "save_changes": "Enregistrer les Modifications",
+    "close_editing": "Fermer la Modification",
     
     // Copyright
     "copyright_text": "© {{year}} SCC PDV. Tous droits réservés. Développé par xD Manga.",
