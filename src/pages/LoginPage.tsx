@@ -129,6 +129,12 @@ const LoginPage: React.FC = () => {
         )}
       >
         <CardHeader className="text-center p-0 mb-8">
+          {/* Logo and App Title */}
+          <div className="flex items-center justify-center mb-4">
+            <Dumbbell className="h-8 w-8 text-primary" />
+            <span className="text-2xl font-extrabold text-[#111827] dark:text-foreground ml-2">{t("app_title")}</span>
+          </div>
+          
           <CardTitle className="text-2xl font-semibold text-[#111827] dark:text-foreground">
             {cardTitle}
           </CardTitle>
