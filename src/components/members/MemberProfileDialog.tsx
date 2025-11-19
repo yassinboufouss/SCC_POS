@@ -26,7 +26,7 @@ import { useUserRole } from '@/hooks/use-user-role'; // Import useUserRole
 
 interface MemberProfileDialogProps {
   member: Profile; // Initial member data from the list
-  canEdit: boolean; // New prop to control editing access
+  canEdit: boolean; // New prop to control editing access (passed from parent, e.g., MembersPage)
   isDialogOpen?: boolean; // NEW: External control
   setIsDialogOpen?: (open: boolean) => void; // NEW: External control
 }
