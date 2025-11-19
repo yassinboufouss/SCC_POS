@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useTranslation } from 'react-i18next';
-import { Chrome } from 'lucide-react'; // Changed from Mail
+import { Chrome } from 'lucide-react';
 import { showError } from '@/utils/toast';
 
 const SocialAuthButtons: React.FC = () => {
