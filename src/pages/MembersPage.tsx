@@ -7,14 +7,14 @@ import { Profile, MembershipPlan } from '@/types/supabase';
 import { PaymentMethod } from '@/types/pos';
 import { recordTransaction } from '@/integrations/supabase/data/use-transactions';
 import { toast } from 'sonner';
-import MemberRegistrationForm from '@/components/members/MemberRegistrationForm'; // FIX: Changed to default import
+import MemberRegistrationForm from '@/components/members/MemberRegistrationForm';
 import { MemberTable } from '@/components/members/MemberTable';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2 } from 'lucide-react';
 
 // Assuming this function is defined within the component or passed down
-const handleRegistrationSuccess = async (member: Profile, plan: MembershipPlan, paymentMethod: PaymentMethod) => {
+const handleRegistrationSuccess = async ({ member, plan, paymentMethod }: { member: Profile, plan: MembershipPlan, paymentMethod: PaymentMethod }) => {
     const t = (key: string, options?: any) => key; // Placeholder for t function
 
     // Record Transaction for the membership fee immediately (since this is standalone registration)
