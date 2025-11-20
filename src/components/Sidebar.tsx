@@ -4,7 +4,6 @@ import { Users, ShoppingCart, LogOut, Package, Ticket, QrCode, LayoutDashboard, 
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
-import ThemeToggle from './ThemeToggle'; // Import ThemeToggle
 import { supabase } from '@/integrations/supabase/client';
 import { showError } from '@/utils/toast';
 import { useUserRole } from '@/hooks/use-user-role';
@@ -79,7 +78,7 @@ const Sidebar: React.FC = () => {
       
       <div className="mt-auto pt-4 border-t border-sidebar-border space-y-2">
         
-        <ThemeToggle />
+        {/* ThemeToggle removed */}
         <LanguageSwitcher />
         <button
           onClick={handleLogout}

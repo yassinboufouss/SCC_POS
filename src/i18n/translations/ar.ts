@@ -265,11 +265,7 @@ export const ar = {
     "manager": "المدير",
     "cashier": "أمين الصندوق",
     
-    // Theme Toggle Keys
-    "light_mode": "الوضع الفاتح",
-    "dark_mode": "الوضع الداكن",
-    "blue_mode": "الوضع الأزرق",
-    "switch_to_theme": "التبديل إلى {{theme}}",
+    // Theme Toggle Keys (REMOVED)
     
     // Transaction Filters
     "membership": "العضوية",
@@ -287,7 +283,7 @@ export const ar = {
     "delete_item_confirmation": "هل أنت متأكد من أنك تريد حذف عنصر المخزون '{{name}}' نهائيًا؟ لا يمكن التراجع عن هذا الإجراء.",
     "delete_plan_confirmation": "هل أنت متأكد من أنك تريد حذف خطة العضوية '{{name}}' نهائيًا؟ لا يمكن التراجع عن هذا الإجراء وقد يؤثر على الأعضاء الحاليين.",
     "confirm_delete": "نعم، حذف",
-    "deleting": "جاري الحذف...",
+    "deleting": "جاري الإلغاء...",
     "item_deleted_success": "تم حذف عنصر المخزون '{{name}}' بنجاح.",
     "plan_deleted_success": "تم حذف خطة العضوية '{{name}}' بنجاح.",
     "cancel": "إلغاء",

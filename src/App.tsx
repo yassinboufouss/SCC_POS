@@ -23,7 +23,7 @@ import QueryProvider from './components/QueryProvider';
 
 function App() {
   return (
-    <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+    <ThemeProvider>
       <Toaster richColors position="top-right" />
       <QueryProvider>
         <SessionContextProvider>

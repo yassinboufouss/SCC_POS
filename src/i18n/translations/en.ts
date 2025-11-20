@@ -265,11 +265,7 @@ export const en = {
     "manager": "Manager",
     "cashier": "Cashier",
     
-    // Theme Toggle Keys
-    "light_mode": "Light Mode",
-    "dark_mode": "Dark Mode",
-    "blue_mode": "Blue Mode",
-    "switch_to_theme": "Switch to {{theme}}",
+    // Theme Toggle Keys (REMOVED)
     
     // Transaction Filters
     "membership": "Membership",
