@@ -426,5 +426,12 @@ export const en = {
     "percentage_discount_applied": "Percentage Discount ({{percent}}%)",
     "total_discount_applied": "Total Discount Applied",
     "manual_discount_applied": "Manual Discount Applied",
+    
+    // NEW Avatar Keys
+    "upload_avatar": "Upload Avatar",
+    "avatar_upload_success": "Avatar uploaded successfully.",
+    "avatar_upload_failed": "Failed to upload avatar.",
+    "avatar_delete_success": "Avatar deleted successfully.",
+    "avatar_delete_failed": "Failed to delete avatar.",
   }
 };

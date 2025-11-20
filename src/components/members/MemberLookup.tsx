@@ -15,7 +15,7 @@ import { useUserRole } from '@/hooks/use-user-role';
 
 const MemberLookup: React.FC = () => {
   const { t } = useTranslation();
-  const { isOwner } = useUserRole();
+  const { isOwner, isStaff } = useUserRole();
   const [memberCode, setMemberCode] = useState('');
   const [memberInfo, setMemberInfo] = useState<Profile | null>(null);
   const [isLookingUp, setIsLookingUp] = useState(false);
@@ -59,8 +59,8 @@ const MemberLookup: React.FC = () => {
       setIsProfileDialogOpen(true);
   };
   
-  // Only Owner can edit core profile details (as defined in MembersPage)
-  const canEdit = isOwner; 
+  // Allow all staff/owners to edit basic profile details
+  const canEdit = isOwner || isStaff; 
   
   const MemberDialog = memberInfo ? (
       <MemberProfileDialog 

@@ -8,7 +8,7 @@ import MemberBasicInfoForm from './MemberBasicInfoForm';
 import MemberDetailsCard from './MemberDetailsCard';
 import MemberCheckInButton from './MemberCheckInButton';
 import MemberStatusActions from './MemberStatusActions';
-import { useUserRole } from '@/hooks/use-user-role';
+import MemberAvatarUploader from './MemberAvatarUploader'; // Import the new component
 
 interface MemberProfileTabProps {
   member: Profile;
@@ -36,6 +36,12 @@ const MemberProfileTab: React.FC<MemberProfileTabProps> = ({
 
   return (
     <div className="space-y-4">
+      
+      {/* Avatar Uploader Section */}
+      <div className="flex justify-center mb-4">
+          <MemberAvatarUploader member={member} canEdit={canEdit} />
+      </div>
+      
       <Card className="shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-lg">{t("contact_information")}</CardTitle>

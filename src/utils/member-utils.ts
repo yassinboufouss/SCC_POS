@@ -214,3 +214,85 @@ export const fetchUserProfile = async (userId: string): Promise<Profile | null> 
         return null;
     }
 };
+
+/**
+ * Uploads an avatar file to Supabase Storage and returns the public URL.
+ * Also updates the user's profile with the new URL.
+ * @param userId The ID of the user (profile).
+ * @param file The file object to upload.
+ * @param currentAvatarUrl Optional: The current avatar URL to delete the old file.
+ * @returns The new public URL of the avatar.
+ */
+export const uploadAvatar = async (userId: string, file: File, currentAvatarUrl: string | null): Promise<string> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${userId}.${fileExt}`;
+    const filePath = `${userId}/${fileName}`;
+    
+    // 1. Upload the new file
+    const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: true,
+        });
+
+    if (uploadError) {
+        console.error("Supabase upload error:", uploadError);
+        throw new Error("Failed to upload avatar.");
+    }
+    
+    // 2. Get the public URL
+    const { data: publicUrlData } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+        
+    const newAvatarUrl = publicUrlData.publicUrl;
+
+    // 3. Update the profile table
+    await updateProfile({ id: userId, avatar_url: newAvatarUrl });
+    
+    // 4. (Optional) Delete the old file if it exists and is different
+    if (currentAvatarUrl && currentAvatarUrl !== newAvatarUrl) {
+        // Extract the path from the URL (e.g., 'avatars/user_id/filename.ext')
+        const oldPathMatch = currentAvatarUrl.match(/avatars\/(.*)/);
+        if (oldPathMatch && oldPathMatch[1]) {
+            const oldFilePath = oldPathMatch[1];
+            // Note: Supabase delete requires the path relative to the bucket root (e.g., 'user_id/filename.ext')
+            const { error: deleteError } = await supabase.storage
+                .from('avatars')
+                .remove([oldFilePath]);
+            
+            if (deleteError) {
+                console.warn("Failed to delete old avatar:", deleteError);
+            }
+        }
+    }
+
+    return newAvatarUrl;
+};
+
+/**
+ * Removes the avatar URL from the profile and deletes the file from storage.
+ * @param userId The ID of the user (profile).
+ * @param currentAvatarUrl The current avatar URL.
+ */
+export const deleteAvatar = async (userId: string, currentAvatarUrl: string | null): Promise<void> => {
+    if (!currentAvatarUrl) return;
+
+    // 1. Remove the URL from the profile table
+    await updateProfile({ id: userId, avatar_url: null });
+
+    // 2. Delete the file from storage
+    const oldPathMatch = currentAvatarUrl.match(/avatars\/(.*)/);
+    if (oldPathMatch && oldPathMatch[1]) {
+        const oldFilePath = oldPathMatch[1];
+        const { error: deleteError } = await supabase.storage
+            .from('avatars')
+            .remove([oldFilePath]);
+        
+        if (deleteError) {
+            console.error("Failed to delete avatar file:", deleteError);
+            throw new Error("Failed to delete avatar file.");
+        }
+    }
+};

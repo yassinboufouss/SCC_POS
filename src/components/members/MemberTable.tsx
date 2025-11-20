@@ -20,13 +20,13 @@ const MemberTable: React.FC<MemberTableProps> = () => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<Profile['status'] | 'All'>('All');
-  const { isOwner, isManager } = useUserRole();
+  const { isOwner, isStaff } = useUserRole();
   
   // Fetch data using the hook based on filters
   const { data: filteredMembers, isLoading } = useMembers(searchTerm, statusFilter);
   
-  // Staff (Owner/Manager) can edit member profiles
-  const canEdit = isOwner || isManager; 
+  // Staff (Owner/Manager/Cashier) can edit member profiles
+  const canEdit = isOwner || isStaff; 
 
   const getStatusVariant = (status: Profile['status']) => {
     switch (status) {
