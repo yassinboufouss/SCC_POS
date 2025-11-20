@@ -95,7 +95,7 @@ export const MembersPage = () => {
               <CardTitle>{t("new_member_details_plan_selection")}</CardTitle>
             </CardHeader>
             <CardContent>
-              {plans && <MemberRegistrationForm plans={plans} onSuccess={handleRegistrationSuccess} />}
+              <MemberRegistrationForm onSuccess={handleRegistrationSuccess} />
             </CardContent>
           </Card>
         </TabsContent>
