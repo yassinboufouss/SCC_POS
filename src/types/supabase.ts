@@ -44,6 +44,7 @@ export type TransactionItemData = {
     name: string;
     quantity: number;
     price: number; // Price paid per unit
+    originalPrice: number; // ADDED: Original price before manual override/discount
     type: 'inventory' | 'membership';
     isGiveaway?: boolean;
 };
