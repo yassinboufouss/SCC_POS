@@ -102,12 +102,18 @@ export const renewMemberPlan = async (profileId: string, planId: string): Promis
   const rpcData = renewalResult[0];
 
   // 2. Fetch the updated profile and plan details for the client response
-  const [{ data: updatedProfile, error: profileError }, { data: planData, error: planError }] = await Promise.all([
+  const [profileResult, planResult] = await Promise.all([
     // Fetch the full profile to ensure the client has the latest data (including status, check-ins, etc.)
     supabase.from('profiles').select('*').eq('id', profileId).single(),
     // Fetch minimal plan data
     supabase.from('membership_plans').select('id, name, duration_days, price').eq('id', planId).single(),
   ]);
+  
+  let updatedProfile = profileResult.data as Profile | null;
+  const profileError = profileResult.error;
+  const planData = planResult.data;
+  const planError = planResult.error;
+
 
   if (profileError || !updatedProfile) {
     console.error("Member not found after renewal:", profileError);
