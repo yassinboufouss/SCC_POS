@@ -13,6 +13,7 @@ import { useUserRole } from '@/hooks/use-user-role';
 import MemberProfileTab from './MemberProfileTab'; // NEW
 import MemberRenewalTab from './MemberRenewalTab'; // NEW
 import MemberHistoryTab from './MemberHistoryTab'; // NEW
+import MemberAdminTab from './MemberAdminTab'; // NEW
 
 interface MemberProfileDialogProps {
   member: Profile; // Initial member data from the list
@@ -31,7 +32,7 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member, canEd
   const setIsDialogOpen = isControlled ? setExternalOpen : setInternalOpen;
   
   const [activeTab, setActiveTab] = useState('profile'); 
-  const { isOwner, isStaff } = useUserRole(); 
+  const { isOwner, isStaff, isManager } = useUserRole(); 
   
   // Fetch the freshest member data when the dialog is open
   const { data: currentMember, isLoading: isLoadingMember } = useMember(member.id);
@@ -47,6 +48,11 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member, canEd
   const canCheckIn = isOwner || isStaff; 
   // Only Owner can perform status actions (Freeze/Cancel)
   const canChangeStatus = isOwner; 
+  // Only Owner/Co-Owner can change roles
+  const canChangeRole = isOwner; 
+  
+  // Staff (Owner/Manager/Cashier) can access the dialog, but only Owner/Manager should see the Admin tab
+  const canAccessAdminTab = isOwner || isManager; 
   
   const handleOpenChange = (open: boolean) => {
       setIsDialogOpen(open);
@@ -137,10 +143,14 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member, canEd
         </DialogHeader>
         
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList 
+              className="grid w-full" 
+              style={{ gridTemplateColumns: canAccessAdminTab ? 'repeat(4, 1fr)' : 'repeat(3, 1fr)' }}
+          >
             <TabsTrigger value="profile">{t("member_details")}</TabsTrigger>
             <TabsTrigger value="renewal" disabled={!canRenew}>{t("renew_membership")}</TabsTrigger>
             <TabsTrigger value="history">{t("activity_history")}</TabsTrigger>
+            {canAccessAdminTab && <TabsTrigger value="admin">{t("admin_management")}</TabsTrigger>}
           </TabsList>
           
           {/* Profile Tab Content */}
@@ -168,6 +178,16 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member, canEd
                 isLoadingTransactions={isLoadingTransactions} 
             />
           </TabsContent>
+          
+          {/* Admin Tab Content */}
+          {canAccessAdminTab && (
+              <TabsContent value="admin" className="mt-4">
+                  <MemberAdminTab 
+                      member={displayMember} 
+                      canChangeRole={canChangeRole} 
+                  />
+              </TabsContent>
+          )}
         </Tabs>
       </DialogContent>
     </Dialog>

@@ -261,7 +261,7 @@ export const ar = {
     "assign_new_role": "تعيين دور جديد",
     "select_role": "اختر الدور",
     "owner": "المالك",
-    "co owner": "المالك المشارك", // NEW
+    "co owner": "المالك المشارك",
     "manager": "المدير",
     "cashier": "أمين الصندوق",
     
@@ -416,5 +416,11 @@ export const ar = {
     "monthly_membership_sales": "مبيعات العضوية (شهريًا)",
     "today": "اليوم",
     "print_receipt": "طباعة الإيصال",
+    
+    // NEW Admin Tab Keys
+    "admin_management": "الإدارة",
+    "admin_actions": "الإجراءات الإدارية",
+    "future_admin_actions_placeholder": "ستظهر هنا الإجراءات الإدارية المستقبلية مثل حذف الحساب أو تصدير البيانات.",
+    "role_change_permission_denied": "يمكن للمالكين/المالكين المشاركين فقط تغيير أدوار المستخدمين.",
   }
 };

@@ -261,7 +261,7 @@ export const en = {
     "assign_new_role": "Assign New Role",
     "select_role": "Select Role",
     "owner": "Owner",
-    "co owner": "Co-Owner", // NEW
+    "co owner": "Co-Owner",
     "manager": "Manager",
     "cashier": "Cashier",
     
@@ -416,5 +416,11 @@ export const en = {
     "monthly_membership_sales": "Membership Sales (MTD)",
     "today": "Today",
     "print_receipt": "Print Receipt",
+    
+    // NEW Admin Tab Keys
+    "admin_management": "Admin Management",
+    "admin_actions": "Admin Actions",
+    "future_admin_actions_placeholder": "Future administrative actions like account deletion or data export will appear here.",
+    "role_change_permission_denied": "Only Owners/Co-Owners can change user roles.",
   }
 };
