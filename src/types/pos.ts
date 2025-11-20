@@ -15,7 +15,7 @@ export interface CartItem {
 export type PaymentMethod = 'Card' | 'Cash' | 'Transfer';
 
 // Utility types for forms
-export type NewInventoryItemInput = Omit<InventoryItem, 'id' | 'last_restock' | 'created_at' | 'image_url' | 'stock'> & { 
+export type NewInventoryItemInput = Omit<InventoryItem, 'id' | 'last_restock' | 'created_at' | 'stock' | 'image_url'> & { 
     initial_stock: number;
     image_url?: string;
 };

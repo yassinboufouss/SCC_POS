@@ -1,13 +1,13 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/supabase-client';
+import { supabase } from '@/integrations/supabase/client';
 import { queryKeys } from '@/integrations/supabase/data/query-keys';
 import { Profile, MembershipPlan } from '@/types/supabase';
 import { PaymentMethod } from '@/types/pos';
-import { recordTransaction } from '@/integrations/supabase/data/use-transactions'; // FIX: Import recordTransaction
+import { recordTransaction } from '@/integrations/supabase/data/use-transactions';
 import { toast } from 'sonner';
-import { MemberRegistrationForm } from '@/components/members/MemberRegistrationForm';
+import MemberRegistrationForm from '@/components/members/MemberRegistrationForm'; // FIX: Changed to default import
 import { MemberTable } from '@/components/members/MemberTable';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -43,7 +43,7 @@ export const MembersPage = () => {
   const { t } = useTranslation();
   
   const { data: members, isLoading, error } = useQuery({
-    queryKey: queryKeys.members.all,
+    queryKey: queryKeys.profiles.all,
     queryFn: async () => {
       const { data, error } = await supabase.from('profiles').select('*').eq('role', 'member');
       if (error) throw error;
@@ -52,7 +52,7 @@ export const MembersPage = () => {
   });
 
   const { data: plans, isLoading: isLoadingPlans } = useQuery({
-    queryKey: queryKeys.membershipPlans.all,
+    queryKey: queryKeys.plans.all,
     queryFn: async () => {
       const { data, error } = await supabase.from('membership_plans').select('*');
       if (error) throw error;

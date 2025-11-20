@@ -44,10 +44,9 @@ const GiveawayItemCard: React.FC<GiveawayItemCardProps> = ({ item, linkedPlans =
       const memberName = `${selectedMember.first_name} ${selectedMember.last_name}`;
       
       await issueGiveaway({
-        itemId: item.id,
+        item: item, // FIX: Pass the entire item object
         memberId: memberId,
         memberName: memberName,
-        itemName: item.name,
       });
 
       showSuccess(t("giveaway_issued_success", { item: item.name, member: memberName }));

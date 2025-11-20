@@ -4,15 +4,15 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
-import { Form, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { Profile, MembershipPlan } from '@/types/supabase';
 import { PaymentMethod } from '@/types/pos';
-import { recordTransaction } from '@/integrations/supabase/data/use-transactions'; // FIX: Import recordTransaction
-import { useRenewMemberPlan } from '@/integrations/supabase/data/use-members'; // Assuming this hook exists
+import { recordTransaction } from '@/integrations/supabase/data/use-transactions';
+import { useRenewMemberPlan } from '@/integrations/supabase/data/use-members';
 import { formatCurrency } from '@/utils/currency-utils';
-import { calculateRenewalDates } from '@/utils/date-utils'; // Assuming this utility exists
+import { calculateRenewalDates } from '@/utils/date-utils';
 
 // Define the form schema
 const renewalFormSchema = z.object({

@@ -1,15 +1,6 @@
-import { supabase } from '@/integrations/supabase/supabase-client';
+import { supabase } from '@/integrations/supabase/client';
 import { InventoryItem, TransactionItemData } from '@/types/supabase';
-import { toast } from 'sonner';
-import { useTranslation } from 'react-i18next';
 import { recordTransaction as addTransaction } from '@/integrations/supabase/data/use-transactions';
-
-// Helper to get translation function outside of components
-const t = (key: string, options?: any) => {
-    // This is a simplified placeholder. In a real app, you'd use a global i18n instance or context.
-    const { t: i18n_t } = useTranslation();
-    return i18n_t(key, options);
-};
 
 // --- Core Inventory Management Functions ---
 
@@ -100,10 +91,10 @@ export async function issueManualGiveaway(memberId: string, memberName: string, 
         discount_percent: 0,
     });
 
-    toast.success(t("giveaway_issued_success", { item: item.name, member: memberName }));
+    // Return success status and item/member details for the calling component to display toast
+    return { success: true, item, memberName };
   } catch (error) {
     console.error("Issue giveaway failed:", error);
-    toast.error(t("giveaway_issued_failed"));
     throw error;
   }
 }
