@@ -2,11 +2,15 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Transaction, TransactionItemData } from '@/types/supabase';
 import { queryKeys } from './query-keys.ts';
-import { addTransaction, voidTransaction } from '@/utils/transaction-utils';
+import { addTransaction } from '@/utils/transaction-utils';
 import { PaymentMethod } from '@/types/pos';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { showSuccess, showError, showWarning } from '@/utils/toast';
+import { useSession } from '@/components/auth/SessionContextProvider';
+
+// Define the Edge Function URL (Hardcoded Project ID is required for Edge Functions)
+const VOID_FUNCTION_URL = "https://izbuyhpftsehzwnhhjrc.supabase.co/functions/v1/void_transaction";
 
 // --- Fetch Hooks ---
 
@@ -96,12 +100,35 @@ export const useAddTransaction = () => {
   });
 };
 
-// NEW: Hook for voiding a transaction
+// NEW: Hook for voiding a transaction using Edge Function
 export const useVoidTransaction = () => {
     const queryClient = useQueryClient();
     const { t } = useTranslation();
+    const { session } = useSession();
+    
+    const voidTransactionEdge = async (transactionId: string): Promise<boolean> => {
+        if (!session) throw new Error("Authentication required to void transaction.");
+        
+        const response = await fetch(VOID_FUNCTION_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session.access_token}`,
+            },
+            body: JSON.stringify({ transactionId }),
+        });
+        
+        const result = await response.json();
+
+        if (!response.ok || result.error) {
+            throw new Error(result.error || t("transaction_void_failed"));
+        }
+        
+        return result.requiresManualMembershipReversal;
+    };
+    
     return useMutation({
-        mutationFn: (transactionId: string) => voidTransaction(transactionId),
+        mutationFn: (transactionId: string) => voidTransactionEdge(transactionId),
         onSuccess: (requiresManualMembershipReversal, transactionId) => {
             // Invalidate all relevant data sources
             queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
@@ -115,5 +142,8 @@ export const useVoidTransaction = () => {
                 showSuccess(t("transaction_void_success", { id: transactionId.substring(0, 8) }));
             }
         },
+        onError: (error) => {
+            showError(error.message || t("transaction_void_failed"));
+        }
     });
 };

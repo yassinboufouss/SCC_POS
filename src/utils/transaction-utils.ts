@@ -1,7 +1,7 @@
 import { Transaction, TransactionItemData } from "@/types/supabase";
 import { supabase } from "@/integrations/supabase/client";
 import { format, isToday, isThisWeek, isThisMonth, parseISO, startOfMonth, subMonths } from "date-fns";
-import { incrementInventoryStock } from "./inventory-utils"; // Import stock increment utility
+// Removed: import { incrementInventoryStock } from "./inventory-utils"; 
 
 // Utility to simulate adding a new transaction
 export const addTransaction = async (newTransaction: Omit<Transaction, 'id' | 'created_at' | 'transaction_date' | 'items_data'> & { items_data: TransactionItemData[] }): Promise<Transaction | null> => {
@@ -40,55 +40,10 @@ export const getTransactionsByMemberId = async (memberId: string): Promise<Trans
 
 /**
  * Voids a transaction, reverses inventory stock changes, and handles membership reversal (if applicable).
+ * NOTE: This function is now implemented via the Edge Function /void_transaction.
  * @returns boolean True if manual membership reversal is required.
  */
-export const voidTransaction = async (transactionId: string): Promise<boolean> => {
-    // 1. Fetch the transaction details before deletion
-    const { data: tx, error: fetchError } = await supabase
-        .from('transactions')
-        .select('item_description, type, items_data') // Fetch items_data
-        .eq('id', transactionId)
-        .single();
-
-    if (fetchError || !tx) {
-        console.error("Supabase voidTransaction fetch error:", fetchError);
-        throw new Error("Transaction not found or failed to fetch.");
-    }
-    
-    let requiresManualMembershipReversal = false;
-    
-    // 2. Attempt Inventory Reversal (Robust: Use items_data)
-    if (tx.items_data && (tx.type === 'POS Sale' || tx.type === 'Mixed Sale')) {
-        const inventoryItemsToReverse = tx.items_data.filter(item => item.type === 'inventory' && item.quantity > 0);
-        
-        if (inventoryItemsToReverse.length > 0) {
-            await Promise.all(inventoryItemsToReverse.map(async item => {
-                // Increment stock back for all inventory items, including giveaways (which reduced stock by 1)
-                await incrementInventoryStock(item.sourceId, item.quantity);
-            }));
-        }
-    }
-    
-    // 3. Membership Reversal Check
-    if (tx.type === 'Membership' || tx.type === 'Mixed Sale') {
-        requiresManualMembershipReversal = true;
-        console.warn(`Transaction ${transactionId} involved membership. Manual membership reversal may be required.`);
-    }
-
-    // 4. Delete the transaction
-    const { error: deleteError } = await supabase
-        .from('transactions')
-        .delete()
-        .eq('id', transactionId);
-
-    if (deleteError) {
-        console.error("Supabase voidTransaction delete error:", deleteError);
-        throw new Error("Failed to delete transaction.");
-    }
-    
-    return requiresManualMembershipReversal; // Return the flag
-};
-
+// Removed client-side voidTransaction implementation
 
 export interface SalesSummary {
     dailyTotal: number;
