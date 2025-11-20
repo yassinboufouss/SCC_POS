@@ -61,7 +61,7 @@ const POSMemberSelector: React.FC<POSMemberSelectorProps> = ({ selectedMember, o
             
             <div className="space-y-4">
               <Input
-                placeholder={t("search_by_name_or_id")}
+                placeholder={t("search_by_name_code_or_phone")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="h-10"

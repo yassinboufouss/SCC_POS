@@ -105,7 +105,7 @@ const MembersPage: React.FC = () => {
             <div className="mb-4 flex flex-wrap items-center gap-4">
                 <Search className="h-4 w-4 text-muted-foreground shrink-0" />
                 <Input
-                    placeholder={t("search_members_by_name")}
+                    placeholder={t("search_members_by_name_code_phone")}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="max-w-sm flex-1 min-w-[150px]"

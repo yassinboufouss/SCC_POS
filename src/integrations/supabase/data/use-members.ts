@@ -23,8 +23,8 @@ export const useMembers = (searchTerm: string = '', statusFilter: Profile['statu
 
       if (search) {
         // Supabase doesn't support full text search on multiple columns easily in RLS context, 
-        // so we filter by name/code/email using ILIKE (case-insensitive)
-        query = query.or(`first_name.ilike.%${search}%,last_name.ilike.%${search}%,member_code.ilike.%${search}%`);
+        // so we filter by name/code/email/phone using ILIKE (case-insensitive)
+        query = query.or(`first_name.ilike.%${search}%,last_name.ilike.%${search}%,member_code.ilike.%${search}%,phone.ilike.%${search}%`);
       }
       
       // Apply status filter (Supabase side)
