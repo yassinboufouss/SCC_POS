@@ -59,6 +59,9 @@ const InventoryItemActions: React.FC<InventoryItemActionsProps> = ({ item }) => 
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle>{t("edit_item", { name: currentItem.name })}</DialogTitle>
+            <DialogDescription>
+                {t("manage_item_details_and_stock", { name: currentItem.name })}
+            </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4">

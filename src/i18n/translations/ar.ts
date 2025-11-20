@@ -422,5 +422,8 @@ export const ar = {
     "admin_actions": "الإجراءات الإدارية",
     "future_admin_actions_placeholder": "ستظهر هنا الإجراءات الإدارية المستقبلية مثل حذف الحساب أو تصدير البيانات.",
     "role_change_permission_denied": "يمكن للمالكين/المالكين المشاركين فقط تغيير أدوار المستخدمين.",
+    
+    // NEW Dialog Description Key
+    "manage_item_details_and_stock": "إدارة التفاصيل الأساسية ومستويات المخزون لعنصر المخزون {{name}}.",
   }
 };

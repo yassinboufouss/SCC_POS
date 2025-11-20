@@ -422,5 +422,8 @@ export const fr = {
     "admin_actions": "Actions Administratives",
     "future_admin_actions_placeholder": "Les futures actions administratives comme la suppression de compte ou l'exportation de données apparaîtront ici.",
     "role_change_permission_denied": "Seuls les Propriétaires/Co-Propriétaires peuvent modifier les rôles des utilisateurs.",
+    
+    // NEW Dialog Description Key
+    "manage_item_details_and_stock": "Gérer les détails principaux et les niveaux de stock pour l'article d'inventaire {{name}}.",
   }
 };

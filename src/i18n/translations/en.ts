@@ -422,5 +422,8 @@ export const en = {
     "admin_actions": "Admin Actions",
     "future_admin_actions_placeholder": "Future administrative actions like account deletion or data export will appear here.",
     "role_change_permission_denied": "Only Owners/Co-Owners can change user roles.",
+    
+    // NEW Dialog Description Key
+    "manage_item_details_and_stock": "Manage the core details and stock levels for the inventory item {{name}}.",
   }
 };
