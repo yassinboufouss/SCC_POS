@@ -255,7 +255,7 @@ export const fr = {
     
     // New Role Management Translations
     "role_management": "Gestion des Rôles",
-    "user_roles_directory": "Annuaire des Rôles Utilisateur ({{count}})",
+    "user_roles_directory": "Annuaire des الرؤوس Utilisateur ({{count}})",
     "search_users_by_name_email": "Rechercher des utilisateurs par nom ou e-mail...",
     "current_role": "Rôle Actuel",
     "assign_new_role": "Attribuer un Nouveau Rôle",

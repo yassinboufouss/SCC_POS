@@ -272,7 +272,7 @@ export const en = {
     "pos_sale": "POS Sale",
     "mixed_sale": "Mixed Sale",
     "filter_by_type": "Filter by Type",
-    "filter_by_payment": "Filter by Payment",
+    "filter_by-payment": "Filter by Payment",
     "pick_a_date_range": "Pick a date range",
     "clear_filters": "Clear Filters",
     

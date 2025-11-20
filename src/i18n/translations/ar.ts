@@ -426,5 +426,12 @@ export const ar = {
     "percentage_discount_applied": "الخصم المئوي ({{percent}}%)",
     "total_discount_applied": "إجمالي الخصم المطبق",
     "manual_discount_applied": "تم تطبيق خصم يدوي",
+    
+    // NEW Avatar Keys
+    "upload_avatar": "تحميل الصورة الرمزية",
+    "avatar_upload_success": "تم تحميل الصورة الرمزية بنجاح.",
+    "avatar_upload_failed": "فشل تحميل الصورة الرمزية.",
+    "avatar_delete_success": "تم حذف الصورة الرمزية بنجاح.",
+    "avatar_delete_failed": "فشل حذف الصورة الرمزية.",
   }
 };
