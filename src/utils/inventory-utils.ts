@@ -117,6 +117,7 @@ export const issueManualGiveaway = async (itemId: string, memberId: string, memb
         name: itemName,
         quantity: 1,
         price: 0,
+        originalPrice: 0, // FIX: Added originalPrice (0 since it's a free giveaway)
         type: 'inventory',
         isGiveaway: true,
     }];

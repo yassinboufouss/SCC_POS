@@ -59,6 +59,7 @@ const MembersPage: React.FC = () => {
                 name: plan.name,
                 quantity: 1,
                 price: plan.price,
+                originalPrice: plan.price, // FIX: Added originalPrice
                 type: 'membership',
             }]
         });

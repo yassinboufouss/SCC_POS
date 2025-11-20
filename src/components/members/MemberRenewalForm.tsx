@@ -96,6 +96,7 @@ const MemberRenewalForm: React.FC<MemberRenewalFormProps> = ({ member, canRenew 
                     name: selectedPlan.name,
                     quantity: 1,
                     price: selectedPlan.price,
+                    originalPrice: selectedPlan.price, // FIX: Added originalPrice
                     type: 'membership',
                 }]
             });
