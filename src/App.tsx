@@ -19,15 +19,15 @@ import { Toaster } from 'sonner';
 import MemberProfilePage from './pages/MemberProfilePage';
 import NotFound from './pages/NotFound';
 import { SessionContextProvider } from './components/auth/SessionContextProvider';
-import QueryProvider from './components/QueryProvider'; // Import QueryProvider
+import QueryProvider from './components/QueryProvider';
 
 function App() {
   return (
     <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
       <Toaster richColors position="top-right" />
-      <QueryProvider> {/* Wrap everything that uses data fetching */}
+      <QueryProvider>
         <SessionContextProvider>
-          <Router>
+          <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <Routes>
               {/* Public Route */}
               <Route path="/" element={<LoginPage />} />
