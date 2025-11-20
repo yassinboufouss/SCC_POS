@@ -98,16 +98,32 @@ export const renewMemberPlan = async (profileId: string, planId: string): Promis
       throw new Error("Renewal RPC returned no data.");
   }
   
+  // The RPC returns: [{ profile_id: UUID, plan_name: TEXT, expiration_date: DATE }]
+  const rpcData = renewalResult[0];
+
   // 2. Fetch the updated profile and plan details for the client response
   const [{ data: updatedProfile, error: profileError }, { data: planData, error: planError }] = await Promise.all([
+    // Fetch the full profile to ensure the client has the latest data (including status, check-ins, etc.)
     supabase.from('profiles').select('*').eq('id', profileId).single(),
+    // Fetch minimal plan data
     supabase.from('membership_plans').select('id, name, duration_days, price').eq('id', planId).single(),
   ]);
 
   if (profileError || !updatedProfile) {
     console.error("Member not found after renewal:", profileError);
-    throw new Error("Member profile missing after renewal.");
+    // If profile fetch fails, construct a minimal profile using RPC data to avoid throwing
+    const minimalProfile: Profile = {
+        id: profileId,
+        first_name: null, last_name: null, avatar_url: null, updated_at: null, member_code: null, phone: null, dob: null,
+        plan_name: rpcData.plan_name,
+        status: 'Active',
+        start_date: null, // Cannot determine start date easily here
+        expiration_date: rpcData.expiration_date,
+        last_check_in: null, total_check_ins: 0, email: null, role: 'member',
+    };
+    updatedProfile = minimalProfile;
   }
+  
   if (planError || !planData) {
     console.error("Plan not found after renewal:", planError);
     throw new Error("Plan details missing after renewal.");
