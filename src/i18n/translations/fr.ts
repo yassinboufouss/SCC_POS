@@ -404,7 +404,7 @@ export const fr = {
     "thank_you_for_using_pos": "Merci d'utiliser SCC PDV.",
     "daily_sales_invoice": "Facture des Ventes Quotidiennes",
     "items_sold_today": "Articles Vendus Aujourd'hui",
-    "raw_subtotal": "Sous-total Brut",
+    "raw_subtotal": "Sous-total Brut (Prix Original)",
     "adjustments_tax": "Ajustements/Taxe",
     "no_sales_today": "Aucune vente enregistrée aujourd'hui.",
     "view_summary": "Voir le Résumé",
@@ -425,5 +425,10 @@ export const fr = {
     
     // NEW Dialog Description Key
     "manage_item_details_and_stock": "Gérer les détails principaux et les niveaux de stock pour l'article d'inventaire {{name}}.",
+    
+    // NEW Receipt Keys
+    "percentage_discount_applied": "Remise en Pourcentage ({{percent}}%)",
+    "total_discount_applied": "Remise Totale Appliquée",
+    "manual_discount_applied": "Remise Manuelle Appliquée",
   }
 };

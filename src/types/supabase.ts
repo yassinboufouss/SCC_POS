@@ -60,4 +60,5 @@ export type Transaction = {
   payment_method: 'Card' | 'Cash' | 'Transfer';
   transaction_date: string | null; // Date string
   created_at: string | null;
+  discount_percent: number | null; // NEW: Percentage discount applied to the sale
 };

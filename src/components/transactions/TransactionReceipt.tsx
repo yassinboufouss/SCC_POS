@@ -23,59 +23,38 @@ const TransactionReceipt: React.FC<TransactionReceiptProps> = ({ transaction, cl
     discountAmount, 
     tax, 
     finalTotal, 
-    payableItems 
+    discountPercent 
   } = useMemo(() => {
     const items = transaction.items_data || [];
+    const discountP = transaction.discount_percent || 0;
+    const discountFactor = discountP / 100;
     
-    // 1. Calculate raw subtotal and identify inventory items
+    // 1. Calculate raw subtotal (sum of original prices * quantity)
     const payableItems = items.filter(item => !item.isGiveaway);
     const rawSubtotal = payableItems.reduce((sum, item) => sum + item.originalPrice * item.quantity, 0);
     
-    // 2. Determine discount (This is complex as we don't store discount percent in TX, 
-    // but we can infer the discount amount if the final amount is less than the raw subtotal)
-    // NOTE: We rely on the fact that the final transaction amount (transaction.amount) is the total paid.
-    
-    // We need to calculate the discount amount based on the difference between the sum of item.price * quantity 
-    // and the final transaction amount, accounting for tax.
-    
-    // For simplicity and auditability, we will assume the discount was applied proportionally 
-    // to the difference between the sum of original prices and the sum of paid prices.
-    
-    const sumOfPaidPrices = payableItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    
-    // If the transaction was recorded via POS, the discount is already factored into the final amount.
-    // We will calculate the discount amount by comparing the sum of original prices vs sum of paid prices.
-    
-    const totalOriginalPrice = payableItems.reduce((sum, item) => sum + item.originalPrice * item.quantity, 0);
-    const totalPaidPrice = payableItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    
-    // Discount applied via manual price override (if any)
-    const manualDiscount = totalOriginalPrice - totalPaidPrice;
-    
-    // Calculate taxable base (inventory items at paid price)
+    // 2. Calculate taxable base (inventory items at paid price)
     const taxableBase = payableItems
         .filter(item => item.type === 'inventory')
         .reduce((sum, item) => sum + item.price * item.quantity, 0);
         
-    const calculatedTax = taxableBase * TAX_RATE;
-    
-    // The final total should match transaction.amount (within tolerance)
-    const calculatedTotal = totalPaidPrice + calculatedTax;
+    // Apply percentage discount to the taxable base
+    const discountedTaxableBase = taxableBase * (1 - discountFactor);
+        
+    const calculatedTax = discountedTaxableBase * TAX_RATE;
     
     // Use the recorded transaction amount as the source of truth for the final total
     const finalTotal = transaction.amount;
     
-    // Calculate the total discount applied (manual price overrides + percentage discount if any)
-    // Since we don't store the percentage discount, we use the difference between the raw subtotal (original prices) 
-    // and the final total, minus the calculated tax.
-    const totalDiscount = totalOriginalPrice - (finalTotal - calculatedTax);
+    // Calculate the total discount amount (difference between original subtotal and final total minus tax)
+    const totalDiscount = rawSubtotal - (finalTotal - calculatedTax);
     
     return {
-      subtotal: totalOriginalPrice,
+      subtotal: rawSubtotal,
       discountAmount: Math.max(0, totalDiscount), // Ensure discount is not negative
       tax: calculatedTax,
       finalTotal: finalTotal,
-      payableItems,
+      discountPercent: discountP,
     };
   }, [transaction]);
 
@@ -126,8 +105,9 @@ const TransactionReceipt: React.FC<TransactionReceiptProps> = ({ transaction, cl
                   {item.isGiveaway && (
                       <p className="text-xs text-green-500">{t("free_giveaway")}</p>
                   )}
+                  {/* Show manual discount label if paid price is different from original price */}
                   {item.price < item.originalPrice && !item.isGiveaway && (
-                      <p className="text-xs text-red-500">{t("discount_applied")} (Override)</p>
+                      <p className="text-xs text-red-500">{t("manual_discount_applied")}</p>
                   )}
                 </td>
                 <td className="py-1 text-center text-muted-foreground">
@@ -145,13 +125,20 @@ const TransactionReceipt: React.FC<TransactionReceiptProps> = ({ transaction, cl
       {/* Totals */}
       <div className="space-y-2">
         <div className="flex justify-between text-sm">
-          <span className="text-muted-foreground">{t("raw_subtotal")} (Original Price)</span>
+          <span className="text-muted-foreground">{t("raw_subtotal")}</span>
           <span className="font-medium">{formatCurrency(subtotal)}</span>
         </div>
         
+        {discountPercent > 0 && (
+            <div className="flex justify-between text-sm text-red-500">
+              <span className="text-muted-foreground">{t("percentage_discount_applied", { percent: discountPercent })}</span>
+              <span className="font-medium">-{formatCurrency(subtotal * (discountPercent / 100))}</span>
+            </div>
+        )}
+        
         {discountAmount > 0 && (
             <div className="flex justify-between text-sm text-red-500">
-              <span className="text-muted-foreground">{t("discount_applied")}</span>
+              <span className="text-muted-foreground">{t("total_discount_applied")}</span>
               <span className="font-medium">-{formatCurrency(discountAmount)}</span>
             </div>
         )}

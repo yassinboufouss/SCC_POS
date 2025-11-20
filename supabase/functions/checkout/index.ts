@@ -283,6 +283,7 @@ serve(async (req) => {
         amount: total,
         payment_method: paymentMethod,
         transaction_date: new Date().toISOString().substring(0, 10), // YYYY-MM-DD
+        discount_percent: discountPercent, // NEW: Store discount percent
     };
     
     const { data: txData, error: txError } = await supabaseAdmin

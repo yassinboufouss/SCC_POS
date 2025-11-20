@@ -404,7 +404,7 @@ export const ar = {
     "thank_you_for_using_pos": "شكرًا لاستخدامك SCC POS.",
     "daily_sales_invoice": "فاتورة المبيعات اليومية",
     "items_sold_today": "العناصر المباعة اليوم",
-    "raw_subtotal": "المجموع الفرعي الخام",
+    "raw_subtotal": "المجموع الفرعي الخام (السعر الأصلي)",
     "adjustments_tax": "التعديلات/الضريبة",
     "no_sales_today": "لم يتم تسجيل مبيعات اليوم.",
     "view_summary": "عرض الملخص",
@@ -425,5 +425,10 @@ export const ar = {
     
     // NEW Dialog Description Key
     "manage_item_details_and_stock": "إدارة التفاصيل الأساسية ومستويات المخزون لعنصر المخزون {{name}}.",
+    
+    // NEW Receipt Keys
+    "percentage_discount_applied": "الخصم المئوي ({{percent}}%)",
+    "total_discount_applied": "إجمالي الخصم المطبق",
+    "manual_discount_applied": "تم تطبيق خصم يدوي",
   }
 };

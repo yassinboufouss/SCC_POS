@@ -404,7 +404,7 @@ export const en = {
     "thank_you_for_using_pos": "Thank you for using SCC POS.",
     "daily_sales_invoice": "Daily Sales Invoice",
     "items_sold_today": "Items Sold Today",
-    "raw_subtotal": "Raw Subtotal",
+    "raw_subtotal": "Raw Subtotal (Original Price)",
     "adjustments_tax": "Adjustments/Tax",
     "no_sales_today": "No sales recorded today.",
     "view_summary": "View Summary",
@@ -425,5 +425,10 @@ export const en = {
     
     // NEW Dialog Description Key
     "manage_item_details_and_stock": "Manage the core details and stock levels for the inventory item {{name}}.",
+    
+    // NEW Receipt Keys
+    "percentage_discount_applied": "Percentage Discount ({{percent}}%)",
+    "total_discount_applied": "Total Discount Applied",
+    "manual_discount_applied": "Manual Discount Applied",
   }
 };
