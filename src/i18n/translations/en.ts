@@ -261,6 +261,7 @@ export const en = {
     "assign_new_role": "Assign New Role",
     "select_role": "Select Role",
     "owner": "Owner",
+    "co owner": "Co-Owner", // NEW
     "manager": "Manager",
     "cashier": "Cashier",
     

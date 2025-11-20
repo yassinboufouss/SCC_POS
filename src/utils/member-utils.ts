@@ -44,6 +44,7 @@ export const updateMemberStatus = async (profileId: string, newStatus: Profile['
 
 // Utility to update member role
 export const updateMemberRole = async (profileId: string, newRole: Profile['role']): Promise<Profile | null> => {
+    // Allow setting any role except 'owner' (which should be reserved for initial setup or SQL)
     if (!newRole || newRole === 'owner') {
         throw new Error("Invalid role assignment attempt.");
     }

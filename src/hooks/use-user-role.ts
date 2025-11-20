@@ -8,9 +8,13 @@ export const useUserRole = () => {
   
   const role: UserRole = profile?.role || null;
 
-  const isOwner = role === 'owner';
+  const isTrueOwner = role === 'owner';
+  const isCoOwner = role === 'co owner'; // NEW
   const isManager = role === 'manager';
   const isCashier = role === 'cashier';
+  
+  // isOwner now represents anyone with Owner-level permissions
+  const isOwner = isTrueOwner || isCoOwner; // UPDATED: Includes co owner
   
   // Staff includes managers and cashiers
   const isStaff = isManager || isCashier; 
@@ -20,7 +24,7 @@ export const useUserRole = () => {
 
   return {
     role,
-    isOwner,
+    isOwner, // This is the combined permission check used everywhere
     isManager,
     isCashier,
     isStaff, // Keep isStaff for general checks

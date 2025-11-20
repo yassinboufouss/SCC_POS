@@ -10,14 +10,16 @@ interface RoleSelectorProps {
   currentUserId: string;
 }
 
-const availableRoles: Profile['role'][] = ['manager', 'cashier', 'member'];
+const availableRoles: Profile['role'][] = ['owner', 'co owner', 'manager', 'cashier', 'member']; // Added 'owner' and 'co owner' to the list
 
 const RoleSelector: React.FC<RoleSelectorProps> = ({ profile, currentUserId }) => {
   const { t } = useTranslation();
   const { mutateAsync: updateRole, isPending } = useUpdateMemberRole();
   
   const isSelf = profile.id === currentUserId;
-  const isDisabled = isSelf || isPending || profile.role === 'owner';
+  // Prevent changing the role of the original 'owner' or self-modification.
+  // Note: We allow 'owner' to change 'co owner' and vice versa, but not the original 'owner' role.
+  const isDisabled = isSelf || isPending || profile.role === 'owner'; 
 
   const handleRoleChange = async (newRole: string) => {
     if (!availableRoles.includes(newRole as Profile['role'])) return;

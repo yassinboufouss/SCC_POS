@@ -214,9 +214,6 @@ export const fr = {
     "weekly_sales_total": "Ventes Hebdomadaires Totales",
     "monthly_sales_total": "Ventes Mensuelles Totales",
     "sales_summary": "Résumé des Ventes",
-    "print": "Imprimer",
-    "print_summary_success": "PDF du résumé des ventes généré avec succès.",
-    "print_summary_failed": "Échec de la génération du PDF du résumé des ventes.",
     "login_successful": "Connexion réussie !",
     "logout_successful": "Déconnexion réussie.",
     "logging_in": "Connexion en cours...",
@@ -264,6 +261,7 @@ export const fr = {
     "assign_new_role": "تعيين دور جديد",
     "select_role": "اختر الدور",
     "owner": "المالك",
+    "co owner": "Co-Propriétaire", // NEW
     "manager": "المدير",
     "cashier": "أمين الصندوق",
     

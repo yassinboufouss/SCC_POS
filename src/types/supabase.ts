@@ -14,7 +14,7 @@ export type Profile = {
   last_check_in: string | null; // TIMESTAMP WITH TIME ZONE
   total_check_ins: number | null;
   email: string | null; // Added email field
-  role: 'owner' | 'manager' | 'cashier' | 'member' | null; // UPDATED: Granular staff roles
+  role: 'owner' | 'co owner' | 'manager' | 'cashier' | 'member' | null; // UPDATED: Granular staff roles
 };
 
 export type MembershipPlan = {

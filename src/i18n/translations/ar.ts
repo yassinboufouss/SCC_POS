@@ -261,6 +261,7 @@ export const ar = {
     "assign_new_role": "تعيين دور جديد",
     "select_role": "اختر الدور",
     "owner": "المالك",
+    "co owner": "المالك المشارك", // NEW
     "manager": "المدير",
     "cashier": "أمين الصندوق",
     
