@@ -19,7 +19,7 @@ const POSCartItem: React.FC<POSCartItemProps> = ({ item, updateQuantity, removeI
   const { isOwner, isManager } = useUserRole();
   
   const isGiveaway = item.isGiveaway;
-  // Only Owner or Manager can override price, and it must not be a giveaway item
+  // Only Owner (which includes co owner) or Manager can override price, and it must not be a giveaway item
   const canOverridePrice = (isOwner || isManager) && !isGiveaway;
   
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {

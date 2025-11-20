@@ -21,9 +21,8 @@ const RoleSelector: React.FC<RoleSelectorProps> = ({ profile, currentUserId }) =
   const isSelf = profile.id === currentUserId;
   
   // Prevent self-modification.
-  // Prevent changing the role of the original 'owner' (assuming the first registered user is the true owner and should be protected).
-  // Allow 'co owner' (who is also 'isCurrentUserOwner') to change roles, including assigning 'owner', but not to the original 'owner' profile.
-  const isDisabled = isSelf || isPending || (profile.role === 'owner' && !isCurrentUserOwner); 
+  // Only allow 'owner' or 'co owner' to change roles.
+  const isDisabled = isSelf || isPending || !isCurrentUserOwner; 
 
   const handleRoleChange = async (newRole: string) => {
     if (!availableRoles.includes(newRole as Profile['role'])) return;
@@ -47,6 +46,7 @@ const RoleSelector: React.FC<RoleSelectorProps> = ({ profile, currentUserId }) =
       </SelectTrigger>
       <SelectContent>
         {availableRoles.map((role) => (
+          // Only allow 'owner' role to be selected if the current user is an owner/co-owner
           <SelectItem key={role} value={role} disabled={role === 'owner' && !isCurrentUserOwner}>
             {t(role)}
           </SelectItem>

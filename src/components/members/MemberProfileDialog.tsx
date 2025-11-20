@@ -46,7 +46,7 @@ const MemberProfileDialog: React.FC<MemberProfileDialogProps> = ({ member, canEd
   const canRenew = isOwner || isStaff; 
   // Staff (and Owner) should be able to check members in
   const canCheckIn = isOwner || isStaff; 
-  // Only Owner can perform status actions (Freeze/Cancel)
+  // Only Owner/Co-Owner can perform status actions (Freeze/Cancel)
   const canChangeStatus = isOwner; 
   // Only Owner/Co-Owner can change roles
   const canChangeRole = isOwner; 
