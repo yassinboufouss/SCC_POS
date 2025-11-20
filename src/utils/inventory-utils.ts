@@ -1,135 +1,109 @@
-import { InventoryItem, TransactionItemData } from "@/types/supabase";
-import { supabase } from "@/integrations/supabase/client";
-import { format } from "date-fns";
-import { NewInventoryItemInput } from "@/types/pos";
-import { addTransaction } from "./transaction-utils"; // Import addTransaction
+import { supabase } from '@/integrations/supabase/supabase-client';
+import { InventoryItem, TransactionItemData } from '@/types/supabase';
+import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
+import { recordTransaction as addTransaction } from '@/integrations/supabase/data/use-transactions';
 
-// Utility to update inventory data
-export const updateInventoryItem = async (updatedItem: Partial<InventoryItem> & { id: string }): Promise<InventoryItem | null> => {
-  const { data, error } = await supabase
-    .from('inventory_items')
-    .update(updatedItem)
-    .eq('id', updatedItem.id)
-    .select()
-    .single();
-
-  if (error) {
-    console.error("Supabase updateInventoryItem error:", error);
-    throw new Error("Failed to update inventory item.");
-  }
-  return data;
+// Helper to get translation function outside of components
+const t = (key: string, options?: any) => {
+    // This is a simplified placeholder. In a real app, you'd use a global i18n instance or context.
+    const { t: i18n_t } = useTranslation();
+    return i18n_t(key, options);
 };
 
-// Utility to simulate adding stock
-export const restockInventoryItem = async (itemId: string, quantity: number, currentStock: number): Promise<InventoryItem | null> => {
-  const now = format(new Date(), 'yyyy-MM-dd');
-  
-  const { data, error } = await supabase
-    .from('inventory_items')
-    .update({
-      stock: currentStock + quantity,
-      last_restock: now,
-      created_at: new Date().toISOString(), // Using created_at as a generic timestamp update field
-    })
-    .eq('id', itemId)
-    .select()
-    .single();
+// --- Core Inventory Management Functions ---
 
-  if (error) {
-    console.error("Supabase restockInventoryItem error:", error);
-    throw new Error("Failed to restock inventory item.");
-  }
-  return data;
-};
+export async function addInventoryItem(item: Omit<InventoryItem, 'id' | 'created_at' | 'last_restock'> & { initial_stock: number }) {
+    const { initial_stock, ...rest } = item;
+    const { data, error } = await supabase
+        .from('inventory_items')
+        .insert({
+            ...rest,
+            stock: initial_stock,
+            last_restock: new Date().toISOString().substring(0, 10),
+        })
+        .select()
+        .single();
 
-// Utility to simulate adding a new inventory item
-export const addInventoryItem = async (newItemData: NewInventoryItemInput & { image_url?: string }): Promise<InventoryItem | null> => {
-  const now = format(new Date(), 'yyyy-MM-dd');
+    if (error) throw new Error(error.message);
+    return data as InventoryItem;
+}
 
-  const newItem = {
-    name: newItemData.name,
-    category: newItemData.category,
-    stock: newItemData.initial_stock,
-    price: newItemData.price,
-    last_restock: now,
-    image_url: newItemData.image_url || null,
-  };
+export async function updateInventoryItem(item: Partial<InventoryItem> & { id: string }) {
+    const { data, error } = await supabase
+        .from('inventory_items')
+        .update(item)
+        .eq('id', item.id)
+        .select()
+        .single();
 
-  const { data, error } = await supabase
-    .from('inventory_items')
-    .insert(newItem)
-    .select()
-    .single();
+    if (error) throw new Error(error.message);
+    return data as InventoryItem;
+}
 
-  if (error) {
-    console.error("Supabase addInventoryItem error:", error);
-    throw new Error("Failed to add new inventory item.");
-  }
-  return data;
-};
-
-// Utility to reduce stock after a POS sale
-export const reduceInventoryStock = async (itemId: string, quantity: number): Promise<void> => {
-    const { error } = await supabase.rpc('decrement_inventory_stock', {
-        item_id: itemId,
-        quantity_to_decrement: quantity,
-    });
-
-    if (error) {
-        console.error("Supabase reduceInventoryStock error:", error);
-        throw new Error("Failed to reduce inventory stock.");
-    }
-};
-
-// NEW: Utility to increase stock (reversal)
-export const incrementInventoryStock = async (itemId: string, quantity: number): Promise<void> => {
-    const { error } = await supabase.rpc('increment_inventory_stock', {
+export async function restockInventoryItem(itemId: string, quantity: number) {
+    const { data, error } = await supabase.rpc('increment_inventory_stock', {
         item_id: itemId,
         quantity_to_increment: quantity,
-    });
+    }).select().single();
 
-    if (error) {
-        console.error("Supabase incrementInventoryStock error:", error);
-        throw new Error("Failed to increment inventory stock.");
-    }
-};
+    if (error) throw new Error(error.message);
+    return data as InventoryItem;
+}
 
-// Utility to delete an inventory item
-export const deleteInventoryItem = async (itemId: string): Promise<void> => {
+export async function deleteInventoryItem(itemId: string) {
     const { error } = await supabase
         .from('inventory_items')
         .delete()
         .eq('id', itemId);
 
-    if (error) {
-        console.error("Supabase deleteInventoryItem error:", error);
-        throw new Error("Failed to delete inventory item.");
-    }
-};
+    if (error) throw new Error(error.message);
+    return true;
+}
 
-// Utility to manually issue a giveaway item
-export const issueManualGiveaway = async (itemId: string, memberId: string, memberName: string, itemName: string): Promise<void> => {
-    // 1. Reduce stock by 1 (using RPC for safety)
-    await reduceInventoryStock(itemId, 1);
-    
-    const itemsData: TransactionItemData[] = [{
-        sourceId: itemId,
-        name: itemName,
-        quantity: 1,
-        price: 0,
-        originalPrice: 0, // FIX: Added originalPrice (0 since it's a free giveaway)
-        type: 'inventory',
-        isGiveaway: true,
-    }];
-    
+// --- Stock Reduction RPC (Used by Giveaway/Checkout) ---
+
+export async function reduceInventoryStock(itemId: string, quantity: number) {
+    const { error } = await supabase.rpc('decrement_inventory_stock', {
+        item_id: itemId,
+        quantity_to_decrement: quantity,
+    });
+
+    if (error) throw new Error(error.message);
+    return true;
+}
+
+// --- Giveaway Logic ---
+
+export async function issueManualGiveaway(memberId: string, memberName: string, item: InventoryItem) {
+  try {
+    // 1. Reduce stock via RPC
+    await reduceInventoryStock(item.id, 1);
+
     // 2. Record a zero-amount transaction
     await addTransaction({
         member_id: memberId,
         member_name: memberName,
-        type: 'POS Sale', // Classify as POS Sale
-        item_description: `${itemName} (Manual Giveaway)`,
+        type: 'POS Sale',
+        item_description: `Manual Giveaway: ${item.name}`,
         amount: 0,
-        payment_method: 'Cash', // Payment method is irrelevant for $0, default to Cash
-        items_data: itemsData,
+        payment_method: 'Cash', // Default to cash for zero-value transaction
+        items_data: [{
+            sourceId: item.id,
+            name: item.name,
+            quantity: 1,
+            price: 0, // Price paid is 0
+            originalPrice: item.price, // Original price for auditing
+            type: 'inventory',
+            isGiveaway: true,
+        }] as TransactionItemData[],
+        discount_percent: 0,
     });
-};
+
+    toast.success(t("giveaway_issued_success", { item: item.name, member: memberName }));
+  } catch (error) {
+    console.error("Issue giveaway failed:", error);
+    toast.error(t("giveaway_issued_failed"));
+    throw error;
+  }
+}

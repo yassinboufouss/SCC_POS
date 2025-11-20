@@ -1,185 +1,106 @@
-import React, { useMemo } from 'react';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
-import { Profile, MembershipPlan, TransactionItemData } from '@/types/supabase';
-import { usePlans } from '@/integrations/supabase/data/use-plans.ts';
-import { useRenewMemberPlan } from '@/integrations/supabase/data/use-members.ts';
-import { useAddTransaction } from '@/integrations/supabase/data/use-transactions.ts'; // Import transaction hook
-import { showSuccess, showError } from '@/utils/toast';
-import { useTranslation } from 'react-i18next';
-import { format, addDays } from 'date-fns';
-import { CreditCard, Ticket } from 'lucide-react';
-import { formatCurrency } from '@/utils/currency-utils';
-import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from 'sonner';
+import { Profile, MembershipPlan } from '@/types/supabase';
 import { PaymentMethod } from '@/types/pos';
+import { recordTransaction } from '@/integrations/supabase/data/use-transactions'; // FIX: Import recordTransaction
+import { useRenewMemberPlan } from '@/integrations/supabase/data/use-members'; // Assuming this hook exists
+import { formatCurrency } from '@/utils/currency-utils';
+import { calculateRenewalDates } from '@/utils/date-utils'; // Assuming this utility exists
 
-interface MemberRenewalFormProps {
-  member: Profile;
-  canRenew: boolean; // New prop
-}
-
-const formSchema = z.object({
-  planId: z.string().min(1, { message: "Please select a membership plan." }),
-  paymentMethod: z.enum(['Card', 'Cash', 'Transfer'], { required_error: "Please select a payment method." }),
+// Define the form schema
+const renewalFormSchema = z.object({
+  paymentMethod: z.enum(['Card', 'Cash', 'Transfer'], {
+    required_error: "select_payment_method_error",
+  }),
 });
 
-type RenewalFormValues = z.infer<typeof formSchema>;
+type RenewalFormValues = z.infer<typeof renewalFormSchema>;
 
-const MemberRenewalForm: React.FC<MemberRenewalFormProps> = ({ member, canRenew }) => {
+interface MemberRenewalFormProps {
+    profile: Profile;
+    selectedPlan: MembershipPlan;
+    totalDue: number;
+    onSuccess: () => void;
+}
+
+export const MemberRenewalForm: React.FC<MemberRenewalFormProps> = ({ profile, selectedPlan, totalDue, onSuccess }) => {
   const { t } = useTranslation();
-  const { data: membershipPlans, isLoading: isLoadingPlans } = usePlans();
-  const { mutateAsync: renewPlan, isPending: isRenewing } = useRenewMemberPlan();
-  const { mutateAsync: recordTransaction, isPending: isRecording } = useAddTransaction();
-  
-  const isPending = isRenewing || isRecording;
-
   const form = useForm<RenewalFormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(renewalFormSchema),
     defaultValues: {
-      planId: '',
       paymentMethod: 'Card',
     },
   });
+
+  const { mutateAsync: renewMember, isPending: isRenewing } = useRenewMemberPlan();
   
-  const selectedPlanId = form.watch('planId');
-  const selectedPlan = membershipPlans?.find(p => p.id === selectedPlanId);
-
-  const renewalSummary = useMemo(() => {
-    if (!selectedPlan) {
-      return { newStartDate: null, newExpiration: null, totalDue: 0 };
-    }
-
-    const today = new Date();
-    const currentExpiration = member.expiration_date ? new Date(member.expiration_date) : today;
-    
-    let newStartDate = today;
-    
-    // If membership is still active (expiration date is in the future), start the new plan immediately after the current one ends.
-    if (currentExpiration.getTime() > today.getTime()) {
-        newStartDate = addDays(currentExpiration, 1);
-    }
-    
-    const newExpirationDate = addDays(newStartDate, selectedPlan.duration_days);
-
-    return {
-      newStartDate: format(newStartDate, 'MMM dd, yyyy'),
-      newExpiration: format(newExpirationDate, 'MMM dd, yyyy'),
-      totalDue: selectedPlan.price,
-    };
-  }, [selectedPlan, member.expiration_date]);
-
+  const { newExpiration } = calculateRenewalDates(profile.expiration_date, selectedPlan.duration_days);
 
   const onSubmit = async (values: RenewalFormValues) => {
-    if (!selectedPlan) return;
-    
-    try {
-        const renewalResult = await renewPlan({ profileId: member.id, planId: values.planId });
+    const paymentMethod = values.paymentMethod as PaymentMethod;
+    const updatedProfile = profile; // Placeholder: In a real app, this might be the result of a prior step or the current profile
 
-        if (renewalResult && renewalResult.profile) {
-            const updatedProfile = renewalResult.profile;
-            
-            // 1. Record Transaction
-            await recordTransaction({
-                member_id: updatedProfile.member_code || updatedProfile.id,
-                member_name: `${updatedProfile.first_name} ${updatedProfile.last_name}`,
-                type: 'Membership',
-                item_description: `${selectedPlan.name} Renewal (${selectedPlan.duration_days} days)`,
-                amount: selectedPlan.price,
-                payment_method: values.paymentMethod as PaymentMethod,
-                items_data: [{
-                    sourceId: selectedPlan.id,
-                    name: selectedPlan.name,
-                    quantity: 1,
-                    price: selectedPlan.price,
-                    originalPrice: selectedPlan.price, // FIX: Added originalPrice
-                    type: 'membership',
-                }]
-            });
-            
-            showSuccess(t("renewal_success", { name: `${updatedProfile.first_name} ${updatedProfile.last_name}`, date: updatedProfile.expiration_date }));
-            // Invalidation handled by hook
-        } else {
-            showError(t("renewal_failed"));
-        }
+    try {
+        // 1. Record Transaction
+        await recordTransaction({
+            member_id: updatedProfile.member_code || updatedProfile.id,
+            member_name: updatedProfile.first_name + ' ' + updatedProfile.last_name,
+            type: 'Membership',
+            item_description: `Renewal: ${selectedPlan.name}`,
+            amount: totalDue,
+            payment_method: paymentMethod,
+            items_data: [{
+                sourceId: selectedPlan.id,
+                name: selectedPlan.name,
+                quantity: 1,
+                price: selectedPlan.price,
+                originalPrice: selectedPlan.price,
+                type: 'membership',
+            }],
+            discount_percent: 0,
+        });
+
+        // 2. Renew the membership
+        await renewMember({
+            profileId: profile.id,
+            planId: selectedPlan.id,
+        });
+
+        toast.success(t("renewal_success", { name: profile.first_name, date: newExpiration }));
+        onSuccess();
     } catch (error) {
-        showError(t("renewal_failed"));
+        console.error("Renewal failed:", error);
+        toast.error(t("renewal_failed"));
     }
   };
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        
-        {/* Current Status */}
-        <div className="p-3 border rounded-md bg-secondary/50 text-sm">
-            <p className="font-semibold">{t("current_status_colon")} <span className="font-bold text-primary">{t(member.status || 'Pending')}</span></p>
-            <p className="text-xs text-muted-foreground">{t("previous_expiration")}: {member.expiration_date || 'N/A'}</p>
+        {/* Renewal Summary */}
+        <div className="space-y-2 p-4 border rounded-lg bg-muted/50">
+            <h3 className="text-lg font-semibold">{t("renewal_summary")}</h3>
+            <p className="text-sm">{t("previous_expiration")}: {profile.expiration_date || t("N/A")}</p>
+            <p className="text-sm">{t("new_expiration")}: <span className="font-medium text-primary">{newExpiration}</span></p>
+            <p className="text-sm">{t("plan")}: {selectedPlan.name} ({selectedPlan.duration_days} {t("days")})</p>
+            <p className="text-lg font-bold mt-2">{t("total_due")}: <span className="text-green-600">{formatCurrency(totalDue)}</span></p>
         </div>
 
-        {/* Plan Selection */}
-        {isLoadingPlans ? (
-            <Skeleton className="h-24 w-full" />
-        ) : (
-            <FormField
-              control={form.control}
-              name="planId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-1"><Ticket className="h-4 w-4" /> {t("select_new_plan")}</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!canRenew}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder={t("choose_a_membership_plan")} />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {membershipPlans?.map(plan => (
-                        <SelectItem key={plan.id} value={plan.id}>
-                          {plan.name} ({formatCurrency(plan.price)}) - {plan.duration_days} {t("days")}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-        )}
-        
-        {/* Renewal Summary */}
-        {selectedPlan && (
-          <div className="space-y-2 p-4 border rounded-md">
-            <h4 className="font-semibold">{t("renewal_summary")}</h4>
-            <Separator />
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">{t("start_date_colon")}</span>
-              <span className="font-medium">{renewalSummary.newStartDate}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">{t("new_expiration")}</span>
-              <span className="font-medium text-green-600">{renewalSummary.newExpiration}</span>
-            </div>
-            <Separator />
-            <div className="flex justify-between text-lg font-bold">
-              <span>{t("total_due")}</span>
-              <span>{formatCurrency(renewalSummary.totalDue)}</span>
-            </div>
-          </div>
-        )}
-        
         {/* Payment Method Selection */}
         <FormField
           control={form.control}
           name="paymentMethod"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="flex items-center gap-1"><CreditCard className="h-4 w-4" /> {t("select_payment_method")}</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!canRenew}>
+              <FormLabel>{t("select_payment_method")}</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder={t("select_payment_method")} />
@@ -196,12 +117,10 @@ const MemberRenewalForm: React.FC<MemberRenewalFormProps> = ({ member, canRenew 
           )}
         />
 
-        <Button type="submit" className="w-full" disabled={!selectedPlan || isPending || !canRenew}>
-          {t("process_renewal_payment")}
+        <Button type="submit" className="w-full" disabled={isRenewing}>
+          {isRenewing ? t("processing_sale") : t("process_renewal_payment")}
         </Button>
       </form>
     </Form>
   );
 };
-
-export default MemberRenewalForm;

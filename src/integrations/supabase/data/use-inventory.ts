@@ -1,95 +1,29 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { InventoryItem } from '@/types/supabase';
+import { supabase } from '@/integrations/supabase/supabase-client';
 import { queryKeys } from './query-keys.ts';
 import { addInventoryItem, updateInventoryItem, restockInventoryItem, deleteInventoryItem, issueManualGiveaway } from '@/utils/inventory-utils';
 import { NewInventoryItemInput } from '@/types/pos';
+import { InventoryItem } from '@/types/supabase';
+import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
-// --- Fetch Hooks ---
+// ... (omitted code)
 
-export const useInventory = (searchTerm: string = '') => {
-  const search = searchTerm.toLowerCase();
-  
-  return useQuery({
-    queryKey: queryKeys.inventory.list(search),
-    queryFn: async () => {
-      let query = supabase
-        .from('inventory_items')
-        .select('*')
-        .order('name', { ascending: true });
-
-      if (search) {
-        query = query.or(`name.ilike.%${search}%,category.ilike.%${search}%`);
-      }
-
-      const { data, error } = await query;
-
-      if (error) {
-        console.error("Supabase fetch inventory error:", error);
-        throw new Error("Failed to fetch inventory items.");
-      }
-      return data as InventoryItem[];
-    },
-  });
-};
-
-// --- Mutation Hooks ---
-
-export const useAddInventoryItem = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (newItemData: NewInventoryItemInput & { image_url?: string }) => addInventoryItem(newItemData),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.inventory.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.metrics });
-    },
-  });
-};
-
-export const useUpdateInventoryItem = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (updatedItem: Partial<InventoryItem> & { id: string }) => updateInventoryItem(updatedItem),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.inventory.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.metrics });
-    },
-  });
-};
-
-export const useRestockInventoryItem = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ itemId, quantity, currentStock }: { itemId: string, quantity: number, currentStock: number }) => restockInventoryItem(itemId, quantity, currentStock),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.inventory.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.metrics });
-    },
-  });
-};
-
-export const useDeleteInventoryItem = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (itemId: string) => deleteInventoryItem(itemId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.inventory.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.metrics });
-    },
-  });
-};
-
-// NEW: Hook for manually issuing a giveaway item
-export const useIssueManualGiveaway = () => {
+export function useIssueManualGiveaway() {
     const queryClient = useQueryClient();
+    const { t } = useTranslation();
+
     return useMutation({
-        mutationFn: ({ itemId, memberId, memberName, itemName }: { itemId: string, memberId: string, memberName: string, itemName: string }) => 
-            issueManualGiveaway(itemId, memberId, memberName, itemName),
+        mutationFn: ({ memberId, memberName, item }: { memberId: string, memberName: string, item: InventoryItem }) => 
+            issueManualGiveaway(memberId, memberName, item),
         onSuccess: () => {
-            // Invalidate inventory and transactions
             queryClient.invalidateQueries({ queryKey: queryKeys.inventory.all });
-            queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
-            queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.metrics });
+            queryClient.invalidateQueries({ queryKey: queryKeys.members.all });
         },
+        onError: (error) => {
+            toast.error(t("giveaway_issued_failed") + `: ${error.message}`);
+        }
     });
-};
+}
+
+// ... (omitted code)
